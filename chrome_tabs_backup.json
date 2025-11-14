@@ -1,0 +1,334 @@
+{
+  "tabs": [
+    {
+      "url": "https://github.com/malston/vcf-9x-in-box/blob/master/docs/DEPLOYMENT_WORKFLOW.md",
+      "title": "vcf-9x-in-box/docs/DEPLOYMENT_WORKFLOW.md at master · malston/vcf-9x-in-box"
+    },
+    {
+      "url": "https://opsman.lab.markalston.net/uaa/login",
+      "title": "Tanzu Ops Manager"
+    },
+    {
+      "url": "https://harbor.lab.markalston.net/",
+      "title": "harbor.lab.markalston.net"
+    },
+    {
+      "url": "https://techdocs.broadcom.com/us/en/vmware-tanzu/platform/platform-automation-toolkit-for-tanzu/5-2/vmware-automation-toolkit/docs-concepts-secrets-handling.html",
+      "title": "Using a secrets store to store credentials"
+    },
+    {
+      "url": "https://techdocs.broadcom.com/us/en/vmware-tanzu/platform/platform-automation-toolkit-for-tanzu/5-2/vmware-automation-toolkit/docs-how-to-guides-upgrade-existing-opsman.html",
+      "title": "Writing a pipeline to upgrade an existing VMware Tanzu Operations Manager"
+    },
+    {
+      "url": "https://techdocs.broadcom.com/us/en/vmware-tanzu/platform/platform-automation-toolkit-for-tanzu/5-2/vmware-automation-toolkit/docs-inputs-outputs.html#download-product-config",
+      "title": "Task inputs and outputs"
+    },
+    {
+      "url": "https://techdocs.broadcom.com/us/en/vmware-tanzu/platform/platform-automation-toolkit-for-tanzu/5-2/vmware-automation-toolkit/docs-tasks.html",
+      "title": "Platform Automation Toolkit Tasks"
+    },
+    {
+      "url": "https://opsman.lab.markalston.net/uaa/login",
+      "title": "Tanzu Ops Manager"
+    },
+    {
+      "url": "https://minio.lab.markalston.net:9001/login",
+      "title": "Privacy error"
+    },
+    {
+      "url": "https://github.com/malston/tanzu-homelab",
+      "title": "malston/tanzu-homelab: For automating all things Tanzu related in my Home Lab."
+    },
+    {
+      "url": "https://vcsa.markalston.net/websso/SAML2/SSO/vsphere.local?SAMLRequest=zVRbb9MwFH7nV0R%2BT5y46TqspVNZmZi0S1kKQrwg1zldLRI7%2BDhJ9%2B9x0haqaVR75NU65zvfTb643FZl0IJFZXRGkigmAWhpCqWfMvJleR2ek8vpuwsUVVnzWeM2%2BhF%2BNYAumCGCdX7tymhsKrA52FZJuNEFbDPigeZ%2BTGnhBuiNczVySluJIqqE%2FSlKdEZHGhztYIVoaD67u2U0zx9oi%2FUGLESlkaIkwbWxEobjGVn7PSDBzTwjP9KJPBuJ83g9YXExkenZKk3OxoVcreL343TE%2FBguBKJq4e8iYuM5ohPaZYTFbBwmcZiMlgnj6YSPxtH5hH0nwcIaZ6QpPyi9M6OxmhuBCrkWFSB3kveEOYtivtoNIf%2B0XC7CxUO%2BHABaVYC999MZeUU2T9MRCb4evGe99z4NjXxw%2B%2FTFek%2BPTPfZDLrs2wHEIT4yPRVNo2gPdoioAicK4cQFPb6648Bq3mu9mS9MqeRzMCtL011ZEM7rd7aBIchKuNPE%2BhdVhOthlNe9PehAOxLkix7%2FcyNKtVZgT3fqH8SPLWZv9ZjuBXJf9UL1puExzJuNfomyB2n9yk5Mr6XqhG%2B%2BNBVFuYFKIBXO2XAApixOGI1T%2BnHrLel7gwdBW1R%2FMLqui7pRZOyTX4gT%2Bu3uNh%2BwQjUUX%2Foo%2FDx3z3VfzZ7xI2joxKqEpX97RfB%2FRHUOJTwdU6Uvw5ke6nn8YU1%2FAw%3D%3D&RelayState=881fb35b-1abe-4189-b170-1deec9aad4a5&SigAlg=http%3A%2F%2Fwww.w3.org%2F2001%2F04%2Fxmldsig-more%23rsa-sha256&Signature=q7Nb3zOJ9kEEjYn6Gy7FqSCi%2B20Pp8MPl%2Fwb%2F5yeCkFfTTIr4pcZkbKaHdPTMFbECdU3kjtogevlVnRaMcHApfcyIG%2BSjatLBkyibSBP6cUuZF%2B%2F6hhvckFIMudj5O6OsQMpIhVkSDpthS48%2FQXqQZvGl1osAdldsM9TBMTRx%2Fihk5QRZ1USkcsulRlnB2uUr8z3VRs4nftTFUh6DBZD1hUl9YSnfmkHazt3%2BaL8FoXIKNicOlJ4qg8rHzUpVEQwhWVpxSbt6r9E8mjlZRJ%2FbEA5Z85sxH0VJXySWLsgneoqY%2BCfmcBm9gEhc5WS%2F3Qa8fP7LFvC9Eha5dwF%2FWqDpoBXbbCgOMePjDbPXR4dUzVLSoCFzf3bOBIPpYo3jNx1Tmy0p55RAWIxMNRCIMn0Hf0GVKmAZFFnUmItiNyFeQBTY6fyqHBlUUQfLLWui8ELQbc7zZoy2d8jon1YsanvaoOb%2BE6eflXanxT%2BjNjvbFk%2BdyUMx1qHCGQjPt5jKy2z&isDiscovery=true&appUrl=https%3A%2F%2Fvcsa.markalston.net%2Fui%2Flogin",
+      "title": "Login"
+    },
+    {
+      "url": "https://192.168.2.231/login?redirect=%2Fnetwork%2Fdefault%2Fsettings%2Fpolicy-table%3Fpreset%3Ddns-records",
+      "title": "UniFi OS"
+    },
+    {
+      "url": "https://concourse.lab.markalston.net/",
+      "title": "Concourse"
+    },
+    {
+      "url": "https://192.168.2.231/login?redirect=%2Fnetwork%2Fdefault%2Fports",
+      "title": "UniFi OS"
+    },
+    {
+      "url": "https://192.168.2.231/login?redirect=%2Fnetwork%2Fdefault%2Fclients%2Fmain",
+      "title": "UniFi OS"
+    },
+    {
+      "url": "https://esxi-ms-a2-01.lab.markalston.net/ui/#/login",
+      "title": "esxi-ms-a2-01.lab.markalston.net"
+    },
+    {
+      "url": "https://esxi-ms-a2-02.lab.markalston.net/ui/#/login",
+      "title": "esxi-ms-a2-02.lab.markalston.net"
+    },
+    {
+      "url": "https://esxi-nuc-01.lab.markalston.net/ui/#/login",
+      "title": "Privacy error"
+    },
+    {
+      "url": "http://172.30.0.51/login.cgi",
+      "title": "172.30.0.51"
+    },
+    {
+      "url": "https://esxi-nuc-02.lab.markalston.net/ui/#/login",
+      "title": "Privacy error"
+    },
+    {
+      "url": "https://esxi-nuc-03.lab.markalston.net/ui/#/login",
+      "title": "Login - VMware ESXi"
+    },
+    {
+      "url": "https://macpro.lab.markalston.net/ui/#/login",
+      "title": "Login - VMware ESXi"
+    },
+    {
+      "url": "https://sddcm01.vcf.lab/vcf-installer-ui/login?sessionExpired=true",
+      "title": "VCF Installer"
+    },
+    {
+      "url": "https://vc01.vcf.lab/websso/SAML2/SSO/vsphere.local?SAMLRequest=zVRdb5swFP0ryO9gIKFLrZAqa1YtUruykk3TXibH3CSWwGa%2BBtJ%2FP0OSLaraKo97Nfeee77E9GZflV4LBqVWKYmCkHighC6k2qbk2%2BrOn5Cb2RR5VdZs3tideoLfDaD13J5CNnxISWMU0xwlMsUrQGYFy%2BcP9ywOQlYbbbXQJfHmiGCsO3SrFTYVmBxMKwUsVQH7lLjTC4csFbcDmZ21NTJKWxFGQSs2QcnXtIM1oqY9ekzz%2FJG2WO%2FAQFBqwd2NO20EDERTsuElAvGWi5T8EtE1hEm8TooQYg6bkYAPm6vrUTji42gdTtwYZhxRtvBvEbFx5NByZVMSh3HiR5EfjVbRFUsSlkyCMBn%2FJF52VPhRqoNv79mxPgwh%2B7xaZX72mK8GgFYWYL646ZSc62Xj8Yh430%2F5OABySmNgZy7PgZ%2FcJ7NXnW0k7VFODldgecEtn9Lzc4fjcc16qstFpkspns84xJeXoSx1d2uAWyfZmgaG7Cpu3wfoX2Thb4ZRVvfGoAVliZdnPaevDS%2FlRoJ5oz9vqCT0qIy5bhaytwnPZV1s7UuUI0jrVg6MekJVx11jha4oih1UHCm31vgDMI3DKKbhmH7aO1197EiOIHuUfzG6rgu6UaDN1i2EEf3xcJ8PWL4cCiucn26e2ee6r1TP%2BAkUdHxdwsq9vSL4P6K6gBK251Tpy3Bmp16e%2F5RmfwA%3D&RelayState=9116e46f-96a0-475b-98e9-4aa49230cbb1&SigAlg=http%3A%2F%2Fwww.w3.org%2F2001%2F04%2Fxmldsig-more%23rsa-sha256&Signature=em6bIt1Tdhr2b%2F%2Fg4aXaTaWAhIixITinj68UH%2FPlPKjrylVeOs2MfXa16vDY9XPW7VRhTNtVm13VYr0Q3p%2Bya9hfYaeARmNRsY2E%2BlOsd8JoWOLPesKhZL7UhYnTNkIUP5IogllXT4TCf3aFQ51bBG5S3xi62PcaD5dwXs3IQSCZ6h%2F5Jvql%2BLPv5Qgvpnvtoy866lXIVrhg3F%2FKCMs23MF3fge2Ui4PdCgDHOvVFkUn1mlG2YZ%2Bkq3HHtSrOv09GCZeMYioqxOAYRCtIvQjwwaQA94PkHa%2BeMGPTwvg3RybOAqAKEQlXmF1gH1fRcdg1v%2FlNovUR0s0wFg6G0BdsNorW7Xj1Ll%2BLwkasWsof8FP3mMIkBAne0709N6a%2F0wjzaZyKvZXajiEnMlUU2Bg2Zqp4yPt1exfkv%2F813Siw%2FZWP6cxo9HoqXqRSUL2b9pEEqSCC8eFhzuvwGOdjnQFKO5Jw0zIFE2wWb3f%2BZfot5TBoEdBxO%2BIpgD%2FjmfkknFt&isDiscovery=true&appUrl=https%3A%2F%2Fvc01.vcf.lab%2Fui%2Flogin",
+      "title": "Login"
+    },
+    {
+      "url": "https://github.com/lamw/vcf-9x-in-box/tree/master/scripts",
+      "title": "vcf-9x-in-box/scripts at master · lamw/vcf-9x-in-box"
+    },
+    {
+      "url": "https://github.com/malston/notes-wiki",
+      "title": "malston/notes-wiki: My notes wiki"
+    },
+    {
+      "url": "https://github.com/malston/vcf-offline-depot",
+      "title": "malston/vcf-offline-depot"
+    },
+    {
+      "url": "https://techdocs.broadcom.com/us/en/vmware-tanzu/platform/elastic-application-runtime/10-3/eart/concepts-overview.html",
+      "title": "Elastic Application Runtime Overview"
+    },
+    {
+      "url": "https://docs.requarks.io/en/editors/markdown",
+      "title": "Markdown | Wiki.js"
+    },
+    {
+      "url": "https://github.com/lamw/vsphere-8-lab-deployment",
+      "title": "lamw/vsphere-8-lab-deployment: Automated vSphere 8.x Lab Deployment"
+    },
+    {
+      "url": "https://github.com/lamw/vcf-automated-import-lab-deployment",
+      "title": "lamw/vcf-automated-import-lab-deployment: Automated VMware Cloud Foundation Import Lab Deployment"
+    },
+    {
+      "url": "https://github.com/lamw/vcf-automated-lab-deployment",
+      "title": "lamw/vcf-automated-lab-deployment: Automated VMware Cloud Foundation Lab Deployment"
+    },
+    {
+      "url": "https://github.com/lamw/vcf-5x-in-box",
+      "title": "lamw/vcf-5x-in-box: Minimal VMware Cloud Foundation (VCF) 5.x in a box"
+    },
+    {
+      "url": "https://store.minisforum.com/products/minisforum-ms-a2",
+      "title": "Minisforum MS-A2"
+    },
+    {
+      "url": "https://williamlam.com/2025/09/quick-tip-retrieving-esxi-host-fingerprint-for-vcf-installer-json-deployment.html#more-190463",
+      "title": "Quick Tip - Retrieving ESXi Host Fingerprint for VCF Installer JSON deployment"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/minimal-resources-for-deploying-vcf-9-0-in-a-lab.html",
+      "title": "Minimal resources for deploying VCF 9.0 in a Lab"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/deploying-vcf-9-0-on-a-single-esxi-host.html",
+      "title": "Deploying VCF 9.0 on a single ESXi host?"
+    },
+    {
+      "url": "https://williamlam.com/2025/08/ms-a2-vcf-9-0-lab-configuring-vsphere-kubernetes-service-vks.html#more-189736",
+      "title": "MS-A2 VCF 9.0 Lab: Configuring vSphere Kubernetes Service (VKS)"
+    },
+    {
+      "url": "https://williamlam.com/category/vmware-cloud-foundation",
+      "title": "VMware Cloud Foundation"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/vmware-cloud-foundation-vcf-on-minisforum-ms-a2.html",
+      "title": "VMware Cloud Foundation (VCF) on Minisforum MS-A2"
+    },
+    {
+      "url": "https://www.servethehome.com/minisforum-ms-a2-review-an-almost-perfect-amd-ryzen-intel-10gbe-homelab-system/",
+      "title": "Minisforum MS-A2 Review An Almost Perfect Homelab System - ServeTheHome"
+    },
+    {
+      "url": "https://github.com/lamw/vcf-automated-lab-deployment/blob/master/screenshots/screenshot-10.png",
+      "title": "vcf-automated-lab-deployment/screenshots/screenshot-10.png at master · lamw/vcf-automated-lab-deployment"
+    },
+    {
+      "url": "https://github.com/lamw/vcf-9x-in-box?tab=readme-ov-file#prereq",
+      "title": "lamw/vcf-9x-in-box: Minimal VMware Cloud Foundation (VCF) 9.x"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/ultimate-lab-resource-for-vcf-9-0.html",
+      "title": "Ultimate Lab Resource for VCF 9.0"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/ultimate-lab-resource-for-vcf-9-0.html#more-188907",
+      "title": "Ultimate Lab Resource for VCF 9.0"
+    },
+    {
+      "url": "https://github.com/lamw/vmware-scripts/blob/master/json/vcf-fleet-simple-sample.json",
+      "title": "vmware-scripts/json/vcf-fleet-simple-sample.json at master · lamw/vmware-scripts"
+    },
+    {
+      "url": "https://github.com/square/certstrap",
+      "title": "square/certstrap: Tools to bootstrap CAs, certificate requests, and signed certificates."
+    },
+    {
+      "url": "https://vcsa.markalston.net:5480/#/login",
+      "title": "VMware Appliance Management"
+    },
+    {
+      "url": "https://github.com/miclip/smart-rv-sail-switch",
+      "title": "miclip/smart-rv-sail-switch: ATtiny85-based smart sail switch bypass for RV furnaces at high altitude using differential pressure sensing"
+    },
+    {
+      "url": "https://vcf01.vcf.lab/ui/login.action?vcf=1&uri=dmNmLW9wZXJhdGlvbnMvdWkvaG9tZTt0YWI9aG9tZS1tdWx0aS1jbG91ZA==",
+      "title": "VMware Cloud Foundation Operations"
+    },
+    {
+      "url": "https://williamlam.com/2025/07/custom-uefi-boot-menu-for-esxi-9-0-using-refind.html",
+      "title": "Custom UEFI Boot Menu for ESXi 9.0 using rEFInd"
+    },
+    {
+      "url": "https://nsx01.vcf.lab/login.jsp",
+      "title": "VMware NSX | Login"
+    },
+    {
+      "url": "https://williamlam.com/2025/09/enhancement-in-vcf-9-0-1-to-bypass-vsan-esa-hcl-host-commission-10gbe-nic-check.html",
+      "title": "Enhancement in VCF 9.0.1 to bypass vSAN ESA HCL & Host Commission 10GbE NIC Check"
+    },
+    {
+      "url": "https://github.com/concourse/time-resource",
+      "title": "concourse/time-resource: A resource for triggering on an interval"
+    },
+    {
+      "url": "https://esx03/ui/#/login",
+      "title": "Login - VMware ESXi"
+    },
+    {
+      "url": "http://192.168.10.2/admin/groups/lists",
+      "title": "Pi-hole pihole"
+    },
+    {
+      "url": "https://esx02/ui/#/login",
+      "title": "Login - VMware ESXi"
+    },
+    {
+      "url": "https://williamlam.com/2025/09/quick-tip-improving-thermals-on-minisforum-ms-a2.html",
+      "title": "Quick Tip - Improving thermals on Minisforum MS-A2"
+    },
+    {
+      "url": "https://esx01/ui/#/login",
+      "title": "Login - VMware ESXi"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/vcf-9-0-offline-depot-using-synology.html",
+      "title": "VCF 9.0 Offline Depot using Synology"
+    },
+    {
+      "url": "https://williamlam.com/lab-deployment-scripts",
+      "title": "Lab Deployment Scripts"
+    },
+    {
+      "url": "https://github.com/malston/vcf-9x-in-box/blob/master/DEPLOYMENT_WORKFLOW.md#step-5-deploy-vcf-installer-appliance",
+      "title": "File not found"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/vsan-esa-disk-hcl-workaround-for-vcf-9-0.html",
+      "title": "vSAN ESA Disk & HCL workaround for VCF 9.0"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/nvme-tiering-with-amd-ryzen-cpu-workaround-for-vcf-9-0.html",
+      "title": "NVMe Tiering with AMD Ryzen CPU workaround for VCF 9.0"
+    },
+    {
+      "url": "https://williamlam.com/2025/07/minimal-vmware-cloud-foundation-vcf-9-0-lab-setup.html",
+      "title": "Minimal VMware Cloud Foundation (VCF) 9.0 Lab Setup"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/ultimate-lab-resource-for-vcf-9-0.html#more-188907",
+      "title": "Ultimate Lab Resource for VCF 9.0"
+    },
+    {
+      "url": "https://williamlam.com/2025/09/my-vcf-9-lab-network-diagram.html",
+      "title": "My VCF 9 Lab Network Diagram"
+    },
+    {
+      "url": "https://williamlam.com/2025/07/initial-mikrotik-router-switch-configuration-for-vcf-9-0.html#more-189493",
+      "title": "Initial Mikrotik router/switch configuration for VCF 9.0"
+    },
+    {
+      "url": "https://docs.pi-hole.net/routers/ubiquiti-usg/",
+      "title": "Ubiquiti USG - Pi-hole documentation"
+    },
+    {
+      "url": "https://www.vmware.com/explore/video-library/search?term[]=William%20Lam",
+      "title": "Search | VMware Explore Videos"
+    },
+    {
+      "url": "https://www.amazon.com/dp/B0DSQMKYLN?th=1&linkCode=sl1&tag=vghetto-20&linkId=78300e2a4b96b96e608096b8c59a1ac4&language=en_US&ref_=as_li_ss_tl",
+      "title": "Crucial 128GB Kit (2X64GB) DDR5 RAM 5600MHz (or 5200MHz or 4800MHz) Laptop Memory Kit, SODIMM 262-Pin, Compatible with Latest Intel Core Ultra and AMD Ryzen 8000 & Above – CT2K64G56C46S5 at Amazon.com"
+    },
+    {
+      "url": "https://williamlam.com/2025/08/quick-tip-establish-trust-between-vcf-9-0-installer-and-vcf-offline-depot-w-self-sign-tls-certificate.html",
+      "title": "Quick Tip - Establish trust between VCF 9.0 Installer and VCF Offline Depot w/self-sign TLS certificate"
+    },
+    {
+      "url": "https://williamlam.com/2025/01/quick-tip-easily-host-vmware-cloud-foundation-vcf-offline-depot-using-python-simplehttpserver-with-authentication.html",
+      "title": "Quick Tip - Easily host VMware Cloud Foundation (VCF) Offline Depot using Python SimpleHTTPServer with Authentication"
+    },
+    {
+      "url": "https://williamlam.com/",
+      "title": "WilliamLam.com"
+    },
+    {
+      "url": "https://www.vmware.com/explore/video/6377278596112",
+      "title": "Deploying Minimal VMware Cloud Foundation 9.0 Lab"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/using-http-with-vcf-9-0-installer-for-offline-depot.html",
+      "title": "Using HTTP with VCF 9.0 Installer and SDDC Manager for Offline Depot"
+    },
+    {
+      "url": "https://williamlam.com/2025/06/ultimate-lab-resource-for-vcf-9-0.html#google_vignette",
+      "title": "Ultimate Lab Resource for VCF 9.0"
+    },
+    {
+      "url": "https://williamlam.com/2025/07/initial-mikrotik-router-switch-configuration-for-vcf-9-0.html",
+      "title": "Initial Mikrotik router/switch configuration for VCF 9.0"
+    },
+    {
+      "url": "http://192.168.10.250/",
+      "title": "RouterOS"
+    },
+    {
+      "url": "https://williamlam.com/2025/07/quick-tip-updating-firmware-on-minisforum-ms-a2.html",
+      "title": "Quick Tip - Updating Firmware on Minisforum MS-A2"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=LzJQDhiGAr4",
+      "title": "Use Node.js on Synology Docker - YouTube"
+    },
+    {
+      "url": "https://www.noip.com/login?ref_url=%2Fmembers%2Fregistration%2Ftransfer.php%3Fpage%3Dstep1",
+      "title": "Sign In - No-IP"
+    }
+  ],
+  "total_count": 82,
+  "backup_timestamp": "2025-11-14T12:58:52.780494"
+}
