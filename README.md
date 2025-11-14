@@ -1,216 +1,183 @@
-# Chrome Tab Consolidator
+# Chrome Tab Manager
 
-A Python script to backup, restore, and deduplicate Chrome tabs. This tool helps you:
-- Backup all tabs from your current Chrome session
-- Restore tabs into a fresh Chrome instance
-- Remove duplicate tabs across all windows
+Complete solution for managing Chrome tabs: organize by domain, remove duplicates, and recover from history.
 
-Perfect for when you have multiple windows with duplicate tabs and want to clean everything up!
+## Features
 
-## Requirements
+### 🎯 Chrome Extension (Primary Tool)
 
-- Python 3.8 or higher
-- Google Chrome
-- [uv](https://github.com/astral-sh/uv) - Fast Python package installer
-- `make` (usually pre-installed on macOS/Linux)
+- **One-click organization** - Automatically group tabs by domain
+- **One-click deduplication** - Remove duplicate tabs instantly
+- **Smart coloring** - Each domain gets a unique color
+- **Shows tab counts** - See how many tabs in each group
+- **Works everywhere** - Use in any Chrome profile, anytime
+- **No setup required** - No remote debugging, no command line
 
-## Installation
+### 🔧 Command-Line Tools (Optional)
 
-### Install uv (if not already installed)
+- **History Recovery** - Restore tabs from your browsing history
+
+## Quick Start
+
+### Install the Chrome Extension (Recommended)
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Open Chrome and navigate to:
+chrome://extensions/
+
+# Enable "Developer mode" (toggle in top-right)
+# Click "Load unpacked"
+# Select: /Users/markalston/workspace/chrome-tabs/chrome-extension
 ```
 
-### Install dependencies
+See [chrome-extension/README.md](chrome-extension/README.md) for detailed instructions.
+
+### Install Command-Line Tools (Optional)
 
 ```bash
 make install
 ```
-
-This will create a virtual environment and install all required dependencies using uv.
 
 ## Usage
 
-### How It Works
+### Organize Tabs by Domain
 
-Chrome's remote debugging requires a **separate user profile** for security. This tool works around that limitation:
+**Use the Chrome Extension**:
 
-1. **Backup**: Exports all tabs from your current Chrome session to JSON
-2. **Restart**: Closes Chrome and restarts with debugging enabled (fresh profile)
-3. **Restore**: Imports all backed-up tabs into the debug Chrome instance
-4. **Deduplicate**: Removes any duplicate URLs
+1. Click the Tab Organizer icon in your toolbar
+2. Click "Organize by Domain"
+3. Done! All tabs grouped automatically
 
-### Quick Start (One Command)
+Example result:
 
-Run the complete workflow automatically:
+- `github.com (25)` - All GitHub tabs
+- `williamlam.com (24)` - All blog tabs
+- `local-network (7)` - All lab IPs
 
-```bash
-# Install dependencies
-make install
+### Remove Duplicate Tabs
 
-# Run full workflow: backup -> restart -> restore -> dedupe
-make full-workflow
-```
+**Use the Chrome Extension**:
 
-The script will prompt before closing Chrome. When done, all your tabs will be consolidated in one window with no duplicates!
+1. Click the Tab Organizer icon
+2. Click "Remove Duplicates"
+3. Done! All duplicate URLs removed
 
-### Step-by-Step Workflow
+### Recover Lost Tabs from History
 
-If you prefer manual control:
-
-```bash
-# 1. Install dependencies
-make install
-
-# 2. Backup your current tabs (while Chrome is running normally)
-make backup-tabs
-
-# 3. Restart Chrome with debugging (closes current Chrome)
-make chrome-restart
-
-# 4. Restore all tabs into debug Chrome
-make restore-tabs
-
-# 5. Remove any duplicates
-make run
-```
-
-### Manual Usage
-
-#### Step 1: Start Chrome with Remote Debugging
-
-You need to start Chrome with remote debugging enabled. **You must completely quit Chrome first (Cmd+Q on Mac)**, then:
-
-##### On macOS:
-```bash
-make chrome-debug
-```
-
-Or manually:
-```bash
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 &
-```
-
-##### On Linux:
-```bash
-google-chrome --remote-debugging-port=9222 &
-```
-
-##### On Windows:
-```cmd
-"C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222
-```
-
-#### Step 2: Run the Script
-
-Using Make:
-```bash
-make run
-```
-
-Or directly with Python:
-```bash
-.venv/bin/python consolidate_tabs.py
-```
-
-The script will:
-1. Connect to your Chrome instance
-2. Scan all tabs across all windows
-3. Identify and remove duplicates
-4. Show you a summary of what was done
-
-### Command-line Options
+**Use the command-line tool**:
 
 ```bash
-# Use a different port
-.venv/bin/python consolidate_tabs.py --port 9223
+# Restore from last 7 days of history
+make restore-history
 
-# Connect to remote Chrome instance
-.venv/bin/python consolidate_tabs.py --host 192.168.1.100 --port 9222
+# Or with custom options
+uv run restore_from_history.py --days 30 --limit 500
 ```
 
-### Makefile Targets
+Note: Requires Chrome to be running with remote debugging. See troubleshooting below.
 
-- `make help` - Show all available commands
-- `make install` - Install dependencies using uv
-- `make backup-tabs` - Backup tabs from current Chrome session
-- `make chrome-restart` - Restart Chrome with debugging enabled
-- `make restore-tabs` - Restore backed-up tabs into debug Chrome
-- `make run` - Remove duplicate tabs
-- `make full-workflow` - Complete workflow (backup -> restart -> restore -> dedupe)
-- `make check-chrome` - Verify Chrome debugging connection
-- `make clean` - Remove virtual environment and backups
+## Requirements
 
-## Example Output
+- **Chrome Extension**: Just Chrome browser
+- **Command-Line Tools** (optional):
+  - Python 3.8+
+  - [uv](https://github.com/astral-sh/uv) package manager
+  - macOS (for AppleScript backup feature)
 
+## Available Commands
+
+```bash
+make help            # Show all available commands
+make install         # Install dependencies
+make restore-history # Restore tabs from history
+make clean           # Clean up
 ```
-Chrome Tab Consolidator
-============================================================
-Connected to Chrome: Chrome/119.0.6045.159
-Fetching all Chrome tabs...
-Found 47 tabs across all windows
 
-Found 3 instances of: https://acme.com/dashboard...
-  Closing duplicate tab: ACME Dashboard
-  Closing duplicate tab: ACME Dashboard
+## Project Structure
 
-Found 2 instances of: https://example.com/inbox...
-  Closing duplicate tab: Example Mail
-
-============================================================
-Summary:
-  Total tabs found: 47
-  Duplicate tabs removed: 4
-  Tabs remaining: 43
-============================================================
+```sh
+chrome-tabs/
+├── chrome-extension/       # Chrome Extension (main tool!)
+│   ├── manifest.json
+│   ├── background.js       # Tab grouping & dedupe logic
+│   ├── popup.html/js       # Extension UI (3 buttons)
+│   └── README.md
+├── restore_from_history.py # History recovery script
+├── Makefile                # Easy command access
+└── README.md               # This file
 ```
 
 ## How It Works
 
-The script uses Chrome DevTools Protocol (CDP) to:
-1. Query all open tabs via the remote debugging interface
-2. Group tabs by URL
-3. Close duplicate tabs (keeping the first one)
-4. Report the results
+### Chrome Extension
 
-## Notes
+- Uses Chrome's native Tab Groups API for organization
+- Uses Chrome's Tabs API for deduplication
+- Groups tabs by extracting domain from URLs
+- Removes duplicates by tracking seen URLs
+- Assigns colors and counts automatically
+- **No remote debugging needed!**
 
-- **Tab Groups**: The script preserves tab groups - duplicate tabs are removed regardless of which group they're in
-- **Bookmarks**: Your bookmarks are never affected by this script
-- **Window Consolidation**: This script currently only removes duplicates. To merge all tabs into one window, you can manually drag tabs or use Chrome's "Move tab to another window" feature
-- **Chrome Internal Pages**: Pages like `chrome://settings` are skipped
+### History Recovery
+
+- Reads Chrome's History SQLite database
+- Filters by date range and limit
+- Creates new tabs via DevTools Protocol
+- Useful for recovering accidentally closed tabs
+- Requires Chrome with `--remote-debugging-port`
 
 ## Troubleshooting
 
-### "Cannot connect to Chrome"
+### Extension not working?
 
-Make sure you:
-1. Closed ALL Chrome windows before starting
-2. Started Chrome with the `--remote-debugging-port=9222` flag
-3. The port 9222 is not blocked by a firewall
+- Make sure Developer Mode is enabled on `chrome://extensions/`
+- Reload the extension (click the refresh icon)
+- Check the service worker console for errors
 
-### "No tabs found"
+### Can't restore history?
 
-- Check that Chrome is actually running
-- Verify the debugging port with: `curl http://localhost:9222/json/version`
-- Make sure you have tabs open (not just a blank window)
+- History recovery requires Chrome with remote debugging
+- Make sure Chrome history isn't cleared
+- Try increasing `--days` or `--limit` parameters
+- Check: `~/Library/Application Support/Google/Chrome/Default/History`
 
-### Permission Issues on macOS
+### How to enable remote debugging for history recovery
 
-If you get a permission error when starting Chrome with remote debugging, try:
 ```bash
-chmod +x /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome
+# Close all Chrome windows, then:
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+  --remote-debugging-port=9222 \
+  --user-data-dir=/tmp/chrome-debug-profile &
 ```
 
-## Safety
+## Tips
 
-This script:
-- Only closes tabs (doesn't modify content)
-- Doesn't access tab content or personal data
-- Works locally on your machine
-- Requires explicit Chrome debugging permission
-- Can be reviewed - it's a simple Python script
+- **Daily use**: Just use the Chrome Extension - it's instant and works everywhere
+- **Tab recovery**: Use `make restore-history` if you accidentally closed important tabs
+- **Session restore**: Chrome's built-in session restore (Cmd+Shift+T) also works great
+- **Pin the extension**: Pin it to your toolbar for easy access
+
+## Workflow Examples
+
+### Spring Cleaning
+
+1. Click extension → "Remove Duplicates"
+2. Click extension → "Organize by Domain"
+3. Manually close groups you don't need
+4. Done!
+
+### Recover Lost Tabs
+
+1. Run `make restore-history`
+2. Review and close unwanted tabs
+3. Click extension → "Organize by Domain"
+
+### Before Closing Chrome
+
+1. Click extension → "Organize by Domain"
+2. Review your tab groups
+3. Bookmark important groups
+4. Close Chrome with confidence
 
 ## License
 

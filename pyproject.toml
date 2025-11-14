@@ -1,7 +1,7 @@
 [project]
-name = "chrome-tab-consolidator"
-version = "1.0.0"
-description = "Remove duplicate tabs across Chrome windows"
+name = "chrome-tab-manager"
+version = "2.0.0"
+description = "Chrome tab management: organize by domain, deduplicate, and recover from history"
 requires-python = ">=3.8"
 dependencies = [
     "requests>=2.31.0",
@@ -9,11 +9,7 @@ dependencies = [
 ]
 
 [project.scripts]
-backup-tabs = "backup_tabs:main"
-restore-tabs = "restore_tabs:main"
 restore-history = "restore_from_history:main"
-consolidate-tabs = "consolidate_tabs:main"
-organize-tabs = "organize_tabs:main"
 
 [build-system]
 requires = ["hatchling"]

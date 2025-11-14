@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Tab Organizer</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0 0 16px 0;
+      color: #202124;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 8px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .primary {
+      background-color: #1a73e8;
+      color: white;
+    }
+
+    .primary:hover {
+      background-color: #1557b0;
+    }
+
+    .secondary {
+      background-color: #f1f3f4;
+      color: #202124;
+    }
+
+    .secondary:hover {
+      background-color: #e8eaed;
+    }
+
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      background-color: #e8f0fe;
+      border-radius: 4px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background-color: #e6f4ea;
+      color: #137333;
+    }
+
+    .status.error {
+      background-color: #fce8e6;
+      color: #c5221f;
+    }
+
+    .footer {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e8eaed;
+      font-size: 12px;
+      color: #5f6368;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tab Organizer</h1>
+
+  <button id="organizeBtn" class="primary">
+    Organize by Domain
+  </button>
+
+  <button id="dedupeBtn" class="primary">
+    Remove Duplicates
+  </button>
+
+  <button id="removeGroupsBtn" class="secondary">
+    Remove All Groups
+  </button>
+
+  <div id="status" class="status"></div>
+
+  <div class="footer">
+    Organize and deduplicate tabs
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
