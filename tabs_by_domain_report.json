@@ -1,0 +1,742 @@
+{
+  "total_tabs": 115,
+  "total_domains": 46,
+  "domains": [
+    {
+      "domain": "github.com",
+      "tab_count": 25,
+      "tabs": [
+        {
+          "title": "Page not found · GitHub · GitHub",
+          "url": "https://github.com/malston/notes-wiki"
+        },
+        {
+          "title": "GitHub - square/certstrap: Tools to bootstrap CAs, certificate requests, and signed certificates.",
+          "url": "https://github.com/square/certstrap"
+        },
+        {
+          "title": "Page not found · GitHub · GitHub",
+          "url": "https://github.com/malston/vcf-offline-depot"
+        },
+        {
+          "title": "GitHub - lamw/vcf-automated-import-lab-deployment: Automated VMware Cloud Foundation Import Lab Deployment",
+          "url": "https://github.com/lamw/vcf-automated-import-lab-deployment"
+        },
+        {
+          "title": "GitHub - lamw/vsphere-8-lab-deployment: Automated vSphere 8.x Lab Deployment",
+          "url": "https://github.com/lamw/vsphere-8-lab-deployment"
+        },
+        {
+          "title": "GitHub - lamw/vcf-automated-lab-deployment: Automated VMware Cloud Foundation Lab Deployment",
+          "url": "https://github.com/lamw/vcf-automated-lab-deployment"
+        },
+        {
+          "title": "GitHub - lamw/vcf-5x-in-box: Minimal VMware Cloud Foundation (VCF) 5.x in a box",
+          "url": "https://github.com/lamw/vcf-5x-in-box"
+        },
+        {
+          "title": "Page not found · GitHub · GitHub",
+          "url": "https://github.com/malston/vcf-in-a-box/blob/main/docs/research.md"
+        },
+        {
+          "title": "GitHub - concourse/time-resource: A resource for triggering on an interval",
+          "url": "https://github.com/concourse/time-resource"
+        },
+        {
+          "title": "GitHub - miclip/smart-rv-sail-switch: ATtiny85-based smart sail switch bypass for RV furnaces at high altitude using differential pressure sensing",
+          "url": "https://github.com/miclip/smart-rv-sail-switch"
+        },
+        {
+          "title": "vmware-scripts/json/vcf-fleet-simple-sample.json at master · lamw/vmware-scripts · GitHub",
+          "url": "https://github.com/lamw/vmware-scripts/blob/master/json/vcf-fleet-simple-sample.json"
+        },
+        {
+          "title": "vcf-automated-lab-deployment/screenshots/screenshot-10.png at master · lamw/vcf-automated-lab-deployment · GitHub",
+          "url": "https://github.com/lamw/vcf-automated-lab-deployment/blob/master/screenshots/screenshot-10.png"
+        },
+        {
+          "title": "vcf-9x-in-box/docs/DEPLOYMENT_WORKFLOW.md at master · malston/vcf-9x-in-box · GitHub",
+          "url": "https://github.com/malston/vcf-9x-in-box/blob/master/docs/DEPLOYMENT_WORKFLOW.md"
+        },
+        {
+          "title": "vcf-9x-in-box/scripts at master · lamw/vcf-9x-in-box · GitHub",
+          "url": "https://github.com/lamw/vcf-9x-in-box/tree/master/scripts"
+        },
+        {
+          "title": "File not found · GitHub",
+          "url": "https://github.com/malston/vcf-9x-in-box/blob/master/DEPLOYMENT_WORKFLOW.md#step-5-deploy-vcf-installer-appliance"
+        },
+        {
+          "title": "Page not found · GitHub · GitHub",
+          "url": "https://github.com/malston/tanzu-homelab"
+        },
+        {
+          "title": "Release v7.5.4 Release of PowerShell · PowerShell/PowerShell · GitHub",
+          "url": "https://github.com/PowerShell/PowerShell/releases/tag/v7.5.4"
+        },
+        {
+          "title": "File not found · GitHub",
+          "url": "https://github.com/malston/vcf-9x-in-box/blob/master/DEPLOYMENT_WORKFLOW.md#complete-workflow"
+        },
+        {
+          "title": "GitHub - lamw/vcf-9x-in-box: Minimal VMware Cloud Foundation (VCF) 9.x",
+          "url": "https://github.com/lamw/vcf-9x-in-box?tab=readme-ov-file#prereq"
+        },
+        {
+          "title": "GitHub - microsoft/Mastering-GitHub-Copilot-for-Paired-Programming: A multi-module course teaching everything you need to know about using GitHub Copilot as an AI Peer Programming resource.",
+          "url": "https://github.com/microsoft/Mastering-GitHub-Copilot-for-Paired-Programming"
+        },
+        {
+          "title": "GitHub - dontriskit/awesome-ai-system-prompts: 🧠 Curated collection of system prompts for top AI tools. Perfect for AI agent builders and prompt engineers. Incuding: ChatGPT, Claude, Perplexity, Manus, Claude-Code, Loveable, v0, Grok, same new, windsurf, notion, and MetaAI.",
+          "url": "https://github.com/dontriskit/awesome-ai-system-prompts"
+        },
+        {
+          "title": "GitHub - jujumilk3/leaked-system-prompts: Collection of leaked system prompts",
+          "url": "https://github.com/jujumilk3/leaked-system-prompts"
+        },
+        {
+          "title": "GitHub - grafana/grafana-infinity-datasource: CSV, JSON, GraphQL, XML and HTML datasource for grafana.",
+          "url": "https://github.com/grafana/grafana-infinity-datasource"
+        },
+        {
+          "title": "GitHub - malston/my-claude-code-setup: Shared starter template configuration and CLAUDE.md memory bank system for Claude Code",
+          "url": "https://github.com/malston/my-claude-code-setup"
+        },
+        {
+          "title": "cf-kaizen/docs/CLAUDE.md at main · cf-toolsuite/cf-kaizen · GitHub",
+          "url": "https://github.com/cf-toolsuite/cf-kaizen/blob/main/docs/CLAUDE.md"
+        }
+      ]
+    },
+    {
+      "domain": "williamlam.com",
+      "tab_count": 24,
+      "tabs": [
+        {
+          "title": "Minimal resources for deploying VCF 9.0 in a Lab",
+          "url": "https://williamlam.com/2025/06/minimal-resources-for-deploying-vcf-9-0-in-a-lab.html"
+        },
+        {
+          "title": "Deploying VCF 9.0 on a single ESXi host?",
+          "url": "https://williamlam.com/2025/06/deploying-vcf-9-0-on-a-single-esxi-host.html"
+        },
+        {
+          "title": "MS-A2 VCF 9.0 Lab: Configuring vSphere Kubernetes Service (VKS)",
+          "url": "https://williamlam.com/2025/08/ms-a2-vcf-9-0-lab-configuring-vsphere-kubernetes-service-vks.html#more-189736"
+        },
+        {
+          "title": "VMware Cloud Foundation",
+          "url": "https://williamlam.com/category/vmware-cloud-foundation"
+        },
+        {
+          "title": "Ultimate Lab Resource for VCF 9.0",
+          "url": "https://williamlam.com/2025/06/ultimate-lab-resource-for-vcf-9-0.html"
+        },
+        {
+          "title": "VMware Cloud Foundation (VCF) on Minisforum MS-A2",
+          "url": "https://williamlam.com/2025/06/vmware-cloud-foundation-vcf-on-minisforum-ms-a2.html"
+        },
+        {
+          "title": "Enhancement in VCF 9.0.1 to bypass vSAN ESA HCL &amp; Host Commission 10GbE NIC Check",
+          "url": "https://williamlam.com/2025/09/enhancement-in-vcf-9-0-1-to-bypass-vsan-esa-hcl-host-commission-10gbe-nic-check.html"
+        },
+        {
+          "title": "Quick Tip - Retrieving ESXi Host Fingerprint for VCF Installer JSON deployment",
+          "url": "https://williamlam.com/2025/09/quick-tip-retrieving-esxi-host-fingerprint-for-vcf-installer-json-deployment.html#more-190463"
+        },
+        {
+          "title": "VCF 9.0 Offline Depot using Synology",
+          "url": "https://williamlam.com/2025/06/vcf-9-0-offline-depot-using-synology.html"
+        },
+        {
+          "title": "Lab Deployment Scripts",
+          "url": "https://williamlam.com/lab-deployment-scripts"
+        },
+        {
+          "title": "vSAN ESA Disk &amp; HCL workaround for VCF 9.0",
+          "url": "https://williamlam.com/2025/06/vsan-esa-disk-hcl-workaround-for-vcf-9-0.html"
+        },
+        {
+          "title": "NVMe Tiering with AMD Ryzen CPU workaround for VCF 9.0",
+          "url": "https://williamlam.com/2025/06/nvme-tiering-with-amd-ryzen-cpu-workaround-for-vcf-9-0.html"
+        },
+        {
+          "title": "Minimal VMware Cloud Foundation (VCF) 9.0 Lab Setup",
+          "url": "https://williamlam.com/2025/07/minimal-vmware-cloud-foundation-vcf-9-0-lab-setup.html"
+        },
+        {
+          "title": "Ultimate Lab Resource for VCF 9.0",
+          "url": "https://williamlam.com/2025/06/ultimate-lab-resource-for-vcf-9-0.html#more-188907"
+        },
+        {
+          "title": "My VCF 9 Lab Network Diagram",
+          "url": "https://williamlam.com/2025/09/my-vcf-9-lab-network-diagram.html"
+        },
+        {
+          "title": "Initial Mikrotik router/switch configuration for VCF 9.0",
+          "url": "https://williamlam.com/2025/07/initial-mikrotik-router-switch-configuration-for-vcf-9-0.html#more-189493"
+        },
+        {
+          "title": "WilliamLam.com",
+          "url": "https://williamlam.com/"
+        },
+        {
+          "title": "Quick Tip - Easily host VMware Cloud Foundation (VCF) Offline Depot using Python SimpleHTTPServer with Authentication",
+          "url": "https://williamlam.com/2025/01/quick-tip-easily-host-vmware-cloud-foundation-vcf-offline-depot-using-python-simplehttpserver-with-authentication.html"
+        },
+        {
+          "title": "Quick Tip - Establish trust between VCF 9.0 Installer and VCF Offline Depot w/self-sign TLS certificate",
+          "url": "https://williamlam.com/2025/08/quick-tip-establish-trust-between-vcf-9-0-installer-and-vcf-offline-depot-w-self-sign-tls-certificate.html"
+        },
+        {
+          "title": "Using HTTP with VCF 9.0 Installer and SDDC Manager for Offline Depot",
+          "url": "https://williamlam.com/2025/06/using-http-with-vcf-9-0-installer-for-offline-depot.html"
+        },
+        {
+          "title": "Ultimate Lab Resource for VCF 9.0",
+          "url": "https://williamlam.com/2025/06/ultimate-lab-resource-for-vcf-9-0.html#google_vignette"
+        },
+        {
+          "title": "Initial Mikrotik router/switch configuration for VCF 9.0",
+          "url": "https://williamlam.com/2025/07/initial-mikrotik-router-switch-configuration-for-vcf-9-0.html"
+        },
+        {
+          "title": "Custom UEFI Boot Menu for ESXi 9.0 using rEFInd",
+          "url": "https://williamlam.com/2025/07/custom-uefi-boot-menu-for-esxi-9-0-using-refind.html"
+        },
+        {
+          "title": "Quick Tip - Updating Firmware on Minisforum MS-A2",
+          "url": "https://williamlam.com/2025/07/quick-tip-updating-firmware-on-minisforum-ms-a2.html"
+        }
+      ]
+    },
+    {
+      "domain": "local-network",
+      "tab_count": 7,
+      "tabs": [
+        {
+          "title": "SL-SG0024W",
+          "url": "http://172.30.0.51/login.cgi"
+        },
+        {
+          "title": "Privacy error",
+          "url": "https://192.168.2.231/login?redirect=%2Fnetwork%2Fdefault%2Fclients%2Fmain"
+        },
+        {
+          "title": "Privacy error",
+          "url": "https://192.168.2.231/login?redirect=%2Fnetwork%2Fdefault%2Fports"
+        },
+        {
+          "title": "Privacy error",
+          "url": "https://192.168.2.231/network/default/settings/policy-table?preset=dns-records"
+        },
+        {
+          "title": "Privacy error",
+          "url": "https://192.168.2.231/login?redirect=%2Fnetwork%2Fdefault%2Fsettings%2Fpolicy-table%3Fpreset%3Ddns-records"
+        },
+        {
+          "title": "Pi-hole pihole",
+          "url": "http://192.168.10.2/admin/groups/lists"
+        },
+        {
+          "title": "Privacy error",
+          "url": "https://172.30.0.13/ui/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "techdocs.broadcom.com",
+      "tab_count": 5,
+      "tabs": [
+        {
+          "title": "Elastic Application Runtime Overview",
+          "url": "https://techdocs.broadcom.com/us/en/vmware-tanzu/platform/elastic-application-runtime/10-3/eart/concepts-overview.html"
+        },
+        {
+          "title": "Writing a pipeline to upgrade an existing VMware Tanzu Operations Manager",
+          "url": "https://techdocs.broadcom.com/us/en/vmware-tanzu/platform/platform-automation-toolkit-for-tanzu/5-2/vmware-automation-toolkit/docs-how-to-guides-upgrade-existing-opsman.html"
+        },
+        {
+          "title": "Using a secrets store to store credentials",
+          "url": "https://techdocs.broadcom.com/us/en/vmware-tanzu/platform/platform-automation-toolkit-for-tanzu/5-2/vmware-automation-toolkit/docs-concepts-secrets-handling.html"
+        },
+        {
+          "title": "Task inputs and outputs",
+          "url": "https://techdocs.broadcom.com/us/en/vmware-tanzu/platform/platform-automation-toolkit-for-tanzu/5-2/vmware-automation-toolkit/docs-inputs-outputs.html#download-product-config"
+        },
+        {
+          "title": "Platform Automation Toolkit Tasks",
+          "url": "https://techdocs.broadcom.com/us/en/vmware-tanzu/platform/platform-automation-toolkit-for-tanzu/5-2/vmware-automation-toolkit/docs-tasks.html"
+        }
+      ]
+    },
+    {
+      "domain": "manning.com",
+      "tab_count": 4,
+      "tabs": [
+        {
+          "title": "Data Science Bookcamp Projects - Leonard Apeltsin, William Koehrsen, Nathan George, and Emre Rencberoglu",
+          "url": "https://www.manning.com/liveprojectseries/data-science-bookcamp-projects-ser"
+        },
+        {
+          "title": "DS Pipeline with Python - Ruihao Qiu",
+          "url": "https://www.manning.com/liveprojectseries/ds-pipeline-ser"
+        },
+        {
+          "title": "Manning Catalog",
+          "url": "https://www.manning.com/meap-catalog"
+        },
+        {
+          "title": "AI Agents in Action, Second Edition - Micheal Lanham",
+          "url": "https://www.manning.com/books/ai-agents-in-action-second-edition"
+        }
+      ]
+    },
+    {
+      "domain": "localhost",
+      "tab_count": 3,
+      "tabs": [
+        {
+          "title": "Workouts | Wiki.js",
+          "url": "http://localhost:3000/en/personal/workouts"
+        },
+        {
+          "title": "localhost",
+          "url": "http://localhost:7777/docs"
+        },
+        {
+          "title": "localhost",
+          "url": "http://localhost:7777/"
+        }
+      ]
+    },
+    {
+      "domain": "vcsa.markalston.net",
+      "tab_count": 3,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://vcsa.markalston.net/websso/SAML2/SSO/vsphere.local?SAMLRequest=zVRLj5swEL73VyDfwUCyaWKFrNJNV420D7rQquqlMjBJrIJNPQay%2F76GJG202kZ77NWa%2BeZ7yfPrfVU6LWgUSkYk8HzigMxVIeQ2Il%2FSW3dKrhfv5sirsmbLxuzkE%2FxqAI2zRARt7NqNkthUoBPQrchhLQvYR8QCreyYkNwM0DtjamSUtjlyr%2BL6Jy%2FRKOlJMLSDDFHRZHl%2FF9IkeaQt1jvQ4JUq5yVxbpXOYTgekY3dA%2BKsVxH5MQY%2FCN5nm2wKMIMJjPzZLBxvuB%2FOigwmlsIaY44oWvi7iNhYjmi4NBEJ%2FfDKDXw3GKfBlIU%2Bu5p6o0nwnTixVkblqvwg5MGMRkumOApkkleAzOSsJ8xCz2fZYQjZpzSN3fgxSQeAVhSgH%2Bx0RF6RzcbjEXG%2BnrwPe%2B9tGhLZ4Pbli%2FWRHlkcsxl06bcD8FN8ZHEpmkbQHuwUUQWGF9zwOT2%2FeuAQ1qzXul7FqhT5s7MsS9XdaODG6je6gSHIipvLxPoXUbibYZTVvT1oQBriJHGP%2F7nhpdgI0Jc79Q%2Fi5xaHb%2FWYHgUyW%2FVC9KbhOcybjX6JcgRp7cpBTK%2Bl6rhtfq4qivkOKo6UG6PdAZiGfhBSf0w%2F7q0lfW%2FwJGiP4g9G13VeN%2FKU3toFP6Df7u%2BSAcsVQ%2FFzG4WdZ%2Ba57qvZM34CCR3PSkjt2yuC%2FyOqKyhhe06Vvgxncarn%2BYe1%2BA0%3D&RelayState=1626fedf-507d-4737-90c7-b96b5300027c&SigAlg=http%3A%2F%2Fwww.w3.org%2F2001%2F04%2Fxmldsig-more%23rsa-sha256&Signature=Jn7iaJvPlR9I33muYhdNJ8jpnR88v%2BdoGcleJZDFHgRAE5vqm4O5kEae1KFzPsKy6R9fFXHH8vOXQGSgbMDijHkaTDpTWEq1fa2EVY3H4WNQD8zenYPd9KVU2dp07hPerd2TRnzuVOZj%2FEdR2h5VRBUkPYE6CZnQl4has5lU9vXxQSl22fLzuSbR%2B4IoNxrfSGGgReX0wbXF0rYkxfh6r%2BnV%2Fza2feHyHySrxzTKIJkmW91zVgVuOSVvQTvjuj6JUVEDt8pgrwqJr7qX%2BFfcMYXsuYqdrECkeqKlEzMOWh6quJfzzqhgG2Kbyu2Eea7l2SSftegRLfCh7WGAjbBYWHfiMnILJwMbAYDB%2FSvBQXgKWqQgna4jh7cWyOv8ndRtSjNapEEdc97s6UW5TiNuKl%2BXd%2FjrNXePkCaGQAF6Trm%2F5ooQBCBTvXOT4wCwEUqyfgmLvb1uhvzNTcjVByeyY0YBcE4kBm8G1xos%2F5EDSit1hWedEXLP2J5ESX9IFPOh&isDiscovery=true&appUrl=https%3A%2F%2Fvcsa.markalston.net%2Fui%2Flogin"
+        },
+        {
+          "title": "Privacy error",
+          "url": "https://vcsa.markalston.net/websso/SAML2/SSO/vsphere.local?SAMLRequest=zVRbb9MwFH7nV0R%2BT5y46TqspVNZmZi0S1kKQrwg1zldLRI7%2BDhJ9%2B9x0haqaVR75NU65zvfTb643FZl0IJFZXRGkigmAWhpCqWfMvJleR2ek8vpuwsUVVnzWeM2%2BhF%2BNYAumCGCdX7tymhsKrA52FZJuNEFbDPigeZ%2BTGnhBuiNczVySluJIqqE%2FSlKdEZHGhztYIVoaD67u2U0zx9oi%2FUGLESlkaIkwbWxEobjGVn7PSDBzTwjP9KJPBuJ83g9YXExkenZKk3OxoVcreL343TE%2FBguBKJq4e8iYuM5ohPaZYTFbBwmcZiMlgnj6YSPxtH5hH0nwcIaZ6QpPyi9M6OxmhuBCrkWFSB3kveEOYtivtoNIf%2B0XC7CxUO%2BHABaVYC999MZeUU2T9MRCb4evGe99z4NjXxw%2B%2FTFek%2BPTPfZDLrs2wHEIT4yPRVNo2gPdoioAicK4cQFPb6648Bq3mu9mS9MqeRzMCtL011ZEM7rd7aBIchKuNPE%2BhdVhOthlNe9PehAOxLkix7%2FcyNKtVZgT3fqH8SPLWZv9ZjuBXJf9UL1puExzJuNfomyB2n9yk5Mr6XqhG%2B%2BNBVFuYFKIBXO2XAApixOGI1T%2BnHrLel7gwdBW1R%2FMLqui7pRZOyTX4gT%2Bu3uNh%2BwQjUUX%2Foo%2FDx3z3VfzZ7xI2joxKqEpX97RfB%2FRHUOJTwdU6Uvw5ke6nn8YU1%2FAw%3D%3D&RelayState=881fb35b-1abe-4189-b170-1deec9aad4a5&SigAlg=http%3A%2F%2Fwww.w3.org%2F2001%2F04%2Fxmldsig-more%23rsa-sha256&Signature=q7Nb3zOJ9kEEjYn6Gy7FqSCi%2B20Pp8MPl%2Fwb%2F5yeCkFfTTIr4pcZkbKaHdPTMFbECdU3kjtogevlVnRaMcHApfcyIG%2BSjatLBkyibSBP6cUuZF%2B%2F6hhvckFIMudj5O6OsQMpIhVkSDpthS48%2FQXqQZvGl1osAdldsM9TBMTRx%2Fihk5QRZ1USkcsulRlnB2uUr8z3VRs4nftTFUh6DBZD1hUl9YSnfmkHazt3%2BaL8FoXIKNicOlJ4qg8rHzUpVEQwhWVpxSbt6r9E8mjlZRJ%2FbEA5Z85sxH0VJXySWLsgneoqY%2BCfmcBm9gEhc5WS%2F3Qa8fP7LFvC9Eha5dwF%2FWqDpoBXbbCgOMePjDbPXR4dUzVLSoCFzf3bOBIPpYo3jNx1Tmy0p55RAWIxMNRCIMn0Hf0GVKmAZFFnUmItiNyFeQBTY6fyqHBlUUQfLLWui8ELQbc7zZoy2d8jon1YsanvaoOb%2BE6eflXanxT%2BjNjvbFk%2BdyUMx1qHCGQjPt5jKy2z&isDiscovery=true&appUrl=https%3A%2F%2Fvcsa.markalston.net%2Fui%2Flogin"
+        },
+        {
+          "title": "Privacy error",
+          "url": "https://vcsa.markalston.net/websso/SAML2/SSO/vsphere.local?SAMLRequest=zVRbb9MwFH7nV0R%2BT5y4HV2splNZmZi0S1kKQrwg1zlbLRI7%2BDhJ9%2B9x0haqaVR75NU65zvfTZ5ebKsyaMGiMjojSRSTALQ0hdJPGfmyugrPycXs3RRFVdZ83riNfoBfDaAL5ohgnV%2B7NBqbCmwOtlUSrnUB24x4oIUfU1q4AXrjXI2c0laiiCphf4oSndGRBkc7WCMams9vbxjN83vaYr0BC1FppChJcGWshOF4Rh79HpDgepGRHyw5S%2BUYoEjT9DwdjYrxezEZy0k6ketkAv0YLgWiauHvImLjOaIT2mWExewsTJIwnqwY4yzhozganaXfSbC0xhlpyg9K78xorOZGoEKuRQXIneQ9Yc6imK93Q8g%2FrVbLcHmfrwaAVhVg7%2Fx0Rl6RzcfjEQm%2BHrxnvfc%2BDY18cPv0xXpPj8z22Qy67NsBxCE%2BMjsVTaNoD3aIqAInCuHElB5f3XFgNe%2B1Xi%2BWplTyOZiXpekuLQjn9TvbwBBkJdxpYv2LKsLHYZTXvT3oQDsS5Mse%2F3MjSvWowJ7u1D%2BIH1vM3uox3QvkvuqF6k3DY5g3G%2F0SZQ%2FS%2BpWdmF5L1QnffGkqinIDlUAqnLPhAExZnDAaj%2BnHrbek7w0eBG1R%2FcHoui7qRpGxT34hTui325t8wArVUHzpo%2FDz3D3XfTV7xg%2BgoRPrElb%2B7RXB%2FxHVBZTwdEyVvgxndqjn8Yc1%2Bw0%3D&RelayState=ece9b7df-5176-42c7-8c1f-30069d79d066&SigAlg=http%3A%2F%2Fwww.w3.org%2F2001%2F04%2Fxmldsig-more%23rsa-sha256&Signature=dMKMcLjMn1eSiX8Hf%2BaOZdEPd8xjyOFUTqRBRA8Yd1VvnORs5%2F411lJyRnn1NJmOgwLuCUL6oJv5BxFexPaTZjPTW%2FveCc3r7BUR8az1xrgFM1QGLR%2FZ7TmdFlFNjBTGugxxtDiE2pnna35GxIpsWQUBP1ppSkozWTVaE2VbfkZMOEB74Cgj7lKRiIILy3USh4v%2FZwXGJXcPNr%2By69Y9LuPgwNe0F3kzG%2Bhh9ip51aaUfvsz8hrJ32hbIl5ShLN1MJZTo7uQ6fVHSgG9amqeCLYnVRuqZuqptLE136DqlGlPQ4aGS7QCKysXfk1GNbEOCNKQB6qOmuC1FBB%2BGupUtBzrLbn0qktQUUCmbJ%2Bj%2BmHDpMaS1GR8RM3UCmYWEkJ3ZwXY8UPNkFFA7Qjt4lo%2FhOwbA8FwgglGv%2BPDoaF1%2FW%2BsK8dzrqHenm%2F4Y67j6M8UEvZjr118DjYgDHq97LR8W4wyGO%2Bs05v7Gi5jPKjxjVerP%2FCV%2B4j9I4LgUwWdc8ee&isDiscovery=true&appUrl=https%3A%2F%2Fvcsa.markalston.net%2Fui%2Flogin"
+        }
+      ]
+    },
+    {
+      "domain": "google.com",
+      "tab_count": 3,
+      "tabs": [
+        {
+          "title": "what is japan&#39;s stock market called - Google Search",
+          "url": "https://www.google.com/search?q=what+is+japan%27s+stock+market+called&oq=what+is+japan%27s+stock+&gs_lcrp=EgZjaHJvbWUqBwgAEAAYgAQyBwgAEAAYgAQyBggBEEUYOTIHCAIQABiABDIICAMQABgWGB4yCAgEEAAYFhgeMggIBRAAGBYYHjIICAYQABgWGB4yCAgHEAAYFhgeMggICBAAGBYYHjIICAkQABgWGB7SAQg1NjQ4ajBqN6gCALACAA&sourceid=chrome&ie=UTF-8"
+        },
+        {
+          "title": "IREN - Google Search",
+          "url": "https://www.google.com/search?q=IREN&oq=IREN&gs_lcrp=EgZjaHJvbWUyDwgAEEUYORiDARixAxiABDINCAEQABiDARixAxiABDIKCAIQLhixAxiABDIKCAMQLhixAxiABDINCAQQABiDARixAxiABDIKCAUQLhixAxiABDITCAYQLhiDARjHARixAxjRAxiABDINCAcQLhjHARjRAxiABDIQCAgQABiDARixAxiABBiKBTIKCAkQLhixAxiABNIBBzM3OWowajeoAgCwAgA&sourceid=chrome&ie=UTF-8"
+        },
+        {
+          "title": "what are ai embeddings - Google Search",
+          "url": "https://www.google.com/search?q=what+are+ai+embeddings&oq=what+are+ai+embe&gs_lcrp=EgZjaHJvbWUqBwgAEAAYgAQyBwgAEAAYgAQyBggBEEUYOTIHCAIQABiABDIICAMQABgWGB4yCggEEAAYChgWGB4yCAgFEAAYFhgeMggIBhAAGBYYHjIICAcQABgWGB4yCAgIEAAYFhgeMg0ICRAAGIYDGIAEGIoF0gEINTMwNGowajeoAgCwAgA&sourceid=chrome&ie=UTF-8&sei=pGMXaebIJP3E0PEP3I6iuA0"
+        }
+      ]
+    },
+    {
+      "domain": "vmware.com",
+      "tab_count": 2,
+      "tabs": [
+        {
+          "title": "Deploying Minimal VMware Cloud Foundation 9.0 Lab",
+          "url": "https://www.vmware.com/explore/video/6377278596112"
+        },
+        {
+          "title": "Search | VMware Explore Videos",
+          "url": "https://www.vmware.com/explore/video-library/search?term[]=William%20Lam"
+        }
+      ]
+    },
+    {
+      "domain": "claude.ai",
+      "tab_count": 2,
+      "tabs": [
+        {
+          "title": "Claude",
+          "url": "https://claude.ai/login?returnTo=%2F%3F"
+        },
+        {
+          "title": "Claude",
+          "url": "https://claude.ai/login?returnTo=%2Fcode"
+        }
+      ]
+    },
+    {
+      "domain": "docs.agno.com",
+      "tab_count": 2,
+      "tabs": [
+        {
+          "title": "Connecting Your AgentOS - Agno",
+          "url": "https://docs.agno.com/agent-os/connecting-your-os"
+        },
+        {
+          "title": "PDF Reader - Agno",
+          "url": "https://docs.agno.com/examples/concepts/knowledge/readers/pdf/pdf-reader"
+        }
+      ]
+    },
+    {
+      "domain": "docs.requarks.io",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Markdown | Wiki.js",
+          "url": "https://docs.requarks.io/en/editors/markdown"
+        }
+      ]
+    },
+    {
+      "domain": "carbonite.lab.markalston.net:8443",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "carbonite.lab.markalston.net",
+          "url": "https://carbonite.lab.markalston.net:8443/VCF9/PROD/COMP/VCF_OPS_CLOUD_PROXY/"
+        }
+      ]
+    },
+    {
+      "domain": "store.minisforum.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Minisforum MS-A2",
+          "url": "https://store.minisforum.com/products/minisforum-ms-a2"
+        }
+      ]
+    },
+    {
+      "domain": "nsx01.vcf.lab",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://nsx01.vcf.lab/login.jsp"
+        }
+      ]
+    },
+    {
+      "domain": "vcf01.vcf.lab",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://vcf01.vcf.lab/ui/login.action?vcf=1&uri=dmNmLW9wZXJhdGlvbnMvdWkvaG9tZTt0YWI9aG9tZS1tdWx0aS1jbG91ZA=="
+        }
+      ]
+    },
+    {
+      "domain": "vc01.vcf.lab",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://vc01.vcf.lab/websso/SAML2/SSO/vsphere.local?SAMLRequest=zVRdb5swFP0ryO9gIKFLrZAqa1YtUruykk3TXibH3CSWwGa%2BBtJ%2FP0OSLaraKo97Nfeee77E9GZflV4LBqVWKYmCkHighC6k2qbk2%2BrOn5Cb2RR5VdZs3tideoLfDaD13J5CNnxISWMU0xwlMsUrQGYFy%2BcP9ywOQlYbbbXQJfHmiGCsO3SrFTYVmBxMKwUsVQH7lLjTC4csFbcDmZ21NTJKWxFGQSs2QcnXtIM1oqY9ekzz%2FJG2WO%2FAQFBqwd2NO20EDERTsuElAvGWi5T8EtE1hEm8TooQYg6bkYAPm6vrUTji42gdTtwYZhxRtvBvEbFx5NByZVMSh3HiR5EfjVbRFUsSlkyCMBn%2FJF52VPhRqoNv79mxPgwh%2B7xaZX72mK8GgFYWYL646ZSc62Xj8Yh430%2F5OABySmNgZy7PgZ%2FcJ7NXnW0k7VFODldgecEtn9Lzc4fjcc16qstFpkspns84xJeXoSx1d2uAWyfZmgaG7Cpu3wfoX2Thb4ZRVvfGoAVliZdnPaevDS%2FlRoJ5oz9vqCT0qIy5bhaytwnPZV1s7UuUI0jrVg6MekJVx11jha4oih1UHCm31vgDMI3DKKbhmH7aO1197EiOIHuUfzG6rgu6UaDN1i2EEf3xcJ8PWL4cCiucn26e2ee6r1TP%2BAkUdHxdwsq9vSL4P6K6gBK251Tpy3Bmp16e%2F5RmfwA%3D&RelayState=9116e46f-96a0-475b-98e9-4aa49230cbb1&SigAlg=http%3A%2F%2Fwww.w3.org%2F2001%2F04%2Fxmldsig-more%23rsa-sha256&Signature=em6bIt1Tdhr2b%2F%2Fg4aXaTaWAhIixITinj68UH%2FPlPKjrylVeOs2MfXa16vDY9XPW7VRhTNtVm13VYr0Q3p%2Bya9hfYaeARmNRsY2E%2BlOsd8JoWOLPesKhZL7UhYnTNkIUP5IogllXT4TCf3aFQ51bBG5S3xi62PcaD5dwXs3IQSCZ6h%2F5Jvql%2BLPv5Qgvpnvtoy866lXIVrhg3F%2FKCMs23MF3fge2Ui4PdCgDHOvVFkUn1mlG2YZ%2Bkq3HHtSrOv09GCZeMYioqxOAYRCtIvQjwwaQA94PkHa%2BeMGPTwvg3RybOAqAKEQlXmF1gH1fRcdg1v%2FlNovUR0s0wFg6G0BdsNorW7Xj1Ll%2BLwkasWsof8FP3mMIkBAne0709N6a%2F0wjzaZyKvZXajiEnMlUU2Bg2Zqp4yPt1exfkv%2F813Siw%2FZWP6cxo9HoqXqRSUL2b9pEEqSCC8eFhzuvwGOdjnQFKO5Jw0zIFE2wWb3f%2BZfot5TBoEdBxO%2BIpgD%2FjmfkknFt&isDiscovery=true&appUrl=https%3A%2F%2Fvc01.vcf.lab%2Fui%2Flogin"
+        }
+      ]
+    },
+    {
+      "domain": "sddcm01.vcf.lab",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://sddcm01.vcf.lab/vcf-installer-ui/login?sessionExpired=true"
+        }
+      ]
+    },
+    {
+      "domain": "esx03",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://esx03/ui/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "esx02",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://esx02/ui/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "esx01",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://esx01/ui/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "docs.pi-hole.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Ubiquiti USG - Pi-hole documentation",
+          "url": "https://docs.pi-hole.net/routers/ubiquiti-usg/"
+        }
+      ]
+    },
+    {
+      "domain": "signin.aws.amazon.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Amazon Web Services Sign-In",
+          "url": "https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fus-east-1.console.aws.amazon.com%2Froute53%2Fv2%2Fhostedzones%3Fca-oauth-flow-id%3D8623%26hashArgs%3D%2523ListRecordSets%252FZ2Q2GUP1WG1LHK%26isauthcode%3Dtrue%26oauthStart%3D1762978867453%26region%3Dus-east-1%26state%3DhashArgsFromTB_us-east-1_e45627ac61d83693&client_id=arn%3Aaws%3Asignin%3A%3A%3Aconsole%2Froute53-daas&forceMobileApp=0&code_challenge=ZjmnznBx3EJi6JFQ8VeQ2qoUVpagKypd1iuPVm16esM&code_challenge_method=SHA-256"
+        }
+      ]
+    },
+    {
+      "domain": "markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Home | Homelab Infrastructure",
+          "url": "https://www.markalston.net/homelab-legacy/"
+        }
+      ]
+    },
+    {
+      "domain": "carbonite.markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://carbonite.markalston.net/#/signin"
+        }
+      ]
+    },
+    {
+      "domain": "macpro.lab.markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://macpro.lab.markalston.net/ui/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "esxi-nuc-03.lab.markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://esxi-nuc-03.lab.markalston.net/ui/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "esxi-nuc-02.lab.markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://esxi-nuc-02.lab.markalston.net/ui/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "esxi-nuc-01.lab.markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://esxi-nuc-01.lab.markalston.net/ui/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "esxi-ms-a2-02.lab.markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "esxi-ms-a2-02.lab.markalston.net",
+          "url": "https://esxi-ms-a2-02.lab.markalston.net/ui/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "esxi-ms-a2-01.lab.markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "esxi-ms-a2-01.lab.markalston.net",
+          "url": "https://esxi-ms-a2-01.lab.markalston.net/ui/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "vcsa.markalston.net:5480",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://vcsa.markalston.net:5480/#/login"
+        }
+      ]
+    },
+    {
+      "domain": "amazon.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Crucial 128GB Kit (2X64GB) DDR5 RAM 5600MHz (or 5200MHz or 4800MHz) Laptop Memory Kit, SODIMM 262-Pin, Compatible with Latest Intel Core Ultra and AMD Ryzen 8000 &amp; Above – CT2K64G56C46S5 at Amazon.com",
+          "url": "https://www.amazon.com/dp/B0DSQMKYLN?th=1&linkCode=sl1&tag=vghetto-20&linkId=78300e2a4b96b96e608096b8c59a1ac4&language=en_US&ref_=as_li_ss_tl"
+        }
+      ]
+    },
+    {
+      "domain": "harbor.lab.markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "harbor.lab.markalston.net",
+          "url": "https://harbor.lab.markalston.net/"
+        }
+      ]
+    },
+    {
+      "domain": "opsman.lab.markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://opsman.lab.markalston.net/"
+        }
+      ]
+    },
+    {
+      "domain": "minio.lab.markalston.net:9001",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://minio.lab.markalston.net:9001/login"
+        }
+      ]
+    },
+    {
+      "domain": "concourse.lab.markalston.net",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Privacy error",
+          "url": "https://concourse.lab.markalston.net/"
+        }
+      ]
+    },
+    {
+      "domain": "youtube.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "New ROGUE OBJECT Discovered In-Between 3I/ATLAS and EARTH 🔭 3I/ATLAS Probe or New Comet? - YouTube",
+          "url": "https://www.youtube.com/watch?app=desktop&v=5uXFELv_EbQ"
+        }
+      ]
+    },
+    {
+      "domain": "prompts.chat",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "prompts.chat — awesome AI prompts",
+          "url": "https://prompts.chat/"
+        }
+      ]
+    },
+    {
+      "domain": "securemail.wf.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Wells Fargo Password Authorization",
+          "url": "https://securemail.wf.com/s/welcome.jsp?b=wellsfargo"
+        }
+      ]
+    },
+    {
+      "domain": "liveproject.manning.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "liveProject - premium training by Manning",
+          "url": "https://liveproject.manning.com/finder"
+        }
+      ]
+    },
+    {
+      "domain": "login.manning.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Login - Single Sign On | Manning Publications",
+          "url": "https://login.manning.com/login?service=https%3A%2F%2Fwww.manning.com%2Flogin%2Fcas"
+        }
+      ]
+    },
+    {
+      "domain": "noip.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Sign In - No-IP",
+          "url": "https://www.noip.com/login?ref_url=%2Fmembers%2Fregistration%2Ftransfer.php%3Fpage%3Dstep1"
+        }
+      ]
+    },
+    {
+      "domain": "usaa.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "USAA / Log Off Successful",
+          "url": "https://www.usaa.com/my/logoff/?akredirect=true"
+        }
+      ]
+    },
+    {
+      "domain": "workspace.google.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Gmail: Private and secure email at no cost | Google Workspace",
+          "url": "https://workspace.google.com/intl/en-US/gmail/#inbox/FMfcgzQcqlCVJGWjMnVnqgDpGKVrHPTl"
+        }
+      ]
+    },
+    {
+      "domain": "os.agno.com",
+      "tab_count": 1,
+      "tabs": [
+        {
+          "title": "Agno",
+          "url": "https://os.agno.com/signin"
+        }
+      ]
+    }
+  ]
+}

@@ -38,15 +38,18 @@ def find_chrome_profile_dir():
 
 def get_chrome_tabs_macos():
     """Get tabs from Chrome using AppleScript on macOS"""
-    applescript = '''
+    # Use a delimiter that's unlikely to appear in URLs/titles
+    delimiter = "|||TAB_SEPARATOR|||"
+
+    applescript = f'''
     tell application "Google Chrome"
-        set tabList to {}
+        set tabData to ""
         repeat with w in windows
             repeat with t in tabs of w
-                set end of tabList to {URL of t, title of t}
+                set tabData to tabData & (URL of t) & "{delimiter}" & (title of t) & "{delimiter}"
             end repeat
         end repeat
-        return tabList
+        return tabData
     end tell
     '''
 
@@ -58,14 +61,12 @@ def get_chrome_tabs_macos():
             check=True
         )
 
-        # Parse AppleScript output: "url1, title1, url2, title2, ..."
         output = result.stdout.strip()
         if not output or output == '':
             return []
 
-        # Split by comma, but be careful of commas in titles/URLs
-        # AppleScript returns: URL of t1, title of t1, URL of t2, title of t2
-        parts = output.split(', ')
+        # Split by delimiter
+        parts = output.split(delimiter)
 
         tabs = []
         i = 0
@@ -73,12 +74,18 @@ def get_chrome_tabs_macos():
             url = parts[i].strip()
             title = parts[i + 1].strip() if i + 1 < len(parts) else "Untitled"
 
-            # Skip empty URLs
+            # Skip empty URLs and validate URL format
             if url and url != '' and not url.startswith('missing value'):
-                tabs.append({
-                    'url': url,
-                    'title': title
-                })
+                # Basic URL validation - should start with http:// or https://
+                if url.startswith('http://') or url.startswith('https://'):
+                    tabs.append({
+                        'url': url,
+                        'title': title
+                    })
+                else:
+                    # Skip invalid URLs but log them
+                    print(f"  Skipping invalid URL: {url[:50]}")
+
             i += 2
 
         return tabs

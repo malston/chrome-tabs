@@ -1,21 +1,23 @@
-.PHONY: help install run chrome-debug chrome-restart check-chrome clean kill-chrome backup-tabs restore-tabs full-workflow organize-domain organize-category
+.PHONY: help install run chrome-debug chrome-restart check-chrome clean kill-chrome backup-tabs restore-tabs restore-history full-workflow organize-domain organize-category organize-interactive
 
 # Default target
 help:
 	@echo "Chrome Tab Consolidator - Makefile"
 	@echo ""
 	@echo "Available targets:"
-	@echo "  make install         - Install dependencies using uv"
-	@echo "  make backup-tabs     - Backup tabs from your current Chrome session"
-	@echo "  make chrome-restart  - Quit Chrome and restart with remote debugging"
-	@echo "  make restore-tabs    - Restore backed-up tabs into debug Chrome"
-	@echo "  make run             - Run the tab consolidator (deduplicate)"
-	@echo "  make organize-domain - Analyze and report tabs grouped by domain"
-	@echo "  make organize-category - Organize tabs by category (coming soon)"
-	@echo "  make full-workflow   - Complete workflow: backup -> restart -> restore -> dedupe"
-	@echo "  make check-chrome    - Check if Chrome debugging is accessible"
-	@echo "  make kill-chrome     - Kill all Chrome processes"
-	@echo "  make clean           - Remove virtual environment and backups"
+	@echo "  make install              - Install dependencies using uv"
+	@echo "  make backup-tabs          - Backup tabs from your current Chrome session"
+	@echo "  make chrome-restart       - Quit Chrome and restart with remote debugging"
+	@echo "  make restore-tabs         - Restore backed-up tabs into debug Chrome"
+	@echo "  make restore-history      - Restore tabs from Chrome browsing history"
+	@echo "  make run                  - Run the tab consolidator (deduplicate)"
+	@echo "  make organize-domain      - Analyze and report tabs grouped by domain"
+	@echo "  make organize-interactive - Interactive guide to group tabs step-by-step"
+	@echo "  make organize-category    - Organize tabs by category (coming soon)"
+	@echo "  make full-workflow        - Complete workflow: backup -> restart -> restore -> dedupe"
+	@echo "  make check-chrome         - Check if Chrome debugging is accessible"
+	@echo "  make kill-chrome          - Kill all Chrome processes"
+	@echo "  make clean                - Remove virtual environment and backups"
 	@echo ""
 	@echo "Recommended workflow:"
 	@echo "  1. make install"
@@ -159,6 +161,13 @@ restore-tabs: check-chrome
 		exit 1; \
 	fi
 
+# Restore tabs from Chrome history
+restore-history: check-chrome
+	@echo "Restoring tabs from Chrome browsing history..."
+	@echo "This will restore the last 7 days of browsing history (max 200 URLs)"
+	@command -v uv >/dev/null 2>&1 || { echo "Error: uv is not installed. Run 'make install' first"; exit 1; }
+	uv run restore_from_history.py
+
 # Complete workflow: backup -> restart -> restore -> dedupe
 full-workflow:
 	@echo "Starting full tab consolidation workflow..."
@@ -185,6 +194,16 @@ organize-domain: check-chrome
 	@echo "Analyzing tabs by domain..."
 	@if [ -d ".venv" ]; then \
 		.venv/bin/python organize_tabs.py --mode domain; \
+	else \
+		echo "Error: Virtual environment not found. Run 'make install' first"; \
+		exit 1; \
+	fi
+
+# Interactive guide to organize tabs
+organize-interactive: check-chrome
+	@echo "Starting interactive tab organization..."
+	@if [ -d ".venv" ]; then \
+		.venv/bin/python organize_tabs.py --mode interactive; \
 	else \
 		echo "Error: Virtual environment not found. Run 'make install' first"; \
 		exit 1; \

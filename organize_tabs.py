@@ -192,12 +192,105 @@ class ChromeTabOrganizer:
 
         return True
 
+    def interactive_organize(self):
+        """Interactive mode to help organize tabs by domain"""
+
+        print("Chrome Tab Organizer - Interactive Mode")
+        print("=" * 60)
+
+        # Check connection
+        if not self.check_connection():
+            print("\nPlease ensure Chrome is running with remote debugging:")
+            print("  make chrome-restart")
+            return False
+
+        # Get all tabs
+        tabs = self.get_all_tabs()
+
+        if not tabs:
+            print("No tabs found.")
+            return False
+
+        print(f"\nFound {len(tabs)} tabs")
+
+        # Skip chrome:// and about: URLs
+        valid_tabs = []
+        for tab in tabs:
+            url = tab.get('url', '')
+            if url and not url.startswith('chrome://') and not url.startswith('chrome-extension://') and url != 'about:blank':
+                valid_tabs.append(tab)
+
+        print(f"Organizing {len(valid_tabs)} tabs")
+
+        # Group tabs by domain
+        domain_groups = defaultdict(list)
+        for tab in valid_tabs:
+            url = tab.get('url', '')
+            domain = self.extract_domain(url)
+            domain_groups[domain].append(tab)
+
+        # Sort domains by tab count (most tabs first)
+        sorted_domains = sorted(domain_groups.items(), key=lambda x: len(x[1]), reverse=True)
+
+        print(f"\n{'=' * 60}")
+        print("INTERACTIVE GROUPING GUIDE")
+        print(f"{'=' * 60}\n")
+
+        print("I'll help you group your tabs step by step.")
+        print("For each domain with multiple tabs, I'll:")
+        print("  1. Show you the tabs")
+        print("  2. Highlight the first tab")
+        print("  3. Wait for you to manually group them\n")
+
+        input("Press Enter to start...")
+
+        grouped_count = 0
+        for domain, tabs_list in sorted_domains:
+            if len(tabs_list) <= 1:
+                continue  # Skip domains with only 1 tab
+
+            print(f"\n{'-' * 60}")
+            print(f"Domain: {domain} ({len(tabs_list)} tabs)")
+            print(f"{'-' * 60}")
+
+            # Show all tabs for this domain
+            for i, tab in enumerate(tabs_list, 1):
+                title = tab.get('title', 'Untitled')[:60]
+                print(f"  {i}. {title}")
+
+            print(f"\nNow I'll highlight the first {domain} tab...")
+
+            # Activate the first tab of this domain
+            if tabs_list:
+                self.activate_tab(tabs_list[0]['id'])
+                time.sleep(0.5)
+
+            print(f"\n✓ First tab highlighted in browser")
+            print(f"\nTo group these {len(tabs_list)} tabs:")
+            print(f"  1. Right-click on the highlighted tab")
+            print(f"  2. Select 'Add tab to group' > 'New group'")
+            print(f"  3. Name it: '{domain}'")
+            print(f"  4. Manually drag the other {len(tabs_list) - 1} tabs into this group")
+            print(f"     (Use Cmd+Click to select multiple tabs)")
+
+            response = input(f"\nPress Enter when done (or 's' to skip this domain)... ")
+
+            if response.lower() != 's':
+                grouped_count += 1
+
+        print(f"\n{'=' * 60}")
+        print(f"Interactive grouping complete!")
+        print(f"  Domains processed: {grouped_count}")
+        print(f"{'=' * 60}\n")
+
+        return True
+
 
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(description='Organize Chrome tabs')
-    parser.add_argument('--mode', choices=['domain', 'category'], default='domain',
+    parser.add_argument('--mode', choices=['domain', 'category', 'interactive'], default='domain',
                        help='Organization mode (default: domain)')
     parser.add_argument('--port', type=int, default=9222,
                        help='Chrome remote debugging port (default: 9222)')
@@ -210,6 +303,11 @@ def main():
 
     if args.mode == 'domain':
         success = organizer.organize_by_domain()
+    elif args.mode == 'interactive':
+        success = organizer.interactive_organize()
+    elif args.mode == 'category':
+        print(f"Mode '{args.mode}' not yet implemented")
+        success = False
     else:
         print(f"Mode '{args.mode}' not yet implemented")
         success = False
