@@ -1,0 +1,15 @@
+[project]
+name = "chrome-tab-consolidator"
+version = "1.0.0"
+description = "Remove duplicate tabs across Chrome windows"
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.31.0",
+]
+
+[project.scripts]
+consolidate-tabs = "consolidate_tabs:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
