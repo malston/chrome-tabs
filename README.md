@@ -10,19 +10,7 @@ Complete solution for managing Chrome tabs: organize by domain, remove duplicate
 
 The extension provides a clean, simple interface with one-click actions:
 
-<!-- TODO: Add screenshot of popup interface showing all buttons -->
-```sh
-┌─────────────────────────┐
-│   Tab Organizer         │
-├─────────────────────────┤
-│ [Organize by Domain]    │
-│ [Organize by Category]  │
-│ [Remove Duplicates]     │
-│ [Save to Bookmarks]     │
-│ [Restore from Bookmarks]│
-│ [Remove All Groups]     │
-└─────────────────────────┘
-```
+![Extension Popup](screenshots/popup.png)
 
 ### Organized Tabs by Domain
 
