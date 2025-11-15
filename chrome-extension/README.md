@@ -72,6 +72,24 @@ The bookmarks are saved in "Other Bookmarks" under a timestamped folder like "Ta
 - New groups are created for groups that don't exist yet
 - All restored tabs are created in the background (not stealing focus)
 
+**Using Existing Bookmark Folders:**
+
+The extension looks for bookmark folders in "Other Bookmarks" that start with "Tab Organizer -". To make your existing bookmark folders compatible:
+
+1. Move your bookmark folder to "Other Bookmarks"
+2. Rename the folder to start with "Tab Organizer -" (e.g., "Tab Organizer - My Work Tabs")
+3. Organize bookmarks inside into subfolders (each subfolder becomes a tab group)
+4. The subfolder names will be used as tab group names
+
+Example structure:
+```
+Other Bookmarks
+└── Tab Organizer - My Work Tabs
+    ├── Development (15 bookmarks)  → Creates "Development" group
+    ├── Documentation (8 bookmarks) → Creates "Documentation" group
+    └── Shopping (5 bookmarks)      → Creates "Shopping" group
+```
+
 ### Remove All Groups
 1. Click the Tab Organizer extension icon
 2. Click "Remove All Groups"

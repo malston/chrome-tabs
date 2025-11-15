@@ -105,6 +105,15 @@ All bookmarks are saved in "Other Bookmarks" under a timestamped folder. Each ta
 - Automatically skips duplicate URLs
 - Creates new groups for groups that don't exist yet
 
+**Use Your Own Bookmark Folders:**
+
+You can restore from any bookmark folder by following this naming convention:
+
+1. Place your folder in "Other Bookmarks"
+2. Name it starting with "Tab Organizer -" (e.g., "Tab Organizer - My Project")
+3. Organize bookmarks into subfolders (subfolder names become tab group names)
+4. The extension will detect and list your folder for restoration
+
 ### Recover Lost Tabs from History
 
 **Use the command-line tool**:
