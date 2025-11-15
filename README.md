@@ -131,10 +131,9 @@ Note: Requires Chrome to be running with remote debugging. See troubleshooting b
 ## Requirements
 
 - **Chrome Extension**: Just Chrome browser
-- **Command-Line Tools** (optional):
+- **Command-Line Tools** (optional, for history recovery):
   - Python 3.8+
   - [uv](https://github.com/astral-sh/uv) package manager
-  - macOS (for AppleScript backup feature)
 
 ## Available Commands
 
