@@ -3,6 +3,8 @@
 Chrome History Restore Tool
 Restores tabs from Chrome's browsing history database.
 """
+# pylint: disable=broad-exception-caught
+# Broad exception catching is intentional for CLI tool robustness
 
 import json
 import os
@@ -19,6 +21,8 @@ import websocket
 
 
 class ChromeHistoryRestorer:
+    """Chrome History Restorer - restores tabs from Chrome's browsing history."""
+
     def __init__(self, host='localhost', port=9222):
         self.host = host
         self.port = port
@@ -47,6 +51,8 @@ class ChromeHistoryRestorer:
 
     def get_history_from_db(self, days=7, limit=200):
         """Read browsing history from Chrome's SQLite database"""
+        # pylint: disable=too-many-locals
+        # Complex database operations require multiple variables
 
         profile_dir = self.find_chrome_profile_dir()
         if not profile_dir:
@@ -132,7 +138,7 @@ class ChromeHistoryRestorer:
     def create_tab(self, url: str) -> Dict:
         """Create a new tab and navigate it to the given URL"""
         create_url = f'{self.base_url}/json/new'
-        response = requests.put(create_url)
+        response = requests.put(create_url, timeout=10)
         response.raise_for_status()
         tab_info = response.json()
 
@@ -211,18 +217,19 @@ class ChromeHistoryRestorer:
                 failed_count += 1
                 print(f"  [{i}/{len(history)}] Failed to restore: {title[:50]}")
 
-        print(f"\n{'=' * 60}")
-        print(f"Restore Summary:")
+        print("\n" + "=" * 60)
+        print("Restore Summary:")
         print(f"  Total URLs in history: {len(history)}")
         print(f"  Successfully restored: {restored_count}")
         print(f"  Failed: {failed_count}")
-        print(f"{'=' * 60}")
+        print("=" * 60)
 
         return restored_count > 0
 
 
 def main():
-    import argparse
+    """Main entry point for the Chrome History Restore Tool."""
+    import argparse  # pylint: disable=import-outside-toplevel
 
     parser = argparse.ArgumentParser(description='Restore Chrome tabs from history')
     parser.add_argument('--days', type=int, default=7,
