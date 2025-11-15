@@ -30,18 +30,7 @@ Tabs intelligently categorized by their purpose:
 
 Select and restore previously saved tab sessions:
 
-<!-- TODO: Add screenshot showing bookmark folder selector -->
-```sh
-┌──────────────────────────────┐
-│ Select Bookmark Folder       │
-├──────────────────────────────┤
-│ ▼ Tab Organizer - 01-15 14:30│
-│   Tab Organizer - 01-14 10:15│
-│   Tab Organizer - 01-13 09:00│
-├──────────────────────────────┤
-│  [Restore]  [Cancel]         │
-└──────────────────────────────┘
-```
+<img src="screenshots/bookmark-restore.jpg" alt="Select Bookmark Folder" width="300">
 
 ## Features
 
