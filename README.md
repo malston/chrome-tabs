@@ -2,6 +2,66 @@
 
 Complete solution for managing Chrome tabs: organize by domain, remove duplicates, and recover from history.
 
+![Extension Icon](chrome-extension/icon128.png)
+
+## Screenshots
+
+### Extension Popup
+The extension provides a clean, simple interface with one-click actions:
+
+<!-- TODO: Add screenshot of popup interface showing all buttons -->
+```
+┌─────────────────────────┐
+│   Tab Organizer         │
+├─────────────────────────┤
+│ [Organize by Domain]    │
+│ [Organize by Category]  │
+│ [Remove Duplicates]     │
+│ [Save to Bookmarks]     │
+│ [Restore from Bookmarks]│
+│ [Remove All Groups]     │
+└─────────────────────────┘
+```
+
+### Organized Tabs by Domain
+Tabs automatically grouped by domain with color coding:
+
+<!-- TODO: Add screenshot showing tabs organized by domain -->
+```
+Tab Groups:
+🔵 github.com (25)
+🔴 acme.com (24)
+🟡 local-network (7)
+```
+
+### Organized Tabs by Category
+Tabs intelligently categorized by their purpose:
+
+<!-- TODO: Add screenshot showing tabs organized by category -->
+```
+Tab Groups:
+🔵 Development (32)
+🔴 Documentation (18)
+🟡 Social Media (12)
+🟢 Shopping (8)
+```
+
+### Bookmark Restore Interface
+Select and restore previously saved tab sessions:
+
+<!-- TODO: Add screenshot showing bookmark folder selector -->
+```
+┌─────────────────────────────┐
+│ Select Bookmark Folder      │
+├─────────────────────────────┤
+│ ▼ Tab Organizer - 01-15 14:30│
+│   Tab Organizer - 01-14 10:15│
+│   Tab Organizer - 01-13 09:00│
+├─────────────────────────────┤
+│  [Restore]  [Cancel]        │
+└─────────────────────────────┘
+```
+
 ## Features
 
 ### 🎯 Chrome Extension (Primary Tool)
@@ -229,6 +289,29 @@ chrome-tabs/
 2. Review your tab groups
 3. Bookmark important groups
 4. Close Chrome with confidence
+
+## Contributing Screenshots
+
+To add actual screenshots to this README:
+
+1. **Take screenshots** of the extension in action:
+   - Extension popup showing all buttons
+   - Tabs organized by domain with visible tab groups
+   - Tabs organized by category
+   - Bookmark restore interface with folder selection
+   - Success status messages
+
+2. **Save screenshots** to the `screenshots/` directory:
+   - `screenshots/popup.png` - Extension popup interface
+   - `screenshots/organize-domain.png` - Tabs grouped by domain
+   - `screenshots/organize-category.png` - Tabs grouped by category
+   - `screenshots/bookmark-restore.png` - Bookmark folder selector
+   - `screenshots/success-message.png` - Example success message
+
+3. **Update README** by replacing the TODO comments with actual image links:
+   ```markdown
+   ![Extension Popup](screenshots/popup.png)
+   ```
 
 ## License
 
