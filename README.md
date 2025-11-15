@@ -29,7 +29,7 @@ chrome://extensions/
 
 # Enable "Developer mode" (toggle in top-right)
 # Click "Load unpacked"
-# Select: /Users/markalston/workspace/chrome-tabs/chrome-extension
+# Select: /path/to/chrome-tabs/chrome-extension
 ```
 
 See [chrome-extension/README.md](chrome-extension/README.md) for detailed instructions.
