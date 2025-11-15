@@ -2,7 +2,7 @@
 
 > Complete solution for managing Chrome tabs: organize by domain, remove duplicates, and recover from history.
 
-**Quick Links:** [Features](#features) • [Installation](#quick-start) • [Usage](#usage) • [Screenshots](#screenshots)
+**Quick Links:** [Features](#features) • [Installation](#quick-start) • [Usage](#usage) • [Screenshots](#screenshots) • [Contributing](#contributing) • [Project Board](https://github.com/users/malston/projects/2)
 
 ---
 
