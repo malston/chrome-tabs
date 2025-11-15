@@ -283,6 +283,260 @@ async function removeDuplicateTabs() {
   };
 }
 
+async function saveTabsToBookmarks() {
+  console.log('Saving tabs to bookmarks...');
+
+  const tabs = await chrome.tabs.query({ currentWindow: true });
+  const groups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+
+  // Create a map of group IDs to group info
+  const groupMap = new Map();
+  for (const group of groups) {
+    groupMap.set(group.id, group);
+  }
+
+  // Create root folder with timestamp
+  const timestamp = new Date().toLocaleString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).replace(/[/:]/g, '-').replace(', ', ' ');
+
+  const rootFolderName = `Tab Organizer - ${timestamp}`;
+
+  // Create root bookmark folder in "Other Bookmarks"
+  const rootFolder = await chrome.bookmarks.create({
+    parentId: '2', // "2" is the ID for "Other Bookmarks" in Chrome
+    title: rootFolderName
+  });
+
+  // Group tabs by their group ID
+  const tabsByGroup = new Map();
+  const ungroupedTabs = [];
+
+  for (const tab of tabs) {
+    // Skip chrome internal pages
+    if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+      continue;
+    }
+
+    if (tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE) {
+      ungroupedTabs.push(tab);
+    } else {
+      if (!tabsByGroup.has(tab.groupId)) {
+        tabsByGroup.set(tab.groupId, []);
+      }
+      tabsByGroup.get(tab.groupId).push(tab);
+    }
+  }
+
+  let savedCount = 0;
+  let folderCount = 0;
+
+  // Save grouped tabs
+  for (const [groupId, groupTabs] of tabsByGroup.entries()) {
+    const group = groupMap.get(groupId);
+    const folderName = group ? group.title : 'Unknown Group';
+
+    // Create folder for this group
+    const groupFolder = await chrome.bookmarks.create({
+      parentId: rootFolder.id,
+      title: folderName
+    });
+    folderCount++;
+
+    // Add bookmarks for each tab in the group
+    for (const tab of groupTabs) {
+      try {
+        await chrome.bookmarks.create({
+          parentId: groupFolder.id,
+          title: tab.title || tab.url,
+          url: tab.url
+        });
+        savedCount++;
+      } catch (e) {
+        console.error(`Error saving bookmark for ${tab.url}:`, e);
+      }
+    }
+  }
+
+  // Save ungrouped tabs if any exist
+  if (ungroupedTabs.length > 0) {
+    const ungroupedFolder = await chrome.bookmarks.create({
+      parentId: rootFolder.id,
+      title: 'Ungrouped Tabs'
+    });
+    folderCount++;
+
+    for (const tab of ungroupedTabs) {
+      try {
+        await chrome.bookmarks.create({
+          parentId: ungroupedFolder.id,
+          title: tab.title || tab.url,
+          url: tab.url
+        });
+        savedCount++;
+      } catch (e) {
+        console.error(`Error saving bookmark for ${tab.url}:`, e);
+      }
+    }
+  }
+
+  console.log(`Saved ${savedCount} bookmarks in ${folderCount} folders`);
+
+  return {
+    totalTabs: tabs.length,
+    savedBookmarks: savedCount,
+    folders: folderCount,
+    rootFolderName: rootFolderName
+  };
+}
+
+async function restoreFromBookmarks(bookmarkFolderId) {
+  console.log('Restoring tabs from bookmarks...');
+
+  // Get the bookmark folder
+  const [folder] = await chrome.bookmarks.get(bookmarkFolderId);
+  if (!folder) {
+    throw new Error('Bookmark folder not found');
+  }
+
+  // Get all children (bookmark folders)
+  const children = await chrome.bookmarks.getChildren(bookmarkFolderId);
+
+  // Get existing tabs to check for duplicates
+  const existingTabs = await chrome.tabs.query({ currentWindow: true });
+  const existingUrls = new Set(existingTabs.map(t => t.url));
+
+  // Get existing groups to check if group name exists
+  const existingGroups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+  const groupsByTitle = new Map();
+  for (const group of existingGroups) {
+    groupsByTitle.set(group.title, group);
+  }
+
+  let totalRestored = 0;
+  let duplicatesSkipped = 0;
+  let groupsCreated = 0;
+  let groupsMerged = 0;
+
+  // Process each bookmark folder (which represents a tab group)
+  for (const child of children) {
+    // Only process folders
+    if (!child.url) {
+      const groupName = child.title;
+      const bookmarks = await chrome.bookmarks.getChildren(child.id);
+
+      // Filter out non-URL bookmarks and duplicates
+      const urlsToRestore = [];
+      for (const bookmark of bookmarks) {
+        if (bookmark.url &&
+            !bookmark.url.startsWith('chrome://') &&
+            !bookmark.url.startsWith('chrome-extension://')) {
+
+          if (existingUrls.has(bookmark.url)) {
+            duplicatesSkipped++;
+          } else {
+            urlsToRestore.push(bookmark.url);
+            existingUrls.add(bookmark.url); // Track to avoid duplicates within this restore
+          }
+        }
+      }
+
+      if (urlsToRestore.length === 0) {
+        continue; // Skip empty folders
+      }
+
+      // Create tabs for these URLs
+      const newTabIds = [];
+      for (const url of urlsToRestore) {
+        try {
+          const tab = await chrome.tabs.create({
+            url: url,
+            active: false
+          });
+          newTabIds.push(tab.id);
+          totalRestored++;
+        } catch (e) {
+          console.error(`Error creating tab for ${url}:`, e);
+        }
+      }
+
+      if (newTabIds.length === 0) {
+        continue; // No tabs created
+      }
+
+      // Check if group with this name already exists
+      const existingGroup = groupsByTitle.get(groupName);
+
+      if (existingGroup) {
+        // Add tabs to existing group
+        try {
+          await chrome.tabs.group({
+            tabIds: newTabIds,
+            groupId: existingGroup.id
+          });
+          groupsMerged++;
+          console.log(`Added ${newTabIds.length} tabs to existing group: ${groupName}`);
+        } catch (e) {
+          console.error(`Error adding tabs to group ${groupName}:`, e);
+        }
+      } else {
+        // Create new group
+        try {
+          const groupId = await chrome.tabs.group({ tabIds: newTabIds });
+          await chrome.tabGroups.update(groupId, {
+            title: groupName,
+            color: getNextColor(),
+            collapsed: false
+          });
+          groupsCreated++;
+
+          // Add to our tracking map
+          const [newGroup] = await chrome.tabGroups.query({ groupId: groupId });
+          groupsByTitle.set(groupName, newGroup);
+
+          console.log(`Created new group: ${groupName} with ${newTabIds.length} tabs`);
+        } catch (e) {
+          console.error(`Error creating group ${groupName}:`, e);
+        }
+      }
+    }
+  }
+
+  console.log(`Restored ${totalRestored} tabs, skipped ${duplicatesSkipped} duplicates`);
+
+  return {
+    totalRestored: totalRestored,
+    duplicatesSkipped: duplicatesSkipped,
+    groupsCreated: groupsCreated,
+    groupsMerged: groupsMerged
+  };
+}
+
+async function getTabOrganizerBookmarkFolders() {
+  console.log('Getting Tab Organizer bookmark folders...');
+
+  // Get "Other Bookmarks" (ID: "2")
+  const children = await chrome.bookmarks.getChildren('2');
+
+  // Find all folders that start with "Tab Organizer -"
+  const tabOrganizerFolders = children.filter(child =>
+    !child.url && child.title && child.title.startsWith('Tab Organizer -')
+  );
+
+  // Sort by title (which includes timestamp) in reverse order (newest first)
+  tabOrganizerFolders.sort((a, b) => b.title.localeCompare(a.title));
+
+  return tabOrganizerFolders.map(folder => ({
+    id: folder.id,
+    title: folder.title
+  }));
+}
+
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'organizeTabs') {
@@ -301,6 +555,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   if (request.action === 'removeDuplicates') {
     removeDuplicateTabs()
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'saveToBookmarks') {
+    saveTabsToBookmarks()
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'getBookmarkFolders') {
+    getTabOrganizerBookmarkFolders()
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'restoreFromBookmarks') {
+    restoreFromBookmarks(request.folderId)
       .then(result => sendResponse(result))
       .catch(error => sendResponse({ error: error.message }));
     return true;

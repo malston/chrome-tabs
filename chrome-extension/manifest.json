@@ -5,7 +5,8 @@
   "description": "Automatically organize tabs by domain with one click",
   "permissions": [
     "tabs",
-    "tabGroups"
+    "tabGroups",
+    "bookmarks"
   ],
   "action": {
     "default_popup": "popup.html",

@@ -3,8 +3,14 @@
 const organizeBtn = document.getElementById('organizeBtn');
 const organizeCategoryBtn = document.getElementById('organizeCategoryBtn');
 const dedupeBtn = document.getElementById('dedupeBtn');
+const saveBookmarksBtn = document.getElementById('saveBookmarksBtn');
+const restoreBookmarksBtn = document.getElementById('restoreBookmarksBtn');
 const removeGroupsBtn = document.getElementById('removeGroupsBtn');
 const statusDiv = document.getElementById('status');
+const bookmarkSelector = document.getElementById('bookmarkSelector');
+const folderSelect = document.getElementById('folderSelect');
+const restoreSelectedBtn = document.getElementById('restoreSelectedBtn');
+const cancelSelectBtn = document.getElementById('cancelSelectBtn');
 
 function showStatus(message, type = 'success') {
   statusDiv.textContent = message;
@@ -92,6 +98,114 @@ dedupeBtn.addEventListener('click', async () => {
     dedupeBtn.disabled = false;
     dedupeBtn.textContent = 'Remove Duplicates';
   }
+});
+
+saveBookmarksBtn.addEventListener('click', async () => {
+  saveBookmarksBtn.disabled = true;
+  saveBookmarksBtn.textContent = 'Saving...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'saveToBookmarks'
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else {
+      showStatus(
+        `✓ Saved ${response.savedBookmarks} bookmarks in ${response.folders} folders!`,
+        'success'
+      );
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    saveBookmarksBtn.disabled = false;
+    saveBookmarksBtn.textContent = 'Save to Bookmarks';
+  }
+});
+
+restoreBookmarksBtn.addEventListener('click', async () => {
+  restoreBookmarksBtn.disabled = true;
+  restoreBookmarksBtn.textContent = 'Loading...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'getBookmarkFolders'
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else if (response.length === 0) {
+      showStatus('No saved bookmark folders found', 'error');
+    } else {
+      // Hide main buttons, show selector
+      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'none');
+      bookmarkSelector.style.display = 'block';
+
+      // Populate folder select
+      folderSelect.innerHTML = '';
+      response.forEach(folder => {
+        const option = document.createElement('option');
+        option.value = folder.id;
+        option.textContent = folder.title;
+        folderSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    restoreBookmarksBtn.disabled = false;
+    restoreBookmarksBtn.textContent = 'Restore from Bookmarks';
+  }
+});
+
+restoreSelectedBtn.addEventListener('click', async () => {
+  const selectedFolderId = folderSelect.value;
+  if (!selectedFolderId) {
+    showStatus('Please select a folder', 'error');
+    return;
+  }
+
+  restoreSelectedBtn.disabled = true;
+  restoreSelectedBtn.textContent = 'Restoring...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'restoreFromBookmarks',
+      folderId: selectedFolderId
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else {
+      let message = `✓ Restored ${response.totalRestored} tabs!`;
+      if (response.groupsCreated > 0) {
+        message += ` Created ${response.groupsCreated} new groups.`;
+      }
+      if (response.groupsMerged > 0) {
+        message += ` Merged into ${response.groupsMerged} existing groups.`;
+      }
+      if (response.duplicatesSkipped > 0) {
+        message += ` Skipped ${response.duplicatesSkipped} duplicates.`;
+      }
+      showStatus(message, 'success');
+
+      // Hide selector, show main buttons
+      bookmarkSelector.style.display = 'none';
+      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    restoreSelectedBtn.disabled = false;
+    restoreSelectedBtn.textContent = 'Restore';
+  }
+});
+
+cancelSelectBtn.addEventListener('click', () => {
+  bookmarkSelector.style.display = 'none';
+  document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
 });
 
 removeGroupsBtn.addEventListener('click', async () => {

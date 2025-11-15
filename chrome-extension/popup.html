@@ -78,6 +78,44 @@
       color: #5f6368;
       text-align: center;
     }
+
+    .bookmark-selector {
+      margin-top: 16px;
+      padding: 16px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      border: 1px solid #e8eaed;
+    }
+
+    .bookmark-selector h2 {
+      font-size: 14px;
+      margin: 0 0 12px 0;
+      color: #202124;
+    }
+
+    .bookmark-selector select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #e8eaed;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      background-color: white;
+    }
+
+    .bookmark-selector select option {
+      padding: 8px;
+    }
+
+    .selector-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .selector-buttons button {
+      flex: 1;
+      margin-bottom: 0;
+    }
   </style>
 </head>
 <body>
@@ -95,11 +133,28 @@
     Remove Duplicates
   </button>
 
+  <button id="saveBookmarksBtn" class="primary">
+    Save to Bookmarks
+  </button>
+
+  <button id="restoreBookmarksBtn" class="primary">
+    Restore from Bookmarks
+  </button>
+
   <button id="removeGroupsBtn" class="secondary">
     Remove All Groups
   </button>
 
   <div id="status" class="status"></div>
+
+  <div id="bookmarkSelector" class="bookmark-selector" style="display: none;">
+    <h2>Select Bookmark Folder</h2>
+    <select id="folderSelect" size="5"></select>
+    <div class="selector-buttons">
+      <button id="restoreSelectedBtn" class="primary">Restore</button>
+      <button id="cancelSelectBtn" class="secondary">Cancel</button>
+    </div>
+  </div>
 
   <div class="footer">
     Organize and deduplicate tabs

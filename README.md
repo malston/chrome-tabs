@@ -8,6 +8,8 @@ Complete solution for managing Chrome tabs: organize by domain, remove duplicate
 
 - **One-click organization** - Automatically group tabs by domain or category
 - **One-click deduplication** - Remove duplicate tabs instantly
+- **Save to bookmarks** - Save all tabs into bookmark folders by group
+- **Restore from bookmarks** - Restore tab groups from saved bookmarks
 - **Smart coloring** - Each group gets a unique color
 - **Shows tab counts** - See how many tabs in each group
 - **Works everywhere** - Use in any Chrome profile, anytime
@@ -76,6 +78,32 @@ Example result:
 1. Click the Tab Organizer icon
 2. Click "Remove Duplicates"
 3. Done! All duplicate URLs removed
+
+### Save Tabs to Bookmarks
+
+**Use the Chrome Extension**:
+
+1. Organize your tabs first (by Domain or Category)
+2. Click the Tab Organizer icon
+3. Click "Save to Bookmarks"
+4. Done! All tabs saved as bookmarks in organized folders
+
+All bookmarks are saved in "Other Bookmarks" under a timestamped folder. Each tab group becomes its own bookmark folder.
+
+### Restore Tabs from Bookmarks
+
+**Use the Chrome Extension**:
+
+1. Click the Tab Organizer icon
+2. Click "Restore from Bookmarks"
+3. Select a previously saved bookmark folder
+4. Click "Restore"
+5. Done! Tabs and groups are recreated
+
+**Smart Features:**
+- Merges tabs into existing groups with the same name
+- Automatically skips duplicate URLs
+- Creates new groups for groups that don't exist yet
 
 ### Recover Lost Tabs from History
 

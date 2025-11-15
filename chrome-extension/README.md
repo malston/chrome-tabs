@@ -7,6 +7,8 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 - **Organize by Domain**: Groups tabs by domain automatically
 - **Organize by Category**: Groups tabs by type (Development, Social Media, Shopping, etc.)
 - **Duplicate Removal**: Remove duplicate tabs instantly
+- **Save to Bookmarks**: Save all tabs into bookmark folders organized by group names
+- **Restore from Bookmarks**: Restore tab groups from saved bookmark folders
 - **Smart Coloring**: Each group gets a unique color
 - **One Click Operations**: Simple, fast, no configuration needed
 - **Handles Special Cases**: Groups localhost, private IPs intelligently
@@ -49,6 +51,27 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 2. Click "Remove Duplicates"
 3. All duplicate URLs are removed (keeps the first occurrence)
 
+### Save to Bookmarks
+1. Organize your tabs first (by Domain or Category)
+2. Click the Tab Organizer extension icon
+3. Click "Save to Bookmarks"
+4. All tabs saved into bookmark folders matching your group names!
+
+The bookmarks are saved in "Other Bookmarks" under a timestamped folder like "Tab Organizer - 2025-01-15 14:30". Each tab group becomes a folder, and ungrouped tabs go into an "Ungrouped Tabs" folder.
+
+### Restore from Bookmarks
+1. Click the Tab Organizer extension icon
+2. Click "Restore from Bookmarks"
+3. Select a previously saved bookmark folder from the list
+4. Click "Restore"
+5. Tabs are restored and grouped automatically!
+
+**Smart Restore Features:**
+- If a group with the same name already exists, new tabs are added to that group
+- Duplicate tabs (URLs already open) are automatically skipped
+- New groups are created for groups that don't exist yet
+- All restored tabs are created in the background (not stealing focus)
+
 ### Remove All Groups
 1. Click the Tab Organizer extension icon
 2. Click "Remove All Groups"
@@ -88,6 +111,27 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 3. Closes tabs with duplicate URLs (keeps the first one)
 4. Skips chrome:// internal pages
 
+**Save to Bookmarks:**
+1. Scans all tabs in the current window
+2. Gets all tab groups and their names
+3. Creates a root bookmark folder with timestamp
+4. For each tab group:
+   - Creates a folder with the group name
+   - Saves all tabs in that group as bookmarks
+5. Ungrouped tabs are saved in "Ungrouped Tabs" folder
+6. All bookmarks saved under "Other Bookmarks"
+
+**Restore from Bookmarks:**
+1. Lists all "Tab Organizer" bookmark folders
+2. User selects which folder to restore
+3. For each bookmark folder in the selected save:
+   - Checks if a group with that name already exists
+   - Filters out duplicate URLs (already open tabs)
+   - Creates new tabs for each bookmark
+   - If group exists: Adds tabs to existing group
+   - If group doesn't exist: Creates new group with that name
+4. All tabs created in background (not stealing focus)
+
 ## Examples
 
 **After "Organize by Domain":**
@@ -103,6 +147,18 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 
 **After "Remove Duplicates":**
 - "Removed 15 duplicate tabs!" - All duplicate URLs closed
+
+**After "Save to Bookmarks":**
+- Bookmarks saved in "Other Bookmarks" → "Tab Organizer - 2025-01-15 14:30"
+  - Folder: "github.com (25)" with 25 bookmarks
+  - Folder: "acme.com (24)" with 24 bookmarks
+  - Folder: "Ungrouped Tabs" with 12 bookmarks
+
+**After "Restore from Bookmarks":**
+- "Restored 61 tabs! Created 2 new groups. Merged into 1 existing groups. Skipped 5 duplicates."
+- Tab groups recreated with the same names as the bookmark folders
+- Existing groups have new tabs added to them
+- Duplicate tabs are not created
 
 ## Troubleshooting
 
