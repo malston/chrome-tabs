@@ -1,4 +1,4 @@
-.PHONY: help install restore-history clean
+.PHONY: help install restore-history lint clean
 
 # Default target
 help:
@@ -10,6 +10,7 @@ help:
 	@echo "Command-Line Tools:"
 	@echo "  make install         - Install dependencies using uv"
 	@echo "  make restore-history - Restore tabs from Chrome browsing history"
+	@echo "  make lint            - Run pylint on Python code"
 	@echo "  make clean           - Remove virtual environment"
 	@echo ""
 	@echo "Recommended workflow:"
@@ -40,6 +41,12 @@ restore-history:
 	@echo ""
 	@command -v uv >/dev/null 2>&1 || { echo "Error: uv is not installed. Run 'make install' first"; exit 1; }
 	uv run restore_from_history.py
+
+# Run pylint on Python code
+lint:
+	@echo "Running pylint on Python code..."
+	@command -v uv >/dev/null 2>&1 || { echo "Error: uv is not installed. Run 'make install' first"; exit 1; }
+	uv run pylint restore_from_history.py
 
 # Clean up virtual environment
 clean:
