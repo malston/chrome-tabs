@@ -39,14 +39,110 @@ function extractDomain(url) {
   }
 }
 
+function categorizeUrl(url) {
+  try {
+    const urlObj = new URL(url);
+    const domain = urlObj.hostname.toLowerCase().replace(/^www\./, '');
+    const path = urlObj.pathname.toLowerCase();
+
+    // Development & Tech
+    if (domain.includes('github') || domain.includes('gitlab') || domain.includes('bitbucket') ||
+        domain.includes('stackoverflow') || domain.includes('stackexchange') ||
+        domain.includes('npmjs') || domain.includes('pypi') || domain.includes('maven') ||
+        domain.includes('docker') || domain.includes('kubernetes') ||
+        domain === 'localhost' || /^[\d.:]+$/.test(domain)) {
+      return 'Development';
+    }
+
+    // Documentation & Learning
+    if (domain.includes('docs.') || domain.includes('documentation') ||
+        domain.includes('readthedocs') || domain.includes('developer.') ||
+        domain.includes('api.') && path.includes('doc') ||
+        domain.includes('tutorial') || domain.includes('learn') ||
+        domain.includes('coursera') || domain.includes('udemy') || domain.includes('edx') ||
+        domain.includes('pluralsight') || domain.includes('codecademy')) {
+      return 'Documentation';
+    }
+
+    // Social Media
+    if (domain.includes('facebook') || domain.includes('twitter') || domain.includes('x.com') ||
+        domain.includes('instagram') || domain.includes('linkedin') || domain.includes('reddit') ||
+        domain.includes('tiktok') || domain.includes('snapchat') || domain.includes('pinterest') ||
+        domain.includes('mastodon') || domain.includes('bluesky')) {
+      return 'Social Media';
+    }
+
+    // Communication
+    if (domain.includes('slack') || domain.includes('discord') || domain.includes('teams') ||
+        domain.includes('zoom') || domain.includes('meet') || domain.includes('webex') ||
+        domain.includes('mail') || domain.includes('gmail') || domain.includes('outlook') ||
+        domain.includes('protonmail') || domain.includes('telegram')) {
+      return 'Communication';
+    }
+
+    // Shopping & Commerce
+    if (domain.includes('amazon') || domain.includes('ebay') || domain.includes('etsy') ||
+        domain.includes('shop') || domain.includes('store') || domain.includes('cart') ||
+        domain.includes('checkout') || domain.includes('buy') ||
+        domain.includes('walmart') || domain.includes('target') || domain.includes('bestbuy')) {
+      return 'Shopping';
+    }
+
+    // Cloud & Productivity
+    if (domain.includes('google') && (path.includes('drive') || path.includes('docs') || path.includes('sheets')) ||
+        domain.includes('dropbox') || domain.includes('onedrive') || domain.includes('icloud') ||
+        domain.includes('notion') || domain.includes('evernote') || domain.includes('trello') ||
+        domain.includes('asana') || domain.includes('monday') || domain.includes('airtable') ||
+        domain.includes('sharepoint') || domain.includes('confluence')) {
+      return 'Productivity';
+    }
+
+    // News & Media
+    if (domain.includes('news') || domain.includes('cnn') || domain.includes('bbc') ||
+        domain.includes('nytimes') || domain.includes('wsj') || domain.includes('reuters') ||
+        domain.includes('medium') || domain.includes('substack') || domain.includes('blog') ||
+        domain.includes('article') || domain.includes('post')) {
+      return 'News & Media';
+    }
+
+    // Entertainment
+    if (domain.includes('youtube') || domain.includes('netflix') || domain.includes('hulu') ||
+        domain.includes('spotify') || domain.includes('twitch') || domain.includes('vimeo') ||
+        domain.includes('soundcloud') || domain.includes('disneyplus') || domain.includes('hbomax') ||
+        domain.includes('gaming') || domain.includes('game')) {
+      return 'Entertainment';
+    }
+
+    // Finance & Banking
+    if (domain.includes('bank') || domain.includes('paypal') || domain.includes('venmo') ||
+        domain.includes('stripe') || domain.includes('mint') || domain.includes('finance') ||
+        domain.includes('investing') || domain.includes('trading') || domain.includes('crypto') ||
+        domain.includes('coinbase') || domain.includes('robinhood')) {
+      return 'Finance';
+    }
+
+    // Cloud Platforms & DevOps
+    if (domain.includes('aws') || domain.includes('azure') || domain.includes('cloud.google') ||
+        domain.includes('heroku') || domain.includes('vercel') || domain.includes('netlify') ||
+        domain.includes('digitalocean') || domain.includes('linode') || domain.includes('vultr')) {
+      return 'Cloud Services';
+    }
+
+    // Default category
+    return 'Other';
+  } catch (e) {
+    return 'Other';
+  }
+}
+
 async function organizeTabs(mode = 'domain') {
   console.log(`Organizing tabs by ${mode}...`);
 
   // Get all tabs in current window
   const tabs = await chrome.tabs.query({ currentWindow: true });
 
-  // Group tabs by domain
-  const domainGroups = {};
+  // Group tabs by domain or category
+  const groups = {};
   const skipDomains = new Set(['chrome://', 'chrome-extension://', 'about:']);
 
   for (const tab of tabs) {
@@ -55,13 +151,13 @@ async function organizeTabs(mode = 'domain') {
       continue;
     }
 
-    const domain = extractDomain(tab.url);
+    const groupKey = mode === 'category' ? categorizeUrl(tab.url) : extractDomain(tab.url);
 
-    if (!domainGroups[domain]) {
-      domainGroups[domain] = [];
+    if (!groups[groupKey]) {
+      groups[groupKey] = [];
     }
 
-    domainGroups[domain].push(tab);
+    groups[groupKey].push(tab);
   }
 
   // Ungroup all tabs first
@@ -75,20 +171,27 @@ async function organizeTabs(mode = 'domain') {
     }
   }
 
-  // Create groups for domains with multiple tabs
+  // Create groups for domains/categories with multiple tabs
   let groupedCount = 0;
   colorIndex = 0; // Reset color index
 
-  // Sort domains by tab count (most tabs first)
-  const sortedDomains = Object.entries(domainGroups)
+  // Sort groups by tab count (most tabs first)
+  const sortedGroups = Object.entries(groups)
     .filter(([_, tabs]) => tabs.length > 1)  // Only group if 2+ tabs
     .sort((a, b) => b[1].length - a[1].length);
 
-  for (const [domain, domainTabs] of sortedDomains) {
-    if (domainTabs.length <= 1) continue;
+  for (const [groupName, groupTabs] of sortedGroups) {
+    if (groupTabs.length <= 1) continue;
 
-    // Get tab IDs
-    const tabIds = domainTabs.map(t => t.id);
+    // Sort tabs within group by title (alphabetically)
+    const sortedTabs = groupTabs.sort((a, b) => {
+      const titleA = a.title.toLowerCase();
+      const titleB = b.title.toLowerCase();
+      return titleA.localeCompare(titleB);
+    });
+
+    // Get tab IDs in sorted order
+    const tabIds = sortedTabs.map(t => t.id);
 
     try {
       // Create a group with these tabs
@@ -96,22 +199,22 @@ async function organizeTabs(mode = 'domain') {
 
       // Update the group with a title and color
       await chrome.tabGroups.update(groupId, {
-        title: `${domain} (${domainTabs.length})`,
+        title: `${groupName} (${groupTabs.length})`,
         color: getNextColor(),
         collapsed: false
       });
 
-      groupedCount += domainTabs.length;
-      console.log(`Grouped ${domainTabs.length} tabs for ${domain}`);
+      groupedCount += groupTabs.length;
+      console.log(`Grouped ${groupTabs.length} tabs for ${groupName} (sorted alphabetically)`);
     } catch (e) {
-      console.error(`Error grouping tabs for ${domain}:`, e);
+      console.error(`Error grouping tabs for ${groupName}:`, e);
     }
   }
 
   return {
     totalTabs: tabs.length,
     groupedTabs: groupedCount,
-    domains: sortedDomains.length,
+    groups: sortedGroups.length,
     ungroupedTabs: tabs.length - groupedCount
   };
 }
