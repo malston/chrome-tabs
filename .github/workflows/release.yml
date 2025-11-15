@@ -1,0 +1,153 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Trigger on version tags like v1.0.0, v1.2.3, etc.
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for changelog
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Get extension version
+        id: ext_version
+        run: |
+          EXT_VERSION=$(grep -o '"version": "[^"]*"' chrome-extension/manifest.json | cut -d'"' -f4)
+          echo "EXT_VERSION=$EXT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create extension zip
+        run: |
+          cd chrome-extension
+          zip -r ../chrome-tab-manager-${{ steps.get_version.outputs.VERSION }}.zip . -x "*.DS_Store" "create_icons.sh"
+          cd ..
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          cat > release_notes.md << 'EOF'
+          # Chrome Tab Manager ${{ steps.get_version.outputs.VERSION }} 🗂️
+
+          A powerful Chrome extension for organizing, managing, and saving your tabs.
+
+          ## 🎯 Features
+
+          ### Tab Organization
+          - **Organize by Domain** - Automatically group tabs by website domain
+          - **Organize by Category** - Intelligently categorize tabs (Development, Social Media, Shopping, etc.)
+          - **Smart Sorting** - Tabs sorted alphabetically within each group
+          - **Color Coding** - Each group gets a unique color for easy identification
+
+          ### Tab Management
+          - **Remove Duplicates** - One-click duplicate tab removal
+          - **Remove All Groups** - Ungroup all tabs while keeping them open
+          - **Tab Counts** - See how many tabs in each group
+
+          ### Bookmark Integration
+          - **Save to Bookmarks** - Save all tabs into organized bookmark folders
+          - **Restore from Bookmarks** - Restore tab groups from saved bookmarks
+          - **Smart Merging** - Automatically merges with existing groups
+          - **Duplicate Detection** - Skips already-open URLs when restoring
+
+          ### Additional Tools
+          - **History Recovery** (CLI) - Restore tabs from Chrome browsing history
+          - **Cross-platform** - Works on macOS, Windows, and Linux
+
+          ## 📦 Installation
+
+          ### Chrome Extension (Recommended)
+
+          1. Download `chrome-tab-manager-${{ steps.get_version.outputs.VERSION }}.zip` from the assets below
+          2. Unzip the file
+          3. Open Chrome and navigate to `chrome://extensions/`
+          4. Enable "Developer mode" (toggle in top-right)
+          5. Click "Load unpacked"
+          6. Select the unzipped `chrome-extension` folder
+          7. Pin the extension to your toolbar for easy access
+
+          ### Command-Line Tools (Optional)
+
+          For history recovery functionality:
+          ```bash
+          git clone https://github.com/${{ github.repository }}.git
+          cd chrome-tabs
+          make install
+          ```
+
+          ## 🚀 Quick Start
+
+          1. Click the Tab Organizer icon in your toolbar
+          2. Choose an action:
+             - **Organize by Domain** - Group tabs by website
+             - **Organize by Category** - Group tabs by purpose
+             - **Remove Duplicates** - Clean up duplicate tabs
+             - **Save to Bookmarks** - Save your tab session
+             - **Restore from Bookmarks** - Reload a saved session
+
+          ## 📋 What's Included
+
+          - Chrome Extension with full UI
+          - History recovery Python script
+          - Complete documentation
+          - Contributing guidelines
+          - Example screenshots
+
+          ## 🐛 Known Issues
+
+          Please [report any issues](https://github.com/${{ github.repository }}/issues) you encounter.
+
+          ## 📚 Documentation
+
+          - [README.md](https://github.com/${{ github.repository }}/blob/main/README.md) - Full documentation
+          - [CONTRIBUTING.md](https://github.com/${{ github.repository }}/blob/main/CONTRIBUTING.md) - Contribution guidelines
+          - [Project Board](https://github.com/users/malston/projects/2) - Development tracking
+
+          ## 🙏 Acknowledgments
+
+          Built with Claude Code - AI-powered coding assistant from Anthropic.
+
+          ## 📄 License
+
+          MIT License - See [LICENSE](https://github.com/${{ github.repository }}/blob/main/LICENSE) for details.
+
+          ---
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/v1.0.0...${{ steps.get_version.outputs.VERSION }}
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          prerelease: false
+          name: Chrome Tab Manager ${{ steps.get_version.outputs.VERSION }} - Release
+          body_path: release_notes.md
+          files: |
+            chrome-tab-manager-${{ steps.get_version.outputs.VERSION }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        run: |
+          echo "## Release Created! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Extension Version:** ${{ steps.ext_version.outputs.EXT_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📦 **Asset:** chrome-tab-manager-${{ steps.get_version.outputs.VERSION }}.zip" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Status:** Draft release created" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Review and publish at: https://github.com/${{ github.repository }}/releases" >> $GITHUB_STEP_SUMMARY
