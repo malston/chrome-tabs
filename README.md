@@ -1,8 +1,10 @@
-# Chrome Tab Manager
+# Chrome Tab Manager 🗂️
 
-Complete solution for managing Chrome tabs: organize by domain, remove duplicates, and recover from history.
+> Complete solution for managing Chrome tabs: organize by domain, remove duplicates, and recover from history.
 
-![Extension Icon](chrome-extension/icon128.png)
+**Quick Links:** [Features](#features) • [Installation](#quick-start) • [Usage](#usage) • [Screenshots](#screenshots)
+
+---
 
 ## Screenshots
 
