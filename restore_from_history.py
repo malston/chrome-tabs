@@ -5,15 +5,17 @@ Restores tabs from Chrome's browsing history database.
 """
 
 import json
-import sys
-import sqlite3
+import os
 import shutil
-from pathlib import Path
+import sqlite3
+import sys
+import time
 from datetime import datetime, timedelta
-from typing import List, Dict
+from pathlib import Path
+from typing import Dict
+
 import requests
 import websocket
-import time
 
 
 class ChromeHistoryRestorer:
@@ -37,7 +39,6 @@ class ChromeHistoryRestorer:
             return chrome_dir
 
         # Windows
-        import os
         chrome_dir = Path(os.environ.get('LOCALAPPDATA', '')) / "Google/Chrome/User Data/Default"
         if chrome_dir.exists():
             return chrome_dir
@@ -124,7 +125,7 @@ class ChromeHistoryRestorer:
             response = requests.get(url, timeout=2)
             response.raise_for_status()
             return True
-        except Exception as e:
+        except Exception:
             print(f"Error: Cannot connect to Chrome at {self.base_url}")
             return False
 
@@ -206,7 +207,7 @@ class ChromeHistoryRestorer:
 
                 time.sleep(0.1)
 
-            except Exception as e:
+            except Exception:
                 failed_count += 1
                 print(f"  [{i}/{len(history)}] Failed to restore: {title[:50]}")
 
