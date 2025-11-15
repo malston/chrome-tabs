@@ -272,30 +272,6 @@ chrome-tabs/
 3. Bookmark important groups
 4. Close Chrome with confidence
 
-## Contributing Screenshots
-
-To add actual screenshots to this README:
-
-1. **Take screenshots** of the extension in action:
-   - Extension popup showing all buttons
-   - Tabs organized by domain with visible tab groups
-   - Tabs organized by category
-   - Bookmark restore interface with folder selection
-   - Success status messages
-
-2. **Save screenshots** to the `screenshots/` directory:
-   - `screenshots/popup.png` - Extension popup interface
-   - `screenshots/organize-domain.png` - Tabs grouped by domain
-   - `screenshots/organize-category.png` - Tabs grouped by category
-   - `screenshots/bookmark-restore.png` - Bookmark folder selector
-   - `screenshots/success-message.png` - Example success message
-
-3. **Update README** by replacing the TODO comments with actual image links:
-
-   ```markdown
-   ![Extension Popup](screenshots/popup.png)
-   ```
-
 ## License
 
 MIT License - feel free to modify and use as needed.
