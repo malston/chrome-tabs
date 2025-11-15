@@ -7,7 +7,6 @@ Restores tabs from Chrome's browsing history database.
 # Broad exception catching is intentional for CLI tool robustness
 
 import json
-import os
 import shutil
 import sqlite3
 import sys

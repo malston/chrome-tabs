@@ -7,10 +7,11 @@ Complete solution for managing Chrome tabs: organize by domain, remove duplicate
 ## Screenshots
 
 ### Extension Popup
+
 The extension provides a clean, simple interface with one-click actions:
 
 <!-- TODO: Add screenshot of popup interface showing all buttons -->
-```
+```sh
 ┌─────────────────────────┐
 │   Tab Organizer         │
 ├─────────────────────────┤
@@ -24,10 +25,11 @@ The extension provides a clean, simple interface with one-click actions:
 ```
 
 ### Organized Tabs by Domain
+
 Tabs automatically grouped by domain with color coding:
 
 <!-- TODO: Add screenshot showing tabs organized by domain -->
-```
+```sh
 Tab Groups:
 🔵 github.com (25)
 🔴 acme.com (24)
@@ -35,10 +37,11 @@ Tab Groups:
 ```
 
 ### Organized Tabs by Category
+
 Tabs intelligently categorized by their purpose:
 
 <!-- TODO: Add screenshot showing tabs organized by category -->
-```
+```sh
 Tab Groups:
 🔵 Development (32)
 🔴 Documentation (18)
@@ -47,19 +50,20 @@ Tab Groups:
 ```
 
 ### Bookmark Restore Interface
+
 Select and restore previously saved tab sessions:
 
 <!-- TODO: Add screenshot showing bookmark folder selector -->
-```
-┌─────────────────────────────┐
-│ Select Bookmark Folder      │
-├─────────────────────────────┤
+```sh
+┌──────────────────────────────┐
+│ Select Bookmark Folder       │
+├──────────────────────────────┤
 │ ▼ Tab Organizer - 01-15 14:30│
 │   Tab Organizer - 01-14 10:15│
 │   Tab Organizer - 01-13 09:00│
-├─────────────────────────────┤
-│  [Restore]  [Cancel]        │
-└─────────────────────────────┘
+├──────────────────────────────┤
+│  [Restore]  [Cancel]         │
+└──────────────────────────────┘
 ```
 
 ## Features
@@ -161,6 +165,7 @@ All bookmarks are saved in "Other Bookmarks" under a timestamped folder. Each ta
 5. Done! Tabs and groups are recreated
 
 **Smart Features:**
+
 - Merges tabs into existing groups with the same name
 - Automatically skips duplicate URLs
 - Creates new groups for groups that don't exist yet
@@ -309,6 +314,7 @@ To add actual screenshots to this README:
    - `screenshots/success-message.png` - Example success message
 
 3. **Update README** by replacing the TODO comments with actual image links:
+
    ```markdown
    ![Extension Popup](screenshots/popup.png)
    ```
