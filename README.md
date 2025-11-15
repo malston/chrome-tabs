@@ -18,26 +18,13 @@ The extension provides a clean, simple interface with one-click actions:
 
 Tabs automatically grouped by domain with color coding:
 
-<!-- TODO: Add screenshot showing tabs organized by domain -->
-```sh
-Tab Groups:
-🔵 github.com (25)
-🔴 acme.com (24)
-🟡 local-network (7)
-```
+<img src="screenshots/organize-domain.jpg" alt="Organize by Domain" width="300">
 
 ### Organized Tabs by Category
 
 Tabs intelligently categorized by their purpose:
 
-<!-- TODO: Add screenshot showing tabs organized by category -->
-```sh
-Tab Groups:
-🔵 Development (32)
-🔴 Documentation (18)
-🟡 Social Media (12)
-🟢 Shopping (8)
-```
+<img src="screenshots/organize-category.jpg" alt="Organize by Category" width="300">
 
 ### Bookmark Restore Interface
 
