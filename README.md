@@ -12,7 +12,7 @@
 
 The extension provides a clean, simple interface with one-click actions:
 
-![Extension Popup](screenshots/popup.png)
+<img src="screenshots/popup.png" alt="Extension Popup" width="300">
 
 ### Organized Tabs by Domain
 
