@@ -2,7 +2,7 @@
 
 > Complete solution for managing Chrome tabs: organize by domain, remove duplicates, and recover from history.
 
-**Quick Links:** [Features](#features) • [Installation](#quick-start) • [Usage](#usage) • [Screenshots](#screenshots) • [Contributing](#contributing) • [Project Board](https://github.com/users/malston/projects/2)
+**Quick Links:** [Features](#features) • [Installation](#quick-start) • [Usage](#usage) • [Screenshots](#screenshots) • [Releases](#releases) • [Contributing](#contributing) • [Project Board](https://github.com/users/malston/projects/2)
 
 ---
 
@@ -53,13 +53,33 @@ Select and restore previously saved tab sessions:
 
 ### Install the Chrome Extension (Recommended)
 
+#### Option 1: Install from Release (Easiest)
+
+1. **Download the latest release**:
+   - Go to [Releases](https://github.com/malston/chrome-tabs/releases)
+   - Download `chrome-tab-manager-vX.X.X.zip` (or beta version)
+   - Unzip the downloaded file
+
+2. **Load in Chrome**:
+   - Open Chrome and navigate to: `chrome://extensions/`
+   - Enable "Developer mode" (toggle in top-right)
+   - Click "Load unpacked"
+   - Select the unzipped folder
+   - Pin the extension to your toolbar
+
+#### Option 2: Install from Source
+
 ```bash
+# Clone the repository
+git clone https://github.com/malston/chrome-tabs.git
+cd chrome-tabs
+
 # Open Chrome and navigate to:
 chrome://extensions/
 
 # Enable "Developer mode" (toggle in top-right)
 # Click "Load unpacked"
-# Select: /path/to/chrome-tabs/chrome-extension
+# Select: chrome-tabs/chrome-extension
 ```
 
 See [chrome-extension/README.md](chrome-extension/README.md) for detailed instructions.
@@ -260,6 +280,64 @@ chrome-tabs/
 2. Review your tab groups
 3. Bookmark important groups
 4. Close Chrome with confidence
+
+## Releases
+
+### For Users
+
+**Latest Release:** [v0.9.0 Beta](https://github.com/malston/chrome-tabs/releases/latest)
+
+All releases include:
+- Ready-to-install extension zip file
+- Complete release notes
+- Installation instructions
+- Changelog
+
+**Installing from a Release:**
+1. Visit the [Releases page](https://github.com/malston/chrome-tabs/releases)
+2. Download the `.zip` file from the latest release
+3. Follow the installation instructions above
+
+### For Developers
+
+**Creating a New Release:**
+
+Releases are automated via GitHub Actions. To create a new release:
+
+1. **Update version** in `chrome-extension/manifest.json`:
+   ```json
+   "version": "1.1.0"
+   ```
+
+2. **Commit and push**:
+   ```bash
+   git add chrome-extension/manifest.json
+   git commit -m "Release v1.1.0"
+   git push origin main
+   ```
+
+3. **Create and push tag**:
+   ```bash
+   git tag v1.1.0
+   git push origin v1.1.0
+   ```
+
+4. **Wait for workflow** to complete:
+   - GitHub Actions automatically creates a draft release
+   - Extension zip is created and uploaded
+   - Release notes are generated
+
+5. **Publish the release**:
+   - Go to [Releases](https://github.com/malston/chrome-tabs/releases)
+   - Review the draft release
+   - Click "Publish release"
+
+**Beta Releases:**
+- Use version format like `0.9.0` for pre-1.0 releases
+- Tag as `v0.9.0-beta`
+- Workflow marks as pre-release automatically
+
+See [.github/workflows/README.md](.github/workflows/README.md) for complete workflow documentation.
 
 ## Contributing
 
