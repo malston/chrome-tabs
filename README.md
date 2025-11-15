@@ -261,6 +261,54 @@ chrome-tabs/
 3. Bookmark important groups
 4. Close Chrome with confidence
 
+## Contributing
+
+We welcome contributions from the community! Whether you want to report a bug, request a feature, or submit code improvements, here's how to get involved:
+
+### 📋 Project Board
+
+Track current development, planned features, and ongoing work on our [GitHub Project Board](https://github.com/users/malston/projects/2).
+
+### 🐛 Report a Bug
+
+Found a bug? Please [open an issue](https://github.com/malston/chrome-tabs/issues/new) with:
+- Clear description of the problem
+- Steps to reproduce
+- Expected vs actual behavior
+- Chrome version and OS
+
+### 💡 Request a Feature
+
+Have an idea? We'd love to hear it!
+- Check the [Project Board](https://github.com/users/malston/projects/2) to see if it's already planned
+- [Open a feature request](https://github.com/malston/chrome-tabs/issues/new) describing:
+  - The problem you're trying to solve
+  - Your proposed solution
+  - Any alternatives you've considered
+
+### 🔧 Submit a Pull Request
+
+Ready to contribute code? Great!
+
+1. **Read the guidelines**: Check out [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions
+2. **Fork and clone** the repository
+3. **Create a branch**: `git checkout -b feature/your-feature-name`
+4. **Make your changes** following our coding standards
+5. **Test thoroughly** - both manual testing and linting
+6. **Submit a PR** with a clear description of your changes
+
+### 📚 Documentation
+
+Improvements to documentation are always welcome! This includes:
+- README updates
+- Code comments
+- Examples and screenshots
+- Contributing guidelines
+
+### 🙏 Thank You
+
+All contributions are appreciated, whether it's code, documentation, bug reports, or feature ideas!
+
 ## License
 
 MIT License - feel free to modify and use as needed.
