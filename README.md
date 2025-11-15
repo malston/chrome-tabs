@@ -18,13 +18,7 @@ The extension provides a clean, simple interface with one-click actions:
 
 Tabs automatically grouped by domain with color coding:
 
-<!-- TODO: Add screenshot showing tabs organized by domain -->
-```sh
-Tab Groups:
-🔵 github.com (25)
-🔴 acme.com (24)
-🟡 local-network (7)
-```
+<img src="screenshots/organize-domain.png" alt="Tabs Organized by Domain" width="800">
 
 ### Organized Tabs by Category
 
