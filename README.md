@@ -6,9 +6,9 @@ Complete solution for managing Chrome tabs: organize by domain, remove duplicate
 
 ### 🎯 Chrome Extension (Primary Tool)
 
-- **One-click organization** - Automatically group tabs by domain
+- **One-click organization** - Automatically group tabs by domain or category
 - **One-click deduplication** - Remove duplicate tabs instantly
-- **Smart coloring** - Each domain gets a unique color
+- **Smart coloring** - Each group gets a unique color
 - **Shows tab counts** - See how many tabs in each group
 - **Works everywhere** - Use in any Chrome profile, anytime
 - **No setup required** - No remote debugging, no command line
@@ -51,8 +51,23 @@ make install
 Example result:
 
 - `github.com (25)` - All GitHub tabs
-- `williamlam.com (24)` - All blog tabs
+- `acme.com (24)` - All acme.com tabs
 - `local-network (7)` - All lab IPs
+
+### Organize Tabs by Category
+
+**Use the Chrome Extension**:
+
+1. Click the Tab Organizer icon in your toolbar
+2. Click "Organize by Category"
+3. Done! All tabs grouped by category
+
+Example result:
+
+- `Development (32)` - GitHub, Stack Overflow, localhost tabs
+- `Documentation (18)` - All docs sites
+- `Social Media (12)` - Twitter, LinkedIn, Reddit tabs
+- `Shopping (8)` - Amazon, eBay tabs
 
 ### Remove Duplicate Tabs
 
@@ -162,7 +177,7 @@ chrome-tabs/
 ### Spring Cleaning
 
 1. Click extension → "Remove Duplicates"
-2. Click extension → "Organize by Domain"
+2. Click extension → "Organize by Domain" or "Organize by Category"
 3. Manually close groups you don't need
 4. Done!
 

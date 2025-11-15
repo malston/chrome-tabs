@@ -4,9 +4,10 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 
 ## Features
 
-- **Automatic Grouping**: Groups tabs by domain automatically
+- **Organize by Domain**: Groups tabs by domain automatically
+- **Organize by Category**: Groups tabs by type (Development, Social Media, Shopping, etc.)
 - **Duplicate Removal**: Remove duplicate tabs instantly
-- **Smart Coloring**: Each domain gets a unique color
+- **Smart Coloring**: Each group gets a unique color
 - **One Click Operations**: Simple, fast, no configuration needed
 - **Handles Special Cases**: Groups localhost, private IPs intelligently
 - **Shows Tab Count**: Each group shows how many tabs it contains
@@ -38,6 +39,11 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 2. Click "Organize by Domain"
 3. All tabs automatically grouped by domain!
 
+### Organize Tabs by Category
+1. Click the Tab Organizer extension icon
+2. Click "Organize by Category"
+3. All tabs automatically grouped by category (Development, Social Media, Shopping, etc.)!
+
 ### Remove Duplicate Tabs
 1. Click the Tab Organizer extension icon
 2. Click "Remove Duplicates"
@@ -52,10 +58,29 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 
 **Organize by Domain:**
 1. Scans all tabs in the current window
-2. Groups them by domain (e.g., github.com, williamlam.com)
+2. Groups them by domain (e.g., github.com, acme.com)
 3. Creates colored tab groups with domain names and tab counts
-4. Skips domains with only 1 tab (no need to group)
-5. Skips chrome:// internal pages
+4. Sorts tabs alphabetically within each group
+5. Skips domains with only 1 tab (no need to group)
+6. Skips chrome:// internal pages
+
+**Organize by Category:**
+1. Scans all tabs in the current window
+2. Categorizes tabs based on their domain and URL:
+   - **Development**: GitHub, GitLab, Stack Overflow, localhost, IP addresses
+   - **Documentation**: Documentation sites, API references, tutorials
+   - **Social Media**: Facebook, Twitter, LinkedIn, Reddit, etc.
+   - **Communication**: Slack, Discord, Gmail, Zoom, etc.
+   - **Shopping**: Amazon, eBay, shopping sites
+   - **Productivity**: Google Drive, Notion, Trello, etc.
+   - **News & Media**: News sites, Medium, blogs
+   - **Entertainment**: YouTube, Netflix, Spotify, etc.
+   - **Finance**: Banking, PayPal, crypto sites
+   - **Cloud Services**: AWS, Azure, Google Cloud, etc.
+   - **Other**: Everything else
+3. Creates colored tab groups with category names and tab counts
+4. Sorts tabs alphabetically within each category
+5. Skips categories with only 1 tab
 
 **Remove Duplicates:**
 1. Scans all tabs in the current window
@@ -67,8 +92,14 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 
 **After "Organize by Domain":**
 - `github.com (25)` - All GitHub tabs in a blue group
-- `williamlam.com (24)` - All blog tabs in a red group
+- `acme.com (24)` - All acme.com tabs in a red group
 - `local-network (7)` - All lab IPs (192.168.x.x) in a yellow group
+
+**After "Organize by Category":**
+- `Development (32)` - GitHub, Stack Overflow, localhost tabs in a blue group
+- `Documentation (18)` - All docs sites in a red group
+- `Social Media (12)` - Twitter, LinkedIn, Reddit tabs in a yellow group
+- `Shopping (8)` - Amazon, eBay tabs in a green group
 
 **After "Remove Duplicates":**
 - "Removed 15 duplicate tabs!" - All duplicate URLs closed
@@ -84,7 +115,9 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 - Check the extension console for errors (click "service worker" link on chrome://extensions/)
 
 ### Want to change grouping behavior?
-Edit `chrome-extension/background.js` and modify the `extractDomain()` or `organizeTabs()` functions.
+- Edit domain grouping: Modify `extractDomain()` in `chrome-extension/background.js`
+- Edit category grouping: Modify `categorizeUrl()` in `chrome-extension/background.js`
+- Add new categories: Add conditions to `categorizeUrl()` function
 
 ## Uninstall
 

@@ -1,6 +1,7 @@
 // Popup script for Tab Organizer extension
 
 const organizeBtn = document.getElementById('organizeBtn');
+const organizeCategoryBtn = document.getElementById('organizeCategoryBtn');
 const dedupeBtn = document.getElementById('dedupeBtn');
 const removeGroupsBtn = document.getElementById('removeGroupsBtn');
 const statusDiv = document.getElementById('status');
@@ -28,7 +29,7 @@ organizeBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       showStatus(
-        `✓ Organized ${response.groupedTabs} tabs into ${response.domains} groups!`,
+        `✓ Organized ${response.groupedTabs} tabs into ${response.groups} groups!`,
         'success'
       );
     }
@@ -37,6 +38,32 @@ organizeBtn.addEventListener('click', async () => {
   } finally {
     organizeBtn.disabled = false;
     organizeBtn.textContent = 'Organize by Domain';
+  }
+});
+
+organizeCategoryBtn.addEventListener('click', async () => {
+  organizeCategoryBtn.disabled = true;
+  organizeCategoryBtn.textContent = 'Organizing...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'organizeTabs',
+      mode: 'category'
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else {
+      showStatus(
+        `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`,
+        'success'
+      );
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    organizeCategoryBtn.disabled = false;
+    organizeCategoryBtn.textContent = 'Organize by Category';
   }
 });
 
