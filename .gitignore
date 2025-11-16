@@ -21,9 +21,6 @@ env/
 # uv
 .uv/
 
-# Tab backups
-# chrome_tabs_backup.json
-
 # IDE
 .vscode/
 .idea/
