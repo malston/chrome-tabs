@@ -1,2 +1,4 @@
 requests>=2.31.0
 websocket-client>=1.6.0
+pylint>=3.0.0
+black>=23.0.0

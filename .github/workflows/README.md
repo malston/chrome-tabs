@@ -86,11 +86,91 @@ git tag -d v1.1.0                    # Delete locally
 git push origin --delete v1.1.0      # Delete remotely
 ```
 
+## CI Workflow
+
+**File:** `ci.yml`
+
+### What It Does
+
+Automatically runs tests and validation on every pull request and push to `main` or `develop`:
+
+1. **Chrome Extension Tests**
+   - Runs Jest unit tests
+   - Generates code coverage reports
+   - Uploads coverage to Codecov (optional)
+
+2. **Python Tests and Linting**
+   - Runs Pylint on Python code
+   - Checks Python formatting with black
+
+3. **Manifest Validation**
+   - Validates manifest.json syntax
+   - Ensures Manifest V3 compliance
+   - Checks required fields
+
+4. **Extension Package Build**
+   - Creates extension zip file
+   - Verifies package integrity
+   - Uploads artifact for download
+
+### Viewing CI Results
+
+1. **On Pull Requests:**
+   - CI checks appear at the bottom of the PR
+   - All checks must pass before merging
+   - Click "Details" to see logs
+
+2. **On the Actions Tab:**
+   - Go to: https://github.com/malston/chrome-tabs/actions
+   - Click on a workflow run to see details
+   - Download build artifacts from successful runs
+
+### Running Locally
+
+Before pushing, you can run the same checks locally:
+
+```bash
+# Run extension tests
+cd chrome-extension && npm test
+
+# Run Python linting
+make lint
+
+# Validate manifest
+python3 -m json.tool chrome-extension/manifest.json
+
+# Build extension package
+cd chrome-extension && zip -r ../chrome-tab-manager.zip . -x "*.test.js" -x "node_modules/*"
+```
+
+### Troubleshooting CI Failures
+
+**Extension tests fail:**
+- Run `make test` locally to reproduce
+- Check test output for specific failures
+- Ensure all dependencies are installed
+
+**Python linting fails:**
+- Run `make lint` locally
+- Fix pylint warnings and errors
+- Consider adding `# pylint: disable=<rule>` for false positives
+
+**Manifest validation fails:**
+- Ensure manifest.json is valid JSON
+- Check that manifest_version is 3
+- Verify required fields are present
+
+**Build fails:**
+- Check that all required files exist
+- Ensure no syntax errors in source files
+- Verify package.json has correct dependencies
+
+---
+
 ## Adding More Workflows
 
-To add additional workflows (like CI/CD, linting, etc.), create new `.yml` files in this directory.
+To add additional workflows, create new `.yml` files in this directory.
 
 Common workflow ideas:
-- `ci.yml` - Run tests on pull requests
-- `lint.yml` - Run linting on pushes
 - `deploy.yml` - Deploy to Chrome Web Store
+- `security.yml` - Run security scanning (Dependabot, CodeQL)

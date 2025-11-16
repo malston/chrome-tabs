@@ -49,12 +49,29 @@ By participating in this project, you agree to maintain a respectful and inclusi
    # Select: chrome-tabs/chrome-extension
    ```
 
-2. **Make changes** to the extension code:
+2. **Install development dependencies**:
+
+   ```bash
+   make setup
+   ```
+
+3. **Install Git hooks** (recommended):
+
+   ```bash
+   ./scripts/install-hooks.sh
+   ```
+
+   This installs a pre-commit hook that automatically:
+   - Runs Jest tests for changed JavaScript files
+   - Runs Pylint for changed Python files
+   - Validates manifest.json if changed
+
+4. **Make changes** to the extension code:
    - `manifest.json` - Extension configuration
    - `background.js` - Core business logic (service worker)
    - `popup.html/js` - Extension UI and event handlers
 
-3. **Reload the extension** after changes:
+5. **Reload the extension** after changes:
    - Go to `chrome://extensions/`
    - Click the refresh icon on the Tab Organizer extension
 
@@ -142,6 +159,37 @@ git commit -m "docs: Update installation instructions"
 
 ## Testing
 
+### Automated Testing (CI)
+
+All pull requests automatically run through our CI pipeline which includes:
+
+1. **Jest unit tests** for the Chrome Extension
+2. **Pylint** checks for Python code
+3. **Manifest validation** to ensure extension compliance
+4. **Build verification** to ensure the extension packages correctly
+
+**Running tests locally before pushing:**
+
+```bash
+# Install dependencies
+make setup
+
+# Run extension unit tests
+make test
+
+# Run Python linting
+make lint
+
+# Validate manifest
+python3 -m json.tool chrome-extension/manifest.json
+```
+
+**View CI results:**
+- CI checks appear automatically on your PR
+- All checks must pass before merging
+- Click "Details" on any check to see logs
+- See [.github/workflows/README.md](.github/workflows/README.md) for details
+
 ### Manual Testing for Chrome Extension
 
 1. **Test all features**:
@@ -162,6 +210,26 @@ git commit -m "docs: Update installation instructions"
 3. **Check console for errors**:
    - Service worker console: `chrome://extensions/` → "service worker"
    - Popup console: Right-click popup → Inspect
+
+### Writing Unit Tests
+
+When adding new functionality, include unit tests:
+
+```javascript
+// In chrome-extension/background.test.js
+describe('Your Feature', () => {
+  test('should do something specific', () => {
+    const result = yourFunction(input);
+    expect(result).toBe(expectedOutput);
+  });
+});
+```
+
+Run your tests:
+```bash
+cd chrome-extension
+npm test
+```
 
 ### Testing Python Code
 
@@ -199,8 +267,18 @@ make restore-history
    - Link related issues
    - Include screenshots for UI changes
    - Update documentation if needed
-   - Ensure all tests pass
+   - Ensure all tests pass (CI will check automatically)
    - Respond to review feedback
+
+### Skipping Pre-commit Hooks
+
+If you need to commit without running hooks (not recommended):
+
+```bash
+git commit --no-verify -m "your message"
+```
+
+Use this sparingly - the hooks exist to catch issues early!
 
 ## Coding Standards
 

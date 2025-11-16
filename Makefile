@@ -1,4 +1,4 @@
-.PHONY: help install setup test restore-history lint clean
+.PHONY: help install setup test install-hooks restore-history lint clean
 
 # Default target
 help:
@@ -10,6 +10,7 @@ help:
 	@echo "Chrome Extension Development:"
 	@echo "  make setup           - Install npm dependencies (Jest for testing)"
 	@echo "  make test            - Run Jest unit tests"
+	@echo "  make install-hooks   - Install Git pre-commit hooks"
 	@echo ""
 	@echo "Command-Line Tools:"
 	@echo "  make install         - Install dependencies using uv"
@@ -38,6 +39,11 @@ test:
 	@echo "Running Jest unit tests..."
 	@command -v npm >/dev/null 2>&1 || { echo "Error: npm is not installed. Run 'make setup' first"; exit 1; }
 	cd chrome-extension && npm test
+
+# Install Git pre-commit hooks
+install-hooks:
+	@echo "Installing Git pre-commit hooks..."
+	@./scripts/install-hooks.sh
 
 # Install dependencies using uv
 install:
