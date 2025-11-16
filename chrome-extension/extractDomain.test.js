@@ -9,8 +9,15 @@
  * - Edge cases and error scenarios
  */
 
-// Import the function (in actual use, you'd import from background.js)
-// For testing, we'll include the function here
+// Mock Chrome APIs (not needed for extractDomain, but included for consistency)
+global.chrome = {
+  tabs: {
+    query: jest.fn(),
+    remove: jest.fn()
+  }
+};
+
+// The extractDomain function (duplicated from background.js for testing)
 function extractDomain(url) {
   try {
     const urlObj = new URL(url);
@@ -42,8 +49,11 @@ function extractDomain(url) {
 
 // Test suite
 describe('extractDomain', () => {
+  beforeEach(() => {
+    // Reset mocks before each test (for consistency with other test files)
+    jest.clearAllMocks();
+  });
 
-  // Standard domain tests
   describe('Standard Domains', () => {
     test('should extract domain from simple URL', () => {
       expect(extractDomain('https://github.com')).toBe('github.com');
@@ -261,23 +271,3 @@ describe('extractDomain', () => {
     });
   });
 });
-
-// Test runner information
-console.log(`
-To run these tests:
-
-1. Install Jest:
-   npm install --save-dev jest
-
-2. Add to package.json:
-   {
-     "scripts": {
-       "test": "jest"
-     }
-   }
-
-3. Run tests:
-   npm test
-
-Alternative: Use with other testing frameworks like Mocha, Jasmine, or QUnit
-`);
