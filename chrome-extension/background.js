@@ -65,7 +65,7 @@ function categorizeUrl(url) {
     }
 
     // Social Media
-    if (domain.includes('facebook') || domain.includes('twitter') || domain.includes('x.com') ||
+    if (domain.includes('facebook') || domain.includes('threads') || domain.includes('x.com') ||
         domain.includes('instagram') || domain.includes('linkedin') || domain.includes('reddit') ||
         domain.includes('tiktok') || domain.includes('snapchat') || domain.includes('pinterest') ||
         domain.includes('mastodon') || domain.includes('bluesky')) {
