@@ -22,11 +22,14 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
+
    ```bash
    git clone https://github.com/YOUR-USERNAME/chrome-tabs.git
    cd chrome-tabs
    ```
+
 3. **Add upstream remote**:
+
    ```bash
    git remote add upstream https://github.com/ORIGINAL-OWNER/chrome-tabs.git
    ```
@@ -36,6 +39,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 ### Chrome Extension Development
 
 1. **Install the extension** in Chrome:
+
    ```bash
    # Open Chrome and navigate to:
    chrome://extensions/
@@ -57,11 +61,13 @@ By participating in this project, you agree to maintain a respectful and inclusi
 ### Python Tools Development
 
 1. **Install dependencies**:
+
    ```bash
    make install
    ```
 
 2. **Run linting**:
+
    ```bash
    make lint
    ```
@@ -90,12 +96,14 @@ chrome-tabs/
 ### Branch Naming Convention
 
 Use descriptive branch names:
+
 - `feature/your-feature-name` - New features
 - `fix/bug-description` - Bug fixes
 - `docs/documentation-update` - Documentation changes
 - `refactor/component-name` - Code refactoring
 
 Example:
+
 ```bash
 git checkout -b feature/add-dark-mode
 ```
@@ -115,6 +123,7 @@ Co-Authored-By: Your Name <your.email@example.com>
 ```
 
 **Types:**
+
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation changes
@@ -124,6 +133,7 @@ Co-Authored-By: Your Name <your.email@example.com>
 - `chore:` - Maintenance tasks
 
 **Examples:**
+
 ```bash
 git commit -m "feat: Add dark mode toggle to popup UI"
 git commit -m "fix: Resolve duplicate detection bug in restore feature"
@@ -166,12 +176,14 @@ make restore-history
 ## Submitting Changes
 
 1. **Update your fork**:
+
    ```bash
    git fetch upstream
    git rebase upstream/main
    ```
 
 2. **Push your changes**:
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -202,6 +214,7 @@ make restore-history
 - **Error handling** with try/catch
 
 Example:
+
 ```javascript
 /**
  * Organizes tabs by domain or category
@@ -228,6 +241,7 @@ async function organizeTabs(mode = 'domain') {
 - Run **pylint** before committing (`make lint`)
 
 Example:
+
 ```python
 def create_tab(self, url: str) -> Dict:
     """Create a new tab and navigate it to the given URL"""
@@ -276,6 +290,7 @@ if (domain.includes('your-pattern') || domain.includes('another-pattern')) {
 1. Take screenshots showing your feature
 2. Save to `screenshots/` directory
 3. Add to README with:
+
    ```markdown
    <img src="screenshots/your-feature.png" alt="Feature Name" width="300">
    ```
