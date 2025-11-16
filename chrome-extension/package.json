@@ -25,7 +25,7 @@
         "statements": 80
       }
     },
-    "coverageReporters": ["text", "text-summary", "lcov", "html"]
+    "coverageReporters": ["text", "text-summary", "lcov", "html", "json-summary"]
   },
   "devDependencies": {
     "jest": "^30.2.0"
