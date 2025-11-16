@@ -11,7 +11,7 @@ on:
       - develop
 
 permissions:
-  contents: read
+  contents: write  # Changed from 'read' to 'write' to allow badge updates
   pull-requests: read
 
 jobs:
