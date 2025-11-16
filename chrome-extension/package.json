@@ -13,7 +13,22 @@
   "jest": {
     "testEnvironment": "node",
     "testMatch": ["**/*.test.js"],
-    "verbose": true
+    "verbose": true,
+    "collectCoverageFrom": [
+      "background.js",
+      "popup.js",
+      "!**/*.test.js",
+      "!**/node_modules/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    },
+    "coverageReporters": ["text", "text-summary", "lcov", "html"]
   },
   "devDependencies": {
     "jest": "^30.2.0"

@@ -1,0 +1,269 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  # Chrome Extension Tests and Linting
+  extension-tests:
+    name: Chrome Extension Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: chrome-extension/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd chrome-extension
+          npm ci
+
+      - name: Run Jest unit tests with coverage
+        run: |
+          cd chrome-extension
+          npm test -- --coverage --ci
+
+      - name: Check coverage thresholds
+        run: |
+          cd chrome-extension
+
+          # Extract coverage percentages from coverage-summary.json
+          if [ -f "coverage/coverage-summary.json" ]; then
+            LINES=$(node -pe "JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.lines.pct")
+            BRANCHES=$(node -pe "JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.branches.pct")
+            FUNCTIONS=$(node -pe "JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.functions.pct")
+            STATEMENTS=$(node -pe "JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.statements.pct")
+
+            echo "📊 Coverage Report:"
+            echo "  Lines:      ${LINES}%"
+            echo "  Branches:   ${BRANCHES}%"
+            echo "  Functions:  ${FUNCTIONS}%"
+            echo "  Statements: ${STATEMENTS}%"
+            echo ""
+
+            # Check if any metric is below 80%
+            THRESHOLD=80
+            FAILED=0
+
+            if (( $(echo "$LINES < $THRESHOLD" | bc -l) )); then
+              echo "❌ Line coverage ${LINES}% is below ${THRESHOLD}%"
+              FAILED=1
+            fi
+
+            if (( $(echo "$BRANCHES < $THRESHOLD" | bc -l) )); then
+              echo "❌ Branch coverage ${BRANCHES}% is below ${THRESHOLD}%"
+              FAILED=1
+            fi
+
+            if (( $(echo "$FUNCTIONS < $THRESHOLD" | bc -l) )); then
+              echo "❌ Function coverage ${FUNCTIONS}% is below ${THRESHOLD}%"
+              FAILED=1
+            fi
+
+            if (( $(echo "$STATEMENTS < $THRESHOLD" | bc -l) )); then
+              echo "❌ Statement coverage ${STATEMENTS}% is below ${THRESHOLD}%"
+              FAILED=1
+            fi
+
+            if [ $FAILED -eq 1 ]; then
+              echo ""
+              echo "💡 Coverage is below 80% threshold. Please add more tests."
+              exit 1
+            fi
+
+            echo "✅ All coverage metrics meet the 80% threshold"
+          else
+            echo "⚠️  Coverage summary not found"
+            exit 1
+          fi
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: ./chrome-extension/coverage/lcov.info
+          flags: extension
+          name: chrome-extension-coverage
+          fail_ci_if_error: false
+        continue-on-error: true
+
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: chrome-extension/coverage/
+          retention-days: 7
+
+      - name: Check for JavaScript errors (ESLint would go here)
+        run: |
+          cd chrome-extension
+          # TODO: Add ESLint configuration and run: npm run lint
+          echo "ESLint not configured yet - skipping"
+
+  # Python Tests and Linting
+  python-tests:
+    name: Python Tests and Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          uv venv
+          uv pip install -r requirements.txt
+
+      - name: Run Pylint
+        run: |
+          source .venv/bin/activate
+          uv run pylint restore_from_history.py
+
+      - name: Check Python formatting (black)
+        run: |
+          source .venv/bin/activate
+          uv pip install black
+          black --check restore_from_history.py
+        continue-on-error: true
+
+  # Manifest Validation
+  manifest-validation:
+    name: Validate Extension Manifest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate manifest.json
+        run: |
+          # Check if manifest.json exists
+          if [ ! -f "chrome-extension/manifest.json" ]; then
+            echo "Error: manifest.json not found"
+            exit 1
+          fi
+
+          # Validate JSON syntax
+          if ! python3 -m json.tool chrome-extension/manifest.json > /dev/null; then
+            echo "Error: manifest.json is not valid JSON"
+            exit 1
+          fi
+
+          # Check required fields
+          MANIFEST_VERSION=$(python3 -c "import json; print(json.load(open('chrome-extension/manifest.json'))['manifest_version'])")
+          NAME=$(python3 -c "import json; print(json.load(open('chrome-extension/manifest.json'))['name'])")
+          VERSION=$(python3 -c "import json; print(json.load(open('chrome-extension/manifest.json'))['version'])")
+
+          echo "Manifest Version: $MANIFEST_VERSION"
+          echo "Extension Name: $NAME"
+          echo "Extension Version: $VERSION"
+
+          # Ensure manifest_version is 3
+          if [ "$MANIFEST_VERSION" != "3" ]; then
+            echo "Error: manifest_version must be 3 (Manifest V3)"
+            exit 1
+          fi
+
+          echo "✅ Manifest validation passed"
+
+  # Extension Package Build Test
+  build-extension:
+    name: Build Extension Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create extension package
+        run: |
+          cd chrome-extension
+
+          # Create zip file (same as release workflow)
+          zip -r ../chrome-tab-manager.zip . \
+            -x "*.test.js" \
+            -x "node_modules/*" \
+            -x "coverage/*" \
+            -x "package-lock.json" \
+            -x ".DS_Store"
+
+          cd ..
+
+          # Verify zip was created and has content
+          if [ ! -f "chrome-tab-manager.zip" ]; then
+            echo "Error: Failed to create extension package"
+            exit 1
+          fi
+
+          ZIP_SIZE=$(wc -c < chrome-tab-manager.zip)
+          if [ "$ZIP_SIZE" -lt 1000 ]; then
+            echo "Error: Extension package seems too small ($ZIP_SIZE bytes)"
+            exit 1
+          fi
+
+          echo "✅ Extension package created successfully ($ZIP_SIZE bytes)"
+
+          # List contents
+          echo "Package contents:"
+          unzip -l chrome-tab-manager.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-package
+          path: chrome-tab-manager.zip
+          retention-days: 7
+
+  # Summary Job
+  ci-success:
+    name: CI Success
+    runs-on: ubuntu-latest
+    needs: [extension-tests, python-tests, manifest-validation, build-extension]
+    if: always()
+
+    steps:
+      - name: Check all jobs
+        run: |
+          echo "Extension Tests: ${{ needs.extension-tests.result }}"
+          echo "Python Tests: ${{ needs.python-tests.result }}"
+          echo "Manifest Validation: ${{ needs.manifest-validation.result }}"
+          echo "Build Extension: ${{ needs.build-extension.result }}"
+
+          if [ "${{ needs.extension-tests.result }}" != "success" ] || \
+             [ "${{ needs.python-tests.result }}" != "success" ] || \
+             [ "${{ needs.manifest-validation.result }}" != "success" ] || \
+             [ "${{ needs.build-extension.result }}" != "success" ]; then
+            echo "❌ One or more CI jobs failed"
+            exit 1
+          fi
+
+          echo "✅ All CI checks passed!"

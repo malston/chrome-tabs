@@ -1,0 +1,153 @@
+#!/bin/bash
+#
+# Pre-commit hook for Chrome Tab Manager
+# Runs tests for changed files only to keep commits fast
+#
+
+set -e
+
+echo "🔍 Running pre-commit checks..."
+echo ""
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Get list of changed files
+CHANGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [ -z "$CHANGED_FILES" ]; then
+  echo "No files to check."
+  exit 0
+fi
+
+echo "Changed files:"
+echo "$CHANGED_FILES"
+echo ""
+
+# Track if we need to run any checks
+RUN_JS_TESTS=false
+RUN_PY_LINT=false
+
+# Check for JavaScript/extension file changes
+if echo "$CHANGED_FILES" | grep -qE '^chrome-extension/(background|popup)\.js$'; then
+  RUN_JS_TESTS=true
+fi
+
+# Check for Python file changes
+if echo "$CHANGED_FILES" | grep -qE '\.py$'; then
+  RUN_PY_LINT=true
+fi
+
+# Check for test file changes
+if echo "$CHANGED_FILES" | grep -qE '\.test\.js$'; then
+  RUN_JS_TESTS=true
+fi
+
+# Exit early if no relevant changes
+if [ "$RUN_JS_TESTS" = false ] && [ "$RUN_PY_LINT" = false ]; then
+  echo -e "${GREEN}✅ No code files changed, skipping tests${NC}"
+  exit 0
+fi
+
+# JavaScript tests (if extension files or tests changed)
+if [ "$RUN_JS_TESTS" = true ]; then
+  echo -e "${BLUE}📦 Running Jest tests for Chrome Extension...${NC}"
+
+  cd chrome-extension
+
+  # Check if node_modules exists
+  if [ ! -d "node_modules" ]; then
+    echo -e "${YELLOW}⚠️  node_modules not found. Run 'make setup' first.${NC}"
+    echo -e "${YELLOW}   Skipping JavaScript tests...${NC}"
+    cd ..
+  else
+    # Run tests for specific files if possible, otherwise run all
+    CHANGED_JS_FILES=$(echo "$CHANGED_FILES" | grep -E '^chrome-extension/.*\.js$' | sed 's/^chrome-extension\///')
+
+    if [ -n "$CHANGED_JS_FILES" ]; then
+      echo "Testing changed files:"
+      echo "$CHANGED_JS_FILES"
+      echo ""
+
+      # Run Jest with only related tests
+      # Jest will find tests related to changed files
+      if ! npm test -- --bail --findRelatedTests $CHANGED_JS_FILES 2>&1; then
+        echo ""
+        echo -e "${RED}❌ JavaScript tests failed${NC}"
+        echo -e "${YELLOW}💡 Fix the tests before committing or use --no-verify to skip${NC}"
+        cd ..
+        exit 1
+      fi
+    else
+      # Run all tests if only test files changed
+      if ! npm test -- --bail 2>&1; then
+        echo ""
+        echo -e "${RED}❌ JavaScript tests failed${NC}"
+        echo -e "${YELLOW}💡 Fix the tests before committing or use --no-verify to skip${NC}"
+        cd ..
+        exit 1
+      fi
+    fi
+
+    echo -e "${GREEN}✅ JavaScript tests passed${NC}"
+    echo ""
+    cd ..
+  fi
+fi
+
+# Python linting (if Python files changed)
+if [ "$RUN_PY_LINT" = true ]; then
+  echo -e "${BLUE}🐍 Running Pylint on changed Python files...${NC}"
+
+  CHANGED_PY_FILES=$(echo "$CHANGED_FILES" | grep -E '\.py$')
+
+  # Check if uv is installed
+  if ! command -v uv &> /dev/null; then
+    echo -e "${YELLOW}⚠️  uv not found. Run 'make install' first.${NC}"
+    echo -e "${YELLOW}   Skipping Python linting...${NC}"
+  else
+    # Check if venv exists
+    if [ ! -d ".venv" ]; then
+      echo -e "${YELLOW}⚠️  Virtual environment not found. Run 'make install' first.${NC}"
+      echo -e "${YELLOW}   Skipping Python linting...${NC}"
+    else
+      # Activate virtual environment and run pylint
+      source .venv/bin/activate
+
+      for py_file in $CHANGED_PY_FILES; do
+        echo "Linting: $py_file"
+        if ! uv run pylint "$py_file" 2>&1; then
+          echo ""
+          echo -e "${RED}❌ Pylint failed for $py_file${NC}"
+          echo -e "${YELLOW}💡 Fix the linting errors before committing or use --no-verify to skip${NC}"
+          deactivate
+          exit 1
+        fi
+      done
+
+      deactivate
+      echo -e "${GREEN}✅ Python linting passed${NC}"
+      echo ""
+    fi
+  fi
+fi
+
+# Check manifest.json validity (if changed)
+if echo "$CHANGED_FILES" | grep -q "chrome-extension/manifest.json"; then
+  echo -e "${BLUE}📋 Validating manifest.json...${NC}"
+
+  if ! python3 -m json.tool chrome-extension/manifest.json > /dev/null 2>&1; then
+    echo -e "${RED}❌ manifest.json is not valid JSON${NC}"
+    exit 1
+  fi
+
+  echo -e "${GREEN}✅ manifest.json is valid${NC}"
+  echo ""
+fi
+
+echo -e "${GREEN}✨ All pre-commit checks passed!${NC}"
+exit 0
