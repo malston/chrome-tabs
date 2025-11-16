@@ -583,3 +583,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 console.log('Tab Organizer extension loaded');
+
+// Export functions for testing (Node.js environment)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    extractDomain,
+    categorizeUrl,
+    organizeTabs,
+    removeDuplicateTabs,
+    saveTabsToBookmarks,
+    restoreFromBookmarks,
+    getTabOrganizerBookmarkFolders,
+    getNextColor,
+    COLORS
+  };
+}

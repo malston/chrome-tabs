@@ -13,17 +13,30 @@
 // Mock Chrome APIs
 global.chrome = {
   tabs: {
-    query: jest.fn()
+    query: jest.fn(),
+    remove: jest.fn(),
+    group: jest.fn(),
+    ungroup: jest.fn(),
+    create: jest.fn(),
+    TAB_GROUP_ID_NONE: -1
   },
   tabGroups: {
     query: jest.fn(),
+    update: jest.fn(),
     TAB_GROUP_ID_NONE: -1
   },
   bookmarks: {
+    get: jest.fn(),
+    getChildren: jest.fn(),
     create: jest.fn()
   },
   windows: {
     WINDOW_ID_CURRENT: -2
+  },
+  runtime: {
+    onMessage: {
+      addListener: jest.fn()
+    }
   }
 };
 
@@ -44,107 +57,8 @@ global.Date = class extends Date {
   }
 };
 
-// The saveTabsToBookmarks function
-async function saveTabsToBookmarks() {
-  const tabs = await chrome.tabs.query({ currentWindow: true });
-  const groups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
-
-  const groupMap = new Map();
-  for (const group of groups) {
-    groupMap.set(group.id, group);
-  }
-
-  const timestamp = new Date().toLocaleString('en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  }).replace(/[/:]/g, '-').replace(', ', ' ');
-
-  const rootFolderName = `Tab Organizer - ${timestamp}`;
-
-  const rootFolder = await chrome.bookmarks.create({
-    parentId: '2',
-    title: rootFolderName
-  });
-
-  const tabsByGroup = new Map();
-  const ungroupedTabs = [];
-
-  for (const tab of tabs) {
-    if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
-      continue;
-    }
-
-    if (tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE) {
-      ungroupedTabs.push(tab);
-    } else {
-      if (!tabsByGroup.has(tab.groupId)) {
-        tabsByGroup.set(tab.groupId, []);
-      }
-      tabsByGroup.get(tab.groupId).push(tab);
-    }
-  }
-
-  let savedCount = 0;
-  let folderCount = 0;
-
-  for (const [groupId, groupTabs] of tabsByGroup.entries()) {
-    const group = groupMap.get(groupId);
-    const folderName = group ? group.title : 'Unknown Group';
-
-    const groupFolder = await chrome.bookmarks.create({
-      parentId: rootFolder.id,
-      title: folderName
-    });
-    folderCount++;
-
-    for (const tab of groupTabs) {
-      try {
-        await chrome.bookmarks.create({
-          parentId: groupFolder.id,
-          title: tab.title || tab.url,
-          url: tab.url
-        });
-        savedCount++;
-      } catch (e) {
-        console.error(`Error saving bookmark for ${tab.url}:`, e);
-      }
-    }
-  }
-
-  if (ungroupedTabs.length > 0) {
-    const ungroupedFolder = await chrome.bookmarks.create({
-      parentId: rootFolder.id,
-      title: 'Ungrouped Tabs'
-    });
-    folderCount++;
-
-    for (const tab of ungroupedTabs) {
-      try {
-        await chrome.bookmarks.create({
-          parentId: ungroupedFolder.id,
-          title: tab.title || tab.url,
-          url: tab.url
-        });
-        savedCount++;
-      } catch (e) {
-        console.error(`Error saving bookmark for ${tab.url}:`, e);
-      }
-    }
-  }
-
-  console.log(`Saved ${savedCount} bookmarks in ${folderCount} folders`);
-
-  return {
-    totalTabs: tabs.length,
-    savedBookmarks: savedCount,
-    folders: folderCount,
-    rootFolderName: rootFolderName
-  };
-}
+// Import function from background.js
+const { saveTabsToBookmarks } = require('./background.js');
 
 describe('saveTabsToBookmarks', () => {
   beforeEach(() => {

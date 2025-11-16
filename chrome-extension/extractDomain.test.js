@@ -9,43 +9,38 @@
  * - Edge cases and error scenarios
  */
 
-// Mock Chrome APIs (not needed for extractDomain, but included for consistency)
+// Mock Chrome APIs (required for background.js to load)
 global.chrome = {
   tabs: {
     query: jest.fn(),
-    remove: jest.fn()
+    remove: jest.fn(),
+    group: jest.fn(),
+    ungroup: jest.fn(),
+    create: jest.fn(),
+    TAB_GROUP_ID_NONE: -1
+  },
+  tabGroups: {
+    query: jest.fn(),
+    update: jest.fn(),
+    TAB_GROUP_ID_NONE: -1
+  },
+  bookmarks: {
+    get: jest.fn(),
+    getChildren: jest.fn(),
+    create: jest.fn()
+  },
+  windows: {
+    WINDOW_ID_CURRENT: 1
+  },
+  runtime: {
+    onMessage: {
+      addListener: jest.fn()
+    }
   }
 };
 
-// The extractDomain function (duplicated from background.js for testing)
-function extractDomain(url) {
-  try {
-    const urlObj = new URL(url);
-    let domain = urlObj.hostname;
-
-    // Remove www. prefix
-    if (domain.startsWith('www.')) {
-      domain = domain.substring(4);
-    }
-
-    // Handle localhost
-    if (domain.startsWith('localhost')) {
-      return 'localhost';
-    }
-
-    // Handle IP addresses - group private IPs together
-    if (/^[\d.:]+$/.test(domain)) {
-      if (domain.startsWith('192.168.') || domain.startsWith('172.') || domain.startsWith('10.')) {
-        return 'local-network';
-      }
-      return 'ip-addresses';
-    }
-
-    return domain;
-  } catch (e) {
-    return 'unknown';
-  }
-}
+// Import the extractDomain function from background.js
+const { extractDomain } = require('./background.js');
 
 // Test suite
 describe('extractDomain', () => {

@@ -13,19 +13,29 @@
 global.chrome = {
   bookmarks: {
     get: jest.fn(),
-    getChildren: jest.fn()
+    getChildren: jest.fn(),
+    create: jest.fn()
   },
   tabs: {
     query: jest.fn(),
     create: jest.fn(),
-    group: jest.fn()
+    group: jest.fn(),
+    ungroup: jest.fn(),
+    remove: jest.fn(),
+    TAB_GROUP_ID_NONE: -1
   },
   tabGroups: {
     query: jest.fn(),
-    update: jest.fn()
+    update: jest.fn(),
+    TAB_GROUP_ID_NONE: -1
   },
   windows: {
     WINDOW_ID_CURRENT: -2
+  },
+  runtime: {
+    onMessage: {
+      addListener: jest.fn()
+    }
   }
 };
 
@@ -36,122 +46,11 @@ global.console = {
 };
 
 // Helper functions
-const COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
+// Import functions from background.js
+const { restoreFromBookmarks, COLORS } = require('./background.js');
+
+// Track colorIndex for tests
 let colorIndex = 0;
-
-function getNextColor() {
-  const color = COLORS[colorIndex % COLORS.length];
-  colorIndex++;
-  return color;
-}
-
-// The restoreFromBookmarks function
-async function restoreFromBookmarks(bookmarkFolderId) {
-  const [folder] = await chrome.bookmarks.get(bookmarkFolderId);
-  if (!folder) {
-    throw new Error('Bookmark folder not found');
-  }
-
-  const children = await chrome.bookmarks.getChildren(bookmarkFolderId);
-  const existingTabs = await chrome.tabs.query({ currentWindow: true });
-  const existingUrls = new Set(existingTabs.map(t => t.url));
-
-  const existingGroups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
-  const groupsByTitle = new Map();
-  for (const group of existingGroups) {
-    groupsByTitle.set(group.title, group);
-  }
-
-  let totalRestored = 0;
-  let duplicatesSkipped = 0;
-  let groupsCreated = 0;
-  let groupsMerged = 0;
-
-  for (const child of children) {
-    if (!child.url) {
-      const groupName = child.title;
-      const bookmarks = await chrome.bookmarks.getChildren(child.id);
-
-      const urlsToRestore = [];
-      for (const bookmark of bookmarks) {
-        if (bookmark.url &&
-            !bookmark.url.startsWith('chrome://') &&
-            !bookmark.url.startsWith('chrome-extension://')) {
-
-          if (existingUrls.has(bookmark.url)) {
-            duplicatesSkipped++;
-          } else {
-            urlsToRestore.push(bookmark.url);
-            existingUrls.add(bookmark.url);
-          }
-        }
-      }
-
-      if (urlsToRestore.length === 0) {
-        continue;
-      }
-
-      const newTabIds = [];
-      for (const url of urlsToRestore) {
-        try {
-          const tab = await chrome.tabs.create({
-            url: url,
-            active: false
-          });
-          newTabIds.push(tab.id);
-          totalRestored++;
-        } catch (e) {
-          console.error(`Error creating tab for ${url}:`, e);
-        }
-      }
-
-      if (newTabIds.length === 0) {
-        continue;
-      }
-
-      const existingGroup = groupsByTitle.get(groupName);
-
-      if (existingGroup) {
-        try {
-          await chrome.tabs.group({
-            tabIds: newTabIds,
-            groupId: existingGroup.id
-          });
-          groupsMerged++;
-          console.log(`Added ${newTabIds.length} tabs to existing group: ${groupName}`);
-        } catch (e) {
-          console.error(`Error adding tabs to group ${groupName}:`, e);
-        }
-      } else {
-        try {
-          const groupId = await chrome.tabs.group({ tabIds: newTabIds });
-          await chrome.tabGroups.update(groupId, {
-            title: groupName,
-            color: getNextColor(),
-            collapsed: false
-          });
-          groupsCreated++;
-
-          const [newGroup] = await chrome.tabGroups.query({ groupId: groupId });
-          groupsByTitle.set(groupName, newGroup);
-
-          console.log(`Created new group: ${groupName} with ${newTabIds.length} tabs`);
-        } catch (e) {
-          console.error(`Error creating group ${groupName}:`, e);
-        }
-      }
-    }
-  }
-
-  console.log(`Restored ${totalRestored} tabs, skipped ${duplicatesSkipped} duplicates`);
-
-  return {
-    totalRestored: totalRestored,
-    duplicatesSkipped: duplicatesSkipped,
-    groupsCreated: groupsCreated,
-    groupsMerged: groupsMerged
-  };
-}
 
 describe('restoreFromBookmarks', () => {
   beforeEach(() => {

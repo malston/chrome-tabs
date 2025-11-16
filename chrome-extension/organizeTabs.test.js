@@ -15,11 +15,27 @@ global.chrome = {
     query: jest.fn(),
     group: jest.fn(),
     ungroup: jest.fn(),
+    create: jest.fn(),
+    remove: jest.fn(),
     TAB_GROUP_ID_NONE: -1
   },
   tabGroups: {
+    query: jest.fn(),
     update: jest.fn(),
     TAB_GROUP_ID_NONE: -1
+  },
+  bookmarks: {
+    get: jest.fn(),
+    getChildren: jest.fn(),
+    create: jest.fn()
+  },
+  windows: {
+    WINDOW_ID_CURRENT: 1
+  },
+  runtime: {
+    onMessage: {
+      addListener: jest.fn()
+    }
   }
 };
 
@@ -29,142 +45,8 @@ global.console = {
   error: jest.fn()
 };
 
-// Import helper functions (would need to be exported from background.js)
-// For now, we'll duplicate them here for testing
-function extractDomain(url) {
-  try {
-    const urlObj = new URL(url);
-    let domain = urlObj.hostname;
-
-    if (domain.startsWith('www.')) {
-      domain = domain.substring(4);
-    }
-
-    if (domain.startsWith('localhost')) {
-      return 'localhost';
-    }
-
-    if (/^[\d.:]+$/.test(domain)) {
-      if (domain.startsWith('192.168.') || domain.startsWith('172.') || domain.startsWith('10.')) {
-        return 'local-network';
-      }
-      return 'ip-addresses';
-    }
-
-    return domain;
-  } catch (e) {
-    return 'unknown';
-  }
-}
-
-function categorizeUrl(url) {
-  try {
-    const urlObj = new URL(url);
-    const domain = urlObj.hostname.toLowerCase();
-    const path = urlObj.pathname.toLowerCase();
-
-    if (domain.includes('github') || domain.includes('gitlab') ||
-        domain.includes('bitbucket') || domain.includes('stackoverflow') ||
-        domain === 'localhost' || /^[\d.:]+$/.test(domain)) {
-      return 'Development';
-    }
-
-    if (domain.includes('docs.') || domain.includes('documentation') ||
-        domain.includes('readthedocs') || domain.includes('developer.') ||
-        domain.includes('api.') && path.includes('doc')) {
-      return 'Documentation';
-    }
-
-    if (domain.includes('twitter') || domain.includes('facebook') ||
-        domain.includes('linkedin') || domain.includes('reddit')) {
-      return 'Social Media';
-    }
-
-    return 'Other';
-  } catch (e) {
-    return 'Other';
-  }
-}
-
-const COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
-let colorIndex = 0;
-
-function getNextColor() {
-  const color = COLORS[colorIndex % COLORS.length];
-  colorIndex++;
-  return color;
-}
-
-// The organizeTabs function
-async function organizeTabs(mode = 'domain') {
-  const tabs = await chrome.tabs.query({ currentWindow: true });
-  const groups = {};
-  const skipDomains = new Set(['chrome://', 'chrome-extension://', 'about:']);
-
-  for (const tab of tabs) {
-    if (skipDomains.has(tab.url.substring(0, tab.url.indexOf('/')))) {
-      continue;
-    }
-
-    const groupKey = mode === 'category' ? categorizeUrl(tab.url) : extractDomain(tab.url);
-
-    if (!groups[groupKey]) {
-      groups[groupKey] = [];
-    }
-
-    groups[groupKey].push(tab);
-  }
-
-  // Ungroup all tabs first
-  for (const tab of tabs) {
-    if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
-      try {
-        await chrome.tabs.ungroup(tab.id);
-      } catch (e) {
-        // Tab might already be ungrouped
-      }
-    }
-  }
-
-  let groupedCount = 0;
-  colorIndex = 0;
-
-  const sortedGroups = Object.entries(groups)
-    .filter(([_, tabs]) => tabs.length > 1)
-    .sort((a, b) => b[1].length - a[1].length);
-
-  for (const [groupName, groupTabs] of sortedGroups) {
-    if (groupTabs.length <= 1) continue;
-
-    const sortedTabs = groupTabs.sort((a, b) => {
-      const titleA = (a.title || '').toLowerCase();
-      const titleB = (b.title || '').toLowerCase();
-      return titleA.localeCompare(titleB);
-    });
-
-    const tabIds = sortedTabs.map(t => t.id);
-
-    try {
-      const groupId = await chrome.tabs.group({ tabIds });
-      await chrome.tabGroups.update(groupId, {
-        title: `${groupName} (${groupTabs.length})`,
-        color: getNextColor(),
-        collapsed: false
-      });
-
-      groupedCount += groupTabs.length;
-    } catch (e) {
-      console.error(`Error grouping tabs for ${groupName}:`, e);
-    }
-  }
-
-  return {
-    totalTabs: tabs.length,
-    groupedTabs: groupedCount,
-    groups: sortedGroups.length,
-    ungroupedTabs: tabs.length - groupedCount
-  };
-}
+// Import functions from background.js
+const { organizeTabs } = require('./background.js');
 
 describe('organizeTabs', () => {
   beforeEach(() => {
