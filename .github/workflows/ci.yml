@@ -95,14 +95,44 @@ jobs:
             exit 1
           fi
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          files: ./chrome-extension/coverage/lcov.info
-          flags: extension
-          name: chrome-extension-coverage
-          fail_ci_if_error: false
+      - name: Generate and commit coverage badge
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd chrome-extension
+
+          # Extract coverage percentage
+          COVERAGE=$(node -pe "Math.floor(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.lines.pct)")
+
+          # Determine badge color
+          if [ $COVERAGE -ge 80 ]; then
+            COLOR="brightgreen"
+          elif [ $COVERAGE -ge 60 ]; then
+            COLOR="yellow"
+          else
+            COLOR="red"
+          fi
+
+          echo "📊 Coverage: ${COVERAGE}% (${COLOR})"
+
+          # Create .github directory for badge storage
+          mkdir -p ../.github
+
+          # Download badge from shields.io
+          curl -s "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}" > ../.github/coverage-badge.svg
+
+          # Configure git
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          # Commit badge if changed
+          cd ..
+          git add .github/coverage-badge.svg
+          if git diff --staged --quiet; then
+            echo "No changes to coverage badge"
+          else
+            git commit -m "Update coverage badge: ${COVERAGE}%"
+            git push
+          fi
         continue-on-error: true
 
       - name: Upload coverage HTML report

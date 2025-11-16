@@ -1,4 +1,4 @@
-.PHONY: help install setup test install-hooks restore-history lint clean
+.PHONY: help install setup test coverage install-hooks restore-history lint clean
 
 # Default target
 help:
@@ -10,6 +10,7 @@ help:
 	@echo "Chrome Extension Development:"
 	@echo "  make setup           - Install npm dependencies (Jest for testing)"
 	@echo "  make test            - Run Jest unit tests"
+	@echo "  make coverage        - Run Jest tests with code coverage report"
 	@echo "  make install-hooks   - Install Git pre-commit hooks"
 	@echo ""
 	@echo "Command-Line Tools:"
@@ -39,6 +40,16 @@ test:
 	@echo "Running Jest unit tests..."
 	@command -v npm >/dev/null 2>&1 || { echo "Error: npm is not installed. Run 'make setup' first"; exit 1; }
 	cd chrome-extension && npm test
+
+# Run Jest tests with code coverage
+coverage:
+	@echo "Running Jest tests with code coverage..."
+	@command -v npm >/dev/null 2>&1 || { echo "Error: npm is not installed. Run 'make setup' first"; exit 1; }
+	cd chrome-extension && npm run coverage
+	@echo ""
+	@echo "Coverage report generated in chrome-extension/coverage/"
+	@echo "  - HTML report: chrome-extension/coverage/lcov-report/index.html"
+	@echo "  - LCOV data:   chrome-extension/coverage/lcov.info"
 
 # Install Git pre-commit hooks
 install-hooks:
