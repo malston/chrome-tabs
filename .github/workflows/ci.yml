@@ -47,20 +47,18 @@ jobs:
 
           # Extract coverage percentages from coverage-summary.json
           if [ -f "coverage/coverage-summary.json" ]; then
-            LINES=$(node -pe "JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.lines.pct")
-            BRANCHES=$(node -pe "JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.branches.pct")
-            FUNCTIONS=$(node -pe "JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.functions.pct")
-            STATEMENTS=$(node -pe "JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.statements.pct")
+            LINES=$(node -pe "Math.floor(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.lines.pct)")
+            BRANCHES=$(node -pe "Math.floor(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.branches.pct)")
+            FUNCTIONS=$(node -pe "Math.floor(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.functions.pct)")
+            STATEMENTS=$(node -pe "Math.floor(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.statements.pct)")
 
-            echo "📊 Coverage Report:"
+            echo "📊 Coverage Report for background.js:"
             echo "  Lines:      ${LINES}%"
             echo "  Branches:   ${BRANCHES}%"
             echo "  Functions:  ${FUNCTIONS}%"
             echo "  Statements: ${STATEMENTS}%"
             echo ""
-            echo "ℹ️  Note: Coverage is 0% because tests use mocked functions rather than importing source code."
-            echo "    This is intentional for Chrome extension testing with browser-specific APIs."
-            echo "    Test suite validates function behavior with 133 passing tests."
+            echo "✅ Tests now import and execute actual source code from background.js"
           else
             echo "⚠️  Coverage summary not found"
           fi
@@ -74,18 +72,12 @@ jobs:
           COVERAGE=$(node -pe "Math.floor(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.lines.pct)")
 
           # Determine badge color
-          if [ $COVERAGE -eq 0 ]; then
-            COLOR="lightgrey"
-            LABEL="tests: 133 passing"
-          elif [ $COVERAGE -ge 80 ]; then
+          if [ $COVERAGE -ge 80 ]; then
             COLOR="brightgreen"
-            LABEL="coverage-${COVERAGE}%"
           elif [ $COVERAGE -ge 60 ]; then
             COLOR="yellow"
-            LABEL="coverage-${COVERAGE}%"
           else
             COLOR="red"
-            LABEL="coverage-${COVERAGE}%"
           fi
 
           echo "📊 Coverage: ${COVERAGE}% (${COLOR})"
@@ -94,7 +86,7 @@ jobs:
           mkdir -p ../.github
 
           # Download badge from shields.io
-          curl -s "https://img.shields.io/badge/${LABEL}-${COLOR}" > ../.github/coverage-badge.svg
+          curl -s "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}" > ../.github/coverage-badge.svg
 
           # Configure git
           git config --global user.name 'github-actions[bot]'

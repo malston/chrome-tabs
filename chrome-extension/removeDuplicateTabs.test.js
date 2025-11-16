@@ -14,7 +14,29 @@
 global.chrome = {
   tabs: {
     query: jest.fn(),
-    remove: jest.fn()
+    remove: jest.fn(),
+    group: jest.fn(),
+    ungroup: jest.fn(),
+    create: jest.fn(),
+    TAB_GROUP_ID_NONE: -1
+  },
+  tabGroups: {
+    query: jest.fn(),
+    update: jest.fn(),
+    TAB_GROUP_ID_NONE: -1
+  },
+  bookmarks: {
+    get: jest.fn(),
+    getChildren: jest.fn(),
+    create: jest.fn()
+  },
+  windows: {
+    WINDOW_ID_CURRENT: 1
+  },
+  runtime: {
+    onMessage: {
+      addListener: jest.fn()
+    }
   }
 };
 
@@ -24,45 +46,8 @@ global.console = {
   error: jest.fn()
 };
 
-// The removeDuplicateTabs function
-async function removeDuplicateTabs() {
-  const tabs = await chrome.tabs.query({ currentWindow: true });
-
-  const seenUrls = new Map();
-  const tabsToClose = [];
-
-  for (const tab of tabs) {
-    const url = tab.url;
-
-    if (url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url === 'about:blank') {
-      continue;
-    }
-
-    if (seenUrls.has(url)) {
-      tabsToClose.push(tab.id);
-      console.log(`Found duplicate: ${tab.title} (${url})`);
-    } else {
-      seenUrls.set(url, tab);
-    }
-  }
-
-  let closedCount = 0;
-  for (const tabId of tabsToClose) {
-    try {
-      await chrome.tabs.remove(tabId);
-      closedCount++;
-    } catch (e) {
-      console.error('Error closing tab:', e);
-    }
-  }
-
-  return {
-    totalTabs: tabs.length,
-    duplicatesFound: tabsToClose.length,
-    duplicatesClosed: closedCount,
-    remainingTabs: tabs.length - closedCount
-  };
-}
+// Import function from background.js
+const { removeDuplicateTabs } = require('./background.js');
 
 describe('removeDuplicateTabs', () => {
   beforeEach(() => {
