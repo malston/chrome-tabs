@@ -4,7 +4,8 @@
   "description": "Complete tab management in one extension: organize by domain AND remove duplicates with one click each.",
   "main": "background.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "coverage": "jest --coverage"
   },
   "keywords": [],
   "author": "",

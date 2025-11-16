@@ -1,7 +1,7 @@
 # Chrome Tab Manager 🗂️
 
 [![CI](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml/badge.svg)](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/malston/chrome-tabs/branch/main/graph/badge.svg)](https://codecov.io/gh/malston/chrome-tabs)
+[![Coverage](.github/coverage-badge.svg)](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml)
 
 > Complete solution for managing Chrome tabs: organize by domain, remove duplicates, and recover from history.
 
