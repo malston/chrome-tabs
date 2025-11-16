@@ -591,6 +591,7 @@ if (typeof module !== 'undefined' && module.exports) {
     categorizeUrl,
     organizeTabs,
     removeDuplicateTabs,
+    removeAllGroups,
     saveTabsToBookmarks,
     restoreFromBookmarks,
     getTabOrganizerBookmarkFolders,
