@@ -1,0 +1,21 @@
+{
+  "name": "chrome-extension",
+  "version": "1.0.0",
+  "description": "Complete tab management in one extension: organize by domain AND remove duplicates with one click each.",
+  "main": "background.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/*.test.js"],
+    "verbose": true
+  },
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
+}

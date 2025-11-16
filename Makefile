@@ -1,4 +1,4 @@
-.PHONY: help install restore-history lint clean
+.PHONY: help install setup test restore-history lint clean
 
 # Default target
 help:
@@ -6,6 +6,10 @@ help:
 	@echo ""
 	@echo "Primary Tool:"
 	@echo "  Chrome Extension - One-click organize & dedupe (see chrome-extension/README.md)"
+	@echo ""
+	@echo "Chrome Extension Development:"
+	@echo "  make setup           - Install npm dependencies (Jest for testing)"
+	@echo "  make test            - Run Jest unit tests"
 	@echo ""
 	@echo "Command-Line Tools:"
 	@echo "  make install         - Install dependencies using uv"
@@ -18,6 +22,22 @@ help:
 	@echo "  2. Click 'Organize by Domain' to group tabs"
 	@echo "  3. Click 'Remove Duplicates' to dedupe"
 	@echo "  4. Use 'make restore-history' to recover lost tabs if needed"
+
+# Install npm dependencies for Chrome Extension development
+setup:
+	@echo "Installing npm dependencies for Chrome Extension..."
+	@command -v npm >/dev/null 2>&1 || { echo "Error: npm is not installed. Install Node.js from: https://nodejs.org/"; exit 1; }
+	cd chrome-extension && npm install
+	@echo ""
+	@echo "Setup complete!"
+	@echo ""
+	@echo "Run 'make test' to run unit tests"
+
+# Run Jest unit tests
+test:
+	@echo "Running Jest unit tests..."
+	@command -v npm >/dev/null 2>&1 || { echo "Error: npm is not installed. Run 'make setup' first"; exit 1; }
+	cd chrome-extension && npm test
 
 # Install dependencies using uv
 install:
