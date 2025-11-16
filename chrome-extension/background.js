@@ -66,9 +66,9 @@ function categorizeUrl(url) {
 
     // Social Media
     if (domain.includes('facebook') || domain.includes('threads') || domain.includes('x.com') ||
-        domain.includes('instagram') || domain.includes('linkedin') || domain.includes('reddit') ||
-        domain.includes('tiktok') || domain.includes('snapchat') || domain.includes('pinterest') ||
-        domain.includes('mastodon') || domain.includes('bluesky')) {
+        domain.includes('twitter') || domain.includes('instagram') || domain.includes('linkedin') ||
+        domain.includes('reddit') || domain.includes('tiktok') || domain.includes('snapchat') ||
+        domain.includes('pinterest') || domain.includes('mastodon') || domain.includes('bluesky')) {
       return 'Social Media';
     }
 
@@ -185,8 +185,8 @@ async function organizeTabs(mode = 'domain') {
 
     // Sort tabs within group by title (alphabetically)
     const sortedTabs = groupTabs.sort((a, b) => {
-      const titleA = a.title.toLowerCase();
-      const titleB = b.title.toLowerCase();
+      const titleA = (a.title || '').toLowerCase();
+      const titleB = (b.title || '').toLowerCase();
       return titleA.localeCompare(titleB);
     });
 
