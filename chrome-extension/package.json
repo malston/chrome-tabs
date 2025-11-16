@@ -15,10 +15,7 @@
     "testMatch": ["**/*.test.js"],
     "verbose": true,
     "collectCoverageFrom": [
-      "background.js",
-      "popup.js",
-      "!**/*.test.js",
-      "!**/node_modules/**"
+      "**/*.test.js"
     ],
     "coverageThreshold": {
       "global": {
