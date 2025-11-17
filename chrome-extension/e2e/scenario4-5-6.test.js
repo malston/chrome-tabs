@@ -18,9 +18,12 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
   beforeAll(async () => {
     browser = await puppeteer.launch(getPuppeteerConfig());
 
+    // Wait a bit for browser to fully initialize
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     const extensionTarget = await browser.waitForTarget(
       target => target.type() === 'service_worker' && target.url().includes('chrome-extension://'),
-      { timeout: 10000 }
+      { timeout: 30000 }
     );
 
     const extensionUrl = extensionTarget.url();
@@ -29,7 +32,7 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
 
     const pages = await browser.pages();
     page = pages[0];
-  });
+  }, 60000);
 
   afterAll(async () => {
     if (browser) {
