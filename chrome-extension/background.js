@@ -11,6 +11,25 @@ function getNextColor() {
 }
 
 /**
+ * Extracts the base name from a group title by removing the tab count suffix.
+ * This allows matching existing groups with new grouping operations.
+ *
+ * Examples:
+ * - "github.com (15)" → "github.com"
+ * - "markalston.net (5)" → "markalston.net"
+ * - "Development (10)" → "Development"
+ *
+ * @param {string} groupTitle - The full group title with count
+ * @returns {string} The base name without the count suffix
+ */
+function extractGroupBaseName(groupTitle) {
+  if (!groupTitle) return '';
+  // Remove the " (count)" suffix using regex
+  // Matches: space, opening paren, one or more digits, closing paren, end of string
+  return groupTitle.replace(/\s*\(\d+\)$/, '');
+}
+
+/**
  * Extracts the base domain from a URL, grouping subdomains together.
  *
  * Examples:
@@ -213,25 +232,31 @@ async function organizeTabs(mode = 'domain') {
     groups[groupKey].push(tab);
   }
 
-  // Ungroup all tabs first
-  for (const tab of tabs) {
-    if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
-      try {
-        await chrome.tabs.ungroup(tab.id);
-      } catch (e) {
-        // Tab might already be ungrouped
-      }
+  // Query existing tab groups to enable smart merging
+  const existingGroups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+
+  // Build a map of existing groups by their base name (without count)
+  const existingGroupsByName = new Map();
+  for (const group of existingGroups) {
+    const baseName = extractGroupBaseName(group.title);
+    if (baseName) {
+      existingGroupsByName.set(baseName, group);
     }
   }
 
   // Create groups for domains/categories with multiple tabs
   let groupedCount = 0;
-  colorIndex = 0; // Reset color index
+  let groupsCreated = 0;
+  let groupsUpdated = 0;
+  colorIndex = 0; // Reset color index for new groups
 
   // Sort groups by tab count (most tabs first)
   const sortedGroups = Object.entries(groups)
     .filter(([_, tabs]) => tabs.length > 1)  // Only group if 2+ tabs
     .sort((a, b) => b[1].length - a[1].length);
+
+  // Track which tabs should be in groups
+  const tabsInGroups = new Set();
 
   for (const [groupName, groupTabs] of sortedGroups) {
     if (groupTabs.length <= 1) continue;
@@ -244,23 +269,70 @@ async function organizeTabs(mode = 'domain') {
     });
 
     // Get tab IDs in sorted order
-    const tabIds = sortedTabs.map(t => t.id);
+    const newTabIds = sortedTabs.map(t => t.id);
+    newTabIds.forEach(id => tabsInGroups.add(id));
 
     try {
-      // Create a group with these tabs
-      const groupId = await chrome.tabs.group({ tabIds });
+      const existingGroup = existingGroupsByName.get(groupName);
 
-      // Update the group with a title and color
-      await chrome.tabGroups.update(groupId, {
-        title: `${groupName} (${groupTabs.length})`,
-        color: getNextColor(),
-        collapsed: false
-      });
+      if (existingGroup) {
+        // Group exists - update it (smart merge)
+        // Get current tabs in this group
+        const currentGroupTabs = await chrome.tabs.query({ groupId: existingGroup.id });
+        const currentTabIds = currentGroupTabs.map(t => t.id);
 
-      groupedCount += groupTabs.length;
-      console.log(`Grouped ${groupTabs.length} tabs for ${groupName} (sorted alphabetically)`);
+        // Calculate diff: tabs to add and tabs to remove
+        const toAdd = newTabIds.filter(id => !currentTabIds.includes(id));
+        const toRemove = currentTabIds.filter(id => !newTabIds.includes(id));
+
+        // Add new tabs to the existing group
+        if (toAdd.length > 0) {
+          await chrome.tabs.group({ tabIds: toAdd, groupId: existingGroup.id });
+        }
+
+        // Remove tabs that shouldn't be in this group anymore
+        if (toRemove.length > 0) {
+          await chrome.tabs.ungroup(toRemove);
+        }
+
+        // Update group title with new count (preserve color and collapsed state)
+        await chrome.tabGroups.update(existingGroup.id, {
+          title: `${groupName} (${newTabIds.length})`
+        });
+
+        groupsUpdated++;
+        console.log(`Updated group: ${groupName} (+${toAdd.length} -${toRemove.length} tabs, total: ${newTabIds.length})`);
+      } else {
+        // Group doesn't exist - create it (same as before)
+        const groupId = await chrome.tabs.group({ tabIds: newTabIds });
+
+        await chrome.tabGroups.update(groupId, {
+          title: `${groupName} (${newTabIds.length})`,
+          color: getNextColor(),
+          collapsed: false
+        });
+
+        // Add to map for potential future updates in this session
+        existingGroupsByName.set(groupName, await chrome.tabGroups.get(groupId));
+
+        groupsCreated++;
+        console.log(`Created new group: ${groupName} (${newTabIds.length} tabs)`);
+      }
+
+      groupedCount += newTabIds.length;
     } catch (e) {
-      console.error(`Error grouping tabs for ${groupName}:`, e);
+      console.error(`Error managing group for ${groupName}:`, e);
+    }
+  }
+
+  // Ungroup tabs that shouldn't be in any group
+  for (const tab of tabs) {
+    if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE && !tabsInGroups.has(tab.id)) {
+      try {
+        await chrome.tabs.ungroup(tab.id);
+      } catch (e) {
+        console.error('Error ungrouping tab:', e);
+      }
     }
   }
 
@@ -268,6 +340,8 @@ async function organizeTabs(mode = 'domain') {
     totalTabs: tabs.length,
     groupedTabs: groupedCount,
     groups: sortedGroups.length,
+    groupsCreated: groupsCreated,
+    groupsUpdated: groupsUpdated,
     ungroupedTabs: tabs.length - groupedCount
   };
 }
@@ -642,6 +716,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     extractDomain,
     extractBaseDomain,
+    extractGroupBaseName,
     categorizeUrl,
     organizeTabs,
     removeDuplicateTabs,

@@ -1,4 +1,4 @@
-.PHONY: help install setup test coverage install-hooks restore-history lint clean
+.PHONY: help install setup test test-e2e coverage install-hooks restore-history lint clean
 
 # Default target
 help:
@@ -10,6 +10,7 @@ help:
 	@echo "Chrome Extension Development:"
 	@echo "  make setup           - Install npm dependencies (Jest for testing)"
 	@echo "  make test            - Run Jest unit tests"
+	@echo "  make test-e2e        - Run Puppeteer end-to-end tests"
 	@echo "  make coverage        - Run Jest tests with code coverage report"
 	@echo "  make install-hooks   - Install Git pre-commit hooks"
 	@echo ""
@@ -40,6 +41,12 @@ test:
 	@echo "Running Jest unit tests..."
 	@command -v npm >/dev/null 2>&1 || { echo "Error: npm is not installed. Run 'make setup' first"; exit 1; }
 	cd chrome-extension && npm test
+
+# Run Puppeteer end-to-end tests
+test-e2e:
+	@echo "Running Puppeteer end-to-end tests..."
+	@command -v npm >/dev/null 2>&1 || { echo "Error: npm is not installed. Run 'make setup' first"; exit 1; }
+	cd chrome-extension && npm run test:e2e
 
 # Run Jest tests with code coverage
 coverage:
