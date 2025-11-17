@@ -365,14 +365,141 @@ describe('organizeTabs', () => {
   });
 
   describe('Category Mode', () => {
-    // TODO: Fix category mode tests - they need updating for smart merging behavior
-    // test('should group tabs by category', async () => { ... });
+    test('should group tabs by category', async () => {
+      const mockTabs = [
+        // Development category
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: -1, windowId: 1 },
+        { id: 2, url: 'https://stackoverflow.com/q/1', title: 'Question 1', groupId: -1, windowId: 1 },
+        { id: 3, url: 'https://npmjs.com/package/test', title: 'Package', groupId: -1, windowId: 1 },
+        // Documentation category
+        { id: 4, url: 'https://docs.github.com', title: 'Docs', groupId: -1, windowId: 1 },
+        { id: 5, url: 'https://developer.mozilla.org', title: 'MDN', groupId: -1, windowId: 1 }
+      ];
 
-    // TODO: Fix category mode tests - categorization logic may have changed
-    // test('should categorize documentation sites correctly', async () => { ... });
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.group.mockResolvedValueOnce(101).mockResolvedValueOnce(102);
 
-    // TODO: Fix category mode tests - needs updating for smart merging
-    // test('should group uncategorized tabs as "Other"', async () => { ... });
+      const result = await organizeTabs('category');
+
+      expect(result.groups).toBe(2);
+      expect(result.groupedTabs).toBe(5);
+
+      // Should create Development and Documentation groups
+      expect(chrome.tabs.group).toHaveBeenCalledTimes(2);
+
+      // Check that both groups were created with correct titles
+      const updateCalls = chrome.tabGroups.update.mock.calls;
+      const titles = updateCalls.map(call => call[1].title);
+      expect(titles).toContain('Development (3)');
+      expect(titles).toContain('Documentation (2)');
+    });
+
+    test('should categorize social media sites correctly', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://facebook.com', title: 'Facebook', groupId: -1 },
+        { id: 2, url: 'https://twitter.com', title: 'Twitter', groupId: -1 },
+        { id: 3, url: 'https://reddit.com', title: 'Reddit', groupId: -1 }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.group.mockResolvedValue(501);
+
+      const result = await organizeTabs('category');
+
+      expect(result.groups).toBe(1);
+      expect(result.groupedTabs).toBe(3);
+
+      // Check the title of the created group
+      const updateCalls = chrome.tabGroups.update.mock.calls;
+      const lastCall = updateCalls[updateCalls.length - 1];
+      expect(lastCall[1].title).toBe('Social Media (3)');
+    });
+
+    test('should categorize shopping sites correctly', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://amazon.com/product', title: 'Product', groupId: -1 },
+        { id: 2, url: 'https://ebay.com/item', title: 'Item', groupId: -1 }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.group.mockResolvedValue(201);
+
+      const result = await organizeTabs('category');
+
+      expect(result.groups).toBe(1);
+      expect(result.groupedTabs).toBe(2);
+
+      // Check the title of the created group
+      const updateCalls = chrome.tabGroups.update.mock.calls;
+      const lastCall = updateCalls[updateCalls.length - 1];
+      expect(lastCall[1].title).toBe('Shopping (2)');
+    });
+
+    test('should categorize cloud services correctly', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://aws.amazon.com', title: 'AWS', groupId: -1, windowId: 1 },
+        { id: 2, url: 'https://portal.azure.com', title: 'Azure', groupId: -1, windowId: 1 }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.group.mockResolvedValue(301);
+
+      const result = await organizeTabs('category');
+
+      expect(result.groups).toBe(1);
+      expect(result.groupedTabs).toBe(2);
+
+      // Check the title of the created group
+      const updateCalls = chrome.tabGroups.update.mock.calls;
+      const lastCall = updateCalls[updateCalls.length - 1];
+      expect(lastCall[1].title).toBe('Cloud Services (2)');
+    });
+
+    test('should group uncategorized tabs as "Other"', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://randomsite1.com', title: 'Random 1', groupId: -1 },
+        { id: 2, url: 'https://randomsite2.org', title: 'Random 2', groupId: -1 }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.group.mockResolvedValue(1);
+
+      const result = await organizeTabs('category');
+
+      expect(result.groups).toBe(1);
+      expect(result.groupedTabs).toBe(2);
+      expect(chrome.tabGroups.update).toHaveBeenCalledWith(1, expect.objectContaining({
+        title: expect.stringContaining('Other')
+      }));
+    });
+
+    test('should update existing category groups', async () => {
+      const existingGroup = { id: 5, title: 'Development (2)' };
+
+      const mockTabs = [
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5 },
+        { id: 2, url: 'https://stackoverflow.com/q/1', title: 'Q1', groupId: 5 },
+        // New tab for same category
+        { id: 3, url: 'https://github.com/repo2', title: 'Repo 2', groupId: -1 }
+      ];
+
+      chrome.tabs.query.mockResolvedValueOnce(mockTabs) // All tabs
+                         .mockResolvedValueOnce([mockTabs[0], mockTabs[1]]); // Tabs in group 5
+      chrome.tabGroups.query.mockResolvedValue([existingGroup]);
+
+      await organizeTabs('category');
+
+      // Should add new tab to existing group
+      expect(chrome.tabs.group).toHaveBeenCalledWith({
+        tabIds: [3],
+        groupId: 5
+      });
+
+      // Should update group title with new count
+      expect(chrome.tabGroups.update).toHaveBeenCalledWith(5, {
+        title: 'Development (3)'
+      });
+    });
   });
 
   describe('Edge Cases', () => {
