@@ -96,11 +96,11 @@ describe('Scenario 2: Re-Organization (Update Existing Groups)', () => {
       const url = initialUrls[i];
       if (i === 0) {
         // Use the first page
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       } else {
         // Create new tabs for the rest
         const newPage = await browser.newPage();
-        await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+        await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       }
     }
 
@@ -158,7 +158,7 @@ describe('Scenario 2: Re-Organization (Update Existing Groups)', () => {
     // Open additional tabs
     for (const url of additionalUrls) {
       const newPage = await browser.newPage();
-      await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+      await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
     }
 
     console.log(`Opened ${additionalUrls.length} additional tabs`);
