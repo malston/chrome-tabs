@@ -207,11 +207,68 @@ function categorizeUrl(url) {
   }
 }
 
-async function organizeTabs(mode = 'domain') {
-  console.log(`Organizing tabs by ${mode}...`);
+async function organizeTabs(mode = 'domain', allWindows = false) {
+  console.log(`Organizing tabs by ${mode}${allWindows ? ' across all windows' : ''}...`);
 
-  // Get all tabs in current window
-  const tabs = await chrome.tabs.query({ currentWindow: true });
+  // Get current window for reference
+  const currentWindow = await chrome.windows.getCurrent();
+
+  // Get all tabs - either from current window or all windows
+  let tabs = await chrome.tabs.query(allWindows ? {} : { currentWindow: true });
+  let duplicatesClosed = 0;
+  let tabsMoved = 0;
+
+  // If organizing across all windows, first remove duplicates and move all tabs to current window
+  if (allWindows) {
+    // Track unique URLs and their first occurrence
+    const seenUrls = new Map(); // url -> tab
+    const tabsToClose = [];
+    const tabsToMove = [];
+
+    for (const tab of tabs) {
+      // Skip chrome internal pages
+      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+        continue;
+      }
+
+      if (seenUrls.has(tab.url)) {
+        // This is a duplicate - mark for closure
+        tabsToClose.push(tab.id);
+        console.log(`Found duplicate: ${tab.title} (${tab.url})`);
+      } else {
+        // First occurrence - keep it
+        seenUrls.set(tab.url, tab);
+
+        // If tab is in a different window, mark for moving
+        if (tab.windowId !== currentWindow.id) {
+          tabsToMove.push(tab);
+        }
+      }
+    }
+
+    // Close duplicate tabs
+    if (tabsToClose.length > 0) {
+      console.log(`Closing ${tabsToClose.length} duplicate tabs...`);
+      await chrome.tabs.remove(tabsToClose);
+      duplicatesClosed = tabsToClose.length;
+    }
+
+    // Move tabs from other windows to current window
+    if (tabsToMove.length > 0) {
+      console.log(`Moving ${tabsToMove.length} tabs to current window...`);
+      for (const tab of tabsToMove) {
+        try {
+          await chrome.tabs.move(tab.id, { windowId: currentWindow.id, index: -1 });
+          tabsMoved++;
+        } catch (e) {
+          console.error(`Error moving tab ${tab.id}:`, e);
+        }
+      }
+    }
+
+    // Re-query tabs in current window after moving
+    tabs = await chrome.tabs.query({ currentWindow: true });
+  }
 
   // Group tabs by domain or category
   const groups = {};
@@ -342,7 +399,9 @@ async function organizeTabs(mode = 'domain') {
     groups: sortedGroups.length,
     groupsCreated: groupsCreated,
     groupsUpdated: groupsUpdated,
-    ungroupedTabs: tabs.length - groupedCount
+    ungroupedTabs: tabs.length - groupedCount,
+    duplicatesClosed: duplicatesClosed,
+    tabsMoved: tabsMoved
   };
 }
 
@@ -667,7 +726,7 @@ async function getTabOrganizerBookmarkFolders() {
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'organizeTabs') {
-    organizeTabs(request.mode || 'domain')
+    organizeTabs(request.mode || 'domain', request.allWindows || false)
       .then(result => sendResponse(result))
       .catch(error => sendResponse({ error: error.message }));
     return true; // Keep channel open for async response
