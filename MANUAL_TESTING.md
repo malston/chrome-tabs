@@ -94,8 +94,8 @@ This document provides step-by-step instructions for manually testing the smart 
 **Acceptance Criteria:** Tabs should move between groups intelligently.
 
 **Steps:**
-1. Starting from existing grouped tabs
-2. Navigate a GitHub tab to google.com (change the URL)
+1. Starting with a GitHub group (3+ tabs) and a Google group (2+ tabs)
+2. Navigate one GitHub tab to google.com (change the URL)
 3. Click "Organize by Domain"
 
 **Expected Results:**
@@ -248,7 +248,7 @@ For Product Manager sign-off, verify:
 - [ ] New groups are still created when needed
 - [ ] Single tabs are correctly ungrouped
 - [ ] Performance is equal or better than before
-- [ ] All 241 automated tests pass
+- [ ] All 285 automated tests pass
 - [ ] No browser console errors
 - [ ] Feature works across Chrome restart
 
