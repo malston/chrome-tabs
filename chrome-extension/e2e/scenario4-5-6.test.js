@@ -7,9 +7,7 @@
  */
 
 const puppeteer = require('puppeteer');
-const path = require('path');
-
-const EXTENSION_PATH = path.resolve(__dirname, '..');
+const { getPuppeteerConfig } = require('./test-config');
 
 describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => {
   let browser;
@@ -18,16 +16,7 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
   let serviceWorker;
 
   beforeAll(async () => {
-    browser = await puppeteer.launch({
-      headless: false,
-      args: [
-        `--disable-extensions-except=${EXTENSION_PATH}`,
-        `--load-extension=${EXTENSION_PATH}`,
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
-      ],
-      defaultViewport: null
-    });
+    browser = await puppeteer.launch(getPuppeteerConfig());
 
     const extensionTarget = await browser.waitForTarget(
       target => target.type() === 'service_worker' && target.url().includes('chrome-extension://'),

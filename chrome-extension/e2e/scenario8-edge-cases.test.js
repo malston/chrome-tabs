@@ -6,9 +6,7 @@
  */
 
 const puppeteer = require('puppeteer');
-const path = require('path');
-
-const EXTENSION_PATH = path.resolve(__dirname, '..');
+const { getPuppeteerConfig } = require('./test-config');
 
 describe('Scenario 8 and Edge Cases', () => {
   let browser;
@@ -17,16 +15,7 @@ describe('Scenario 8 and Edge Cases', () => {
   let serviceWorker;
 
   beforeAll(async () => {
-    browser = await puppeteer.launch({
-      headless: false,
-      args: [
-        `--disable-extensions-except=${EXTENSION_PATH}`,
-        `--load-extension=${EXTENSION_PATH}`,
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
-      ],
-      defaultViewport: null
-    });
+    browser = await puppeteer.launch(getPuppeteerConfig());
 
     const extensionTarget = await browser.waitForTarget(
       target => target.type() === 'service_worker' && target.url().includes('chrome-extension://'),

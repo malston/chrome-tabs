@@ -13,10 +13,7 @@
  */
 
 const puppeteer = require('puppeteer');
-const path = require('path');
-
-// Extension path (relative to e2e directory)
-const EXTENSION_PATH = path.resolve(__dirname, '..');
+const { getPuppeteerConfig } = require('./test-config');
 
 // Test URLs
 const INITIAL_URLS = {
@@ -43,16 +40,7 @@ describe('Scenario 3: Group State Preservation (Collapsed Groups)', () => {
 
   beforeAll(async () => {
     // Launch browser with extension loaded
-    browser = await puppeteer.launch({
-      headless: false,
-      args: [
-        `--disable-extensions-except=${EXTENSION_PATH}`,
-        `--load-extension=${EXTENSION_PATH}`,
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
-      ],
-      defaultViewport: null
-    });
+    browser = await puppeteer.launch(getPuppeteerConfig());
 
     // Wait for the extension's service worker to load
     const extensionTarget = await browser.waitForTarget(
