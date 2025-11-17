@@ -10,6 +10,17 @@ function getNextColor() {
   return color;
 }
 
+/**
+ * Extracts the base domain from a URL, grouping subdomains together.
+ *
+ * Examples:
+ * - vcsa.markalston.net → markalston.net
+ * - api.github.com → github.com
+ * - www.example.co.uk → example.co.uk
+ *
+ * @param {string} url - The URL to extract the domain from
+ * @returns {string} The base domain or special identifier
+ */
 function extractDomain(url) {
   try {
     const urlObj = new URL(url);
@@ -33,10 +44,52 @@ function extractDomain(url) {
       return 'ip-addresses';
     }
 
-    return domain;
+    // Extract base domain (eTLD+1) to group subdomains together
+    // This groups vcsa.markalston.net, opsman.lab.markalston.net → markalston.net
+    return extractBaseDomain(domain);
   } catch (e) {
     return 'unknown';
   }
+}
+
+/**
+ * Extracts the base domain (eTLD+1) from a hostname.
+ * Handles common multi-part TLDs like .co.uk, .com.au, etc.
+ *
+ * @param {string} hostname - The hostname to process
+ * @returns {string} The base domain
+ */
+function extractBaseDomain(hostname) {
+  const parts = hostname.split('.');
+
+  // If only one or two parts, return as-is (e.g., "localhost", "example.com")
+  if (parts.length <= 2) {
+    return hostname;
+  }
+
+  // Known multi-part TLDs (country-code TLDs and special cases)
+  const multiPartTLDs = [
+    'co.uk', 'co.jp', 'co.kr', 'co.nz', 'co.za',
+    'com.au', 'com.br', 'com.cn', 'com.mx', 'com.ar',
+    'net.au', 'org.au', 'edu.au',
+    'ac.uk', 'gov.uk', 'org.uk',
+    'ne.jp', 'or.jp', 'go.jp',
+    'github.io', 'gitlab.io', 'netlify.app', 'vercel.app',
+    'herokuapp.com', 'azurewebsites.net', 'cloudfront.net'
+  ];
+
+  // Check if domain ends with a known multi-part TLD
+  for (const tld of multiPartTLDs) {
+    if (hostname.endsWith('.' + tld)) {
+      // For multi-part TLDs, keep 3 parts: subdomain.domain.tld1.tld2
+      // Example: api.example.co.uk → example.co.uk
+      return parts.slice(-3).join('.');
+    }
+  }
+
+  // Default: keep last 2 parts for standard TLDs
+  // Example: vcsa.markalston.net → markalston.net
+  return parts.slice(-2).join('.');
 }
 
 function categorizeUrl(url) {
@@ -588,6 +641,7 @@ console.log('Tab Organizer extension loaded');
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     extractDomain,
+    extractBaseDomain,
     categorizeUrl,
     organizeTabs,
     removeDuplicateTabs,
