@@ -70,12 +70,12 @@ describe('extractDomain', () => {
       expect(extractDomain('https://example.com:8080/path')).toBe('example.com');
     });
 
-    test('should extract subdomain', () => {
-      expect(extractDomain('https://api.github.com')).toBe('api.github.com');
+    test('should extract base domain from subdomain', () => {
+      expect(extractDomain('https://api.github.com')).toBe('github.com');
     });
 
-    test('should extract multi-level subdomain', () => {
-      expect(extractDomain('https://foo.bar.example.com')).toBe('foo.bar.example.com');
+    test('should extract base domain from multi-level subdomain', () => {
+      expect(extractDomain('https://foo.bar.example.com')).toBe('example.com');
     });
 
     test('should handle http protocol', () => {
@@ -94,11 +94,11 @@ describe('extractDomain', () => {
     });
 
     test('should handle www subdomain with additional subdomains', () => {
-      expect(extractDomain('https://www.api.example.com')).toBe('api.example.com');
+      expect(extractDomain('https://www.api.example.com')).toBe('example.com');
     });
 
-    test('should not remove www if not at start', () => {
-      expect(extractDomain('https://api.www.example.com')).toBe('api.www.example.com');
+    test('should extract base domain even with www in middle', () => {
+      expect(extractDomain('https://api.www.example.com')).toBe('example.com');
     });
 
     test('should handle WWW in different case', () => {
@@ -225,7 +225,7 @@ describe('extractDomain', () => {
     });
 
     test('should handle FTP URLs', () => {
-      expect(extractDomain('ftp://ftp.example.com')).toBe('ftp.example.com');
+      expect(extractDomain('ftp://ftp.example.com')).toBe('example.com');
     });
 
     test('should handle very long domain names', () => {
@@ -263,6 +263,90 @@ describe('extractDomain', () => {
 
     test('should handle case insensitivity in domain', () => {
       expect(extractDomain('https://Example.Com')).toBe('example.com');
+    });
+  });
+
+  describe('Base Domain Extraction (Subdomain Grouping)', () => {
+    test('should group subdomains under base domain', () => {
+      expect(extractDomain('https://vcsa.markalston.net')).toBe('markalston.net');
+      expect(extractDomain('https://opsman.lab.markalston.net')).toBe('markalston.net');
+      expect(extractDomain('https://minio.lab.markalston.net')).toBe('markalston.net');
+      expect(extractDomain('https://concourse.lab.markalston.net')).toBe('markalston.net');
+    });
+
+    test('should handle single subdomain', () => {
+      expect(extractDomain('https://api.github.com')).toBe('github.com');
+      expect(extractDomain('https://mail.google.com')).toBe('google.com');
+      expect(extractDomain('https://docs.microsoft.com')).toBe('microsoft.com');
+    });
+
+    test('should handle multiple nested subdomains', () => {
+      expect(extractDomain('https://a.b.c.example.com')).toBe('example.com');
+      expect(extractDomain('https://deep.nested.subdomain.test.com')).toBe('test.com');
+    });
+
+    test('should handle multi-part TLDs (co.uk)', () => {
+      expect(extractDomain('https://api.example.co.uk')).toBe('example.co.uk');
+      expect(extractDomain('https://www.bbc.co.uk')).toBe('bbc.co.uk');
+      expect(extractDomain('https://shop.amazon.co.uk')).toBe('amazon.co.uk');
+    });
+
+    test('should handle multi-part TLDs (com.au)', () => {
+      expect(extractDomain('https://api.example.com.au')).toBe('example.com.au');
+      expect(extractDomain('https://www.news.com.au')).toBe('news.com.au');
+    });
+
+    test('should handle other country-code TLDs', () => {
+      expect(extractDomain('https://api.example.co.jp')).toBe('example.co.jp');
+      expect(extractDomain('https://test.example.co.kr')).toBe('example.co.kr');
+      expect(extractDomain('https://blog.example.co.nz')).toBe('example.co.nz');
+    });
+
+    test('should handle platform-specific domains (github.io)', () => {
+      expect(extractDomain('https://username.github.io')).toBe('username.github.io');
+      expect(extractDomain('https://project.gitlab.io')).toBe('project.gitlab.io');
+      expect(extractDomain('https://app.netlify.app')).toBe('app.netlify.app');
+      expect(extractDomain('https://mysite.vercel.app')).toBe('mysite.vercel.app');
+    });
+
+    test('should handle cloud platform domains', () => {
+      expect(extractDomain('https://app.herokuapp.com')).toBe('app.herokuapp.com');
+      expect(extractDomain('https://site.azurewebsites.net')).toBe('site.azurewebsites.net');
+      expect(extractDomain('https://dist.cloudfront.net')).toBe('dist.cloudfront.net');
+    });
+
+    test('should preserve base domain for 2-part domains', () => {
+      expect(extractDomain('https://example.com')).toBe('example.com');
+      expect(extractDomain('https://github.com')).toBe('github.com');
+      expect(extractDomain('https://google.net')).toBe('google.net');
+    });
+
+    test('should handle single-part domains', () => {
+      expect(extractDomain('https://localhost')).toBe('localhost');
+    });
+
+    test('should group all markalston.net subdomains together', () => {
+      const urls = [
+        'https://vcsa.markalston.net/ui',
+        'https://opsman.lab.markalston.net/login',
+        'https://minio.lab.markalston.net:9001',
+        'https://concourse.lab.markalston.net/',
+        'https://esxi-nuc-01.lab.markalston.net/ui',
+      ];
+
+      const domains = urls.map(url => extractDomain(url));
+
+      // All should resolve to 'markalston.net'
+      expect(domains.every(domain => domain === 'markalston.net')).toBe(true);
+    });
+
+    test('should maintain distinct groups for different base domains', () => {
+      expect(extractDomain('https://api.acme.com')).toBe('acme.com');
+      expect(extractDomain('https://api.example.com')).toBe('example.com');
+      expect(extractDomain('https://api.test.org')).toBe('test.org');
+
+      // They should all be different
+      expect(extractDomain('https://api.acme.com')).not.toBe(extractDomain('https://api.example.com'));
     });
   });
 });
