@@ -5,7 +5,9 @@
   "main": "background.js",
   "scripts": {
     "test": "jest",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage",
+    "test:e2e": "jest --config jest.e2e.config.js",
+    "test:unit": "jest --testPathIgnorePatterns=e2e"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +15,13 @@
   "type": "commonjs",
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/*.test.js"],
+    "testMatch": [
+      "**/*.test.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/e2e/"
+    ],
     "verbose": true,
     "collectCoverageFrom": [
       "background.js",
@@ -27,9 +35,16 @@
         "statements": 0
       }
     },
-    "coverageReporters": ["text", "text-summary", "lcov", "html", "json-summary"]
+    "coverageReporters": [
+      "text",
+      "text-summary",
+      "lcov",
+      "html",
+      "json-summary"
+    ]
   },
   "devDependencies": {
-    "jest": "^30.2.0"
+    "jest": "^30.2.0",
+    "puppeteer": "^24.30.0"
   }
 }
