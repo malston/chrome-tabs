@@ -130,7 +130,7 @@ describe('popup.js', () => {
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    jest.clearAllTimers();
     jest.useRealTimers();
   });
 
