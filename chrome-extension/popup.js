@@ -2,6 +2,8 @@
 
 const organizeBtn = document.getElementById('organizeBtn');
 const organizeCategoryBtn = document.getElementById('organizeCategoryBtn');
+const organizeAllWindowsBtn = document.getElementById('organizeAllWindowsBtn');
+const organizeAllWindowsCategoryBtn = document.getElementById('organizeAllWindowsCategoryBtn');
 const dedupeBtn = document.getElementById('dedupeBtn');
 const saveBookmarksBtn = document.getElementById('saveBookmarksBtn');
 const restoreBookmarksBtn = document.getElementById('restoreBookmarksBtn');
@@ -73,6 +75,68 @@ organizeCategoryBtn.addEventListener('click', async () => {
   }
 });
 
+organizeAllWindowsBtn.addEventListener('click', async () => {
+  organizeAllWindowsBtn.disabled = true;
+  organizeAllWindowsBtn.textContent = 'Organizing...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'organizeTabs',
+      mode: 'domain',
+      allWindows: true
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else {
+      let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} groups!`;
+      if (response.duplicatesClosed > 0) {
+        message += ` Removed ${response.duplicatesClosed} duplicates.`;
+      }
+      if (response.tabsMoved > 0) {
+        message += ` Moved ${response.tabsMoved} tabs.`;
+      }
+      showStatus(message, 'success');
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    organizeAllWindowsBtn.disabled = false;
+    organizeAllWindowsBtn.textContent = 'Organize All Windows by Domain';
+  }
+});
+
+organizeAllWindowsCategoryBtn.addEventListener('click', async () => {
+  organizeAllWindowsCategoryBtn.disabled = true;
+  organizeAllWindowsCategoryBtn.textContent = 'Organizing...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'organizeTabs',
+      mode: 'category',
+      allWindows: true
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else {
+      let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`;
+      if (response.duplicatesClosed > 0) {
+        message += ` Removed ${response.duplicatesClosed} duplicates.`;
+      }
+      if (response.tabsMoved > 0) {
+        message += ` Moved ${response.tabsMoved} tabs.`;
+      }
+      showStatus(message, 'success');
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    organizeAllWindowsCategoryBtn.disabled = false;
+    organizeAllWindowsCategoryBtn.textContent = 'Organize All Windows by Category';
+  }
+});
+
 dedupeBtn.addEventListener('click', async () => {
   dedupeBtn.disabled = true;
   dedupeBtn.textContent = 'Finding duplicates...';
@@ -140,7 +204,7 @@ restoreBookmarksBtn.addEventListener('click', async () => {
       showStatus('No saved bookmark folders found', 'error');
     } else {
       // Hide main buttons, show selector
-      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'none');
+      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'none');
       bookmarkSelector.style.display = 'block';
 
       // Populate folder select
@@ -193,7 +257,7 @@ restoreSelectedBtn.addEventListener('click', async () => {
 
       // Hide selector, show main buttons
       bookmarkSelector.style.display = 'none';
-      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
+      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
     }
   } catch (error) {
     showStatus(`Error: ${error.message}`, 'error');
@@ -205,7 +269,7 @@ restoreSelectedBtn.addEventListener('click', async () => {
 
 cancelSelectBtn.addEventListener('click', () => {
   bookmarkSelector.style.display = 'none';
-  document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
+  document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
 });
 
 removeGroupsBtn.addEventListener('click', async () => {
