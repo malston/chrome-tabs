@@ -61,7 +61,7 @@ const createElement = (tag) => {
 };
 
 // Setup DOM environment
-let organizeBtn, organizeCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn;
+let organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn;
 let statusDiv, bookmarkSelector, folderSelect, restoreSelectedBtn, cancelSelectBtn;
 const allButtons = [];
 
@@ -78,6 +78,8 @@ global.document = {
     switch(id) {
       case 'organizeBtn': return organizeBtn;
       case 'organizeCategoryBtn': return organizeCategoryBtn;
+      case 'organizeAllWindowsBtn': return organizeAllWindowsBtn;
+      case 'organizeAllWindowsCategoryBtn': return organizeAllWindowsCategoryBtn;
       case 'dedupeBtn': return dedupeBtn;
       case 'saveBookmarksBtn': return saveBookmarksBtn;
       case 'restoreBookmarksBtn': return restoreBookmarksBtn;
@@ -97,6 +99,8 @@ global.document = {
 function setupDOM() {
   organizeBtn = createMockElement('organizeBtn');
   organizeCategoryBtn = createMockElement('organizeCategoryBtn');
+  organizeAllWindowsBtn = createMockElement('organizeAllWindowsBtn');
+  organizeAllWindowsCategoryBtn = createMockElement('organizeAllWindowsCategoryBtn');
   dedupeBtn = createMockElement('dedupeBtn');
   saveBookmarksBtn = createMockElement('saveBookmarksBtn');
   restoreBookmarksBtn = createMockElement('restoreBookmarksBtn');
@@ -110,7 +114,7 @@ function setupDOM() {
   cancelSelectBtn = createMockElement('cancelSelectBtn');
 
   allButtons.length = 0;
-  allButtons.push(organizeBtn, organizeCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn);
+  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn);
   allButtons.forEach = function(callback) {
     for (let i = 0; i < this.length; i++) {
       callback(this[i]);
