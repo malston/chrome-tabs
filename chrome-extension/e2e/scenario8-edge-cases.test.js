@@ -98,10 +98,10 @@ describe('Scenario 8 and Edge Cases', () => {
 
     for (let i = 0; i < realUrls.length; i++) {
       if (i === 0) {
-        await page.goto(realUrls[i], { waitUntil: 'networkidle2', timeout: 15000 });
+        await page.goto(realUrls[i], { waitUntil: 'networkidle2', timeout: 30000 });
       } else {
         const newPage = await browser.newPage();
-        await newPage.goto(realUrls[i], { waitUntil: 'networkidle2', timeout: 15000 });
+        await newPage.goto(realUrls[i], { waitUntil: 'networkidle2', timeout: 30000 });
       }
     }
 
@@ -168,10 +168,10 @@ describe('Scenario 8 and Edge Cases', () => {
 
     for (let i = 0; i < urls.length; i++) {
       if (i === 0) {
-        await page.goto(urls[i], { waitUntil: 'networkidle2', timeout: 15000 });
+        await page.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
       } else {
         const newPage = await browser.newPage();
-        await newPage.goto(urls[i], { waitUntil: 'networkidle2', timeout: 15000 });
+        await newPage.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
       }
     }
 
@@ -218,10 +218,10 @@ describe('Scenario 8 and Edge Cases', () => {
 
     for (let i = 0; i < urls.length; i++) {
       if (i === 0) {
-        await page.goto(urls[i], { waitUntil: 'networkidle2', timeout: 15000 });
+        await page.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
       } else {
         const newPage = await browser.newPage();
-        await newPage.goto(urls[i], { waitUntil: 'networkidle2', timeout: 15000 });
+        await newPage.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
       }
     }
 

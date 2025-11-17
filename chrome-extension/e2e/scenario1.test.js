@@ -85,11 +85,11 @@ describe('Scenario 1: First-Time Organization (Create New Groups)', () => {
       const url = allUrls[i];
       if (i === 0) {
         // Use the first page
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       } else {
         // Create new tabs for the rest
         const newPage = await browser.newPage();
-        await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+        await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       }
     }
 

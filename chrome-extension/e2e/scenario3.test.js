@@ -80,10 +80,10 @@ describe('Scenario 3: Group State Preservation (Collapsed Groups)', () => {
     for (let i = 0; i < initialUrls.length; i++) {
       const url = initialUrls[i];
       if (i === 0) {
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       } else {
         const newPage = await browser.newPage();
-        await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+        await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       }
     }
 
@@ -151,7 +151,7 @@ describe('Scenario 3: Group State Preservation (Collapsed Groups)', () => {
     console.log('Opening additional GitHub tabs...');
     for (const url of ADDITIONAL_GITHUB_URLS) {
       const newPage = await browser.newPage();
-      await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+      await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
     }
 
     console.log(`Opened ${ADDITIONAL_GITHUB_URLS.length} additional GitHub tabs`);

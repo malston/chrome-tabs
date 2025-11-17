@@ -71,10 +71,10 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
 
     for (let i = 0; i < urls.length; i++) {
       if (i === 0) {
-        await page.goto(urls[i], { waitUntil: 'networkidle2', timeout: 15000 });
+        await page.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
       } else {
         const newPage = await browser.newPage();
-        await newPage.goto(urls[i], { waitUntil: 'networkidle2', timeout: 15000 });
+        await newPage.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
       }
     }
 
@@ -147,10 +147,10 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
 
     // Open 2 example.com tabs
     const examplePage1 = await browser.newPage();
-    await examplePage1.goto('https://example.com/page1', { waitUntil: 'networkidle2', timeout: 15000 });
+    await examplePage1.goto('https://example.com/page1', { waitUntil: 'networkidle2', timeout: 30000 });
 
     const examplePage2 = await browser.newPage();
-    await examplePage2.goto('https://example.com/page2', { waitUntil: 'networkidle2', timeout: 15000 });
+    await examplePage2.goto('https://example.com/page2', { waitUntil: 'networkidle2', timeout: 30000 });
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -214,7 +214,7 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
 
     for (const url of newUrls) {
       const newPage = await browser.newPage();
-      await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+      await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
     }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
