@@ -53,7 +53,6 @@ describe('organizeTabs', () => {
   beforeEach(() => {
     // Reset mocks before each test
     jest.clearAllMocks();
-    colorIndex = 0;
 
     // Default: no existing groups (smart merging will create new groups)
     chrome.tabGroups.query.mockResolvedValue([]);
