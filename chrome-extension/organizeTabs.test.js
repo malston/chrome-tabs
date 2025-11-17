@@ -17,6 +17,7 @@ global.chrome = {
     ungroup: jest.fn(),
     create: jest.fn(),
     remove: jest.fn(),
+    move: jest.fn(),
     TAB_GROUP_ID_NONE: -1
   },
   tabGroups: {
@@ -31,7 +32,8 @@ global.chrome = {
     create: jest.fn()
   },
   windows: {
-    WINDOW_ID_CURRENT: 1
+    WINDOW_ID_CURRENT: 1,
+    getCurrent: jest.fn()
   },
   runtime: {
     onMessage: {
@@ -64,6 +66,9 @@ describe('organizeTabs', () => {
       color: 'blue',
       collapsed: false
     }));
+
+    // Mock chrome.windows.getCurrent() to return current window
+    chrome.windows.getCurrent.mockResolvedValue({ id: 1 });
   });
 
   describe('Domain Mode', () => {
@@ -556,6 +561,188 @@ describe('organizeTabs', () => {
         color: 'blue',
         collapsed: false
       });
+    });
+  });
+
+  describe('Cross-Window Organization (allWindows = true)', () => {
+    test('should collect tabs from all windows when allWindows is true', async () => {
+      const mockTabs = [
+        // Window 1
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: -1, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: -1, windowId: 1 },
+        // Window 2
+        { id: 3, url: 'https://github.com/repo3', title: 'Repo 3', groupId: -1, windowId: 2 },
+        { id: 4, url: 'https://example.com/page1', title: 'Page 1', groupId: -1, windowId: 2 }
+      ];
+
+      chrome.tabs.query.mockResolvedValueOnce(mockTabs) // Initial all windows query
+                         .mockResolvedValueOnce([mockTabs[0], mockTabs[1], mockTabs[2], mockTabs[3]]); // After moving
+      chrome.tabs.move.mockResolvedValue(undefined);
+      chrome.tabs.group.mockResolvedValue(1);
+
+      const result = await organizeTabs('domain', true);
+
+      // Should have queried all windows
+      expect(chrome.tabs.query).toHaveBeenNthCalledWith(1, {});
+
+      // Should have moved tabs from window 2 to window 1
+      expect(chrome.tabs.move).toHaveBeenCalledWith(3, { windowId: 1, index: -1 });
+      expect(chrome.tabs.move).toHaveBeenCalledWith(4, { windowId: 1, index: -1 });
+      expect(result.tabsMoved).toBe(2);
+    });
+
+    test('should remove duplicate URLs across all windows', async () => {
+      const mockTabs = [
+        // Window 1
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: -1, windowId: 1 },
+        { id: 2, url: 'https://example.com/page1', title: 'Page 1', groupId: -1, windowId: 1 },
+        // Window 2 - duplicates
+        { id: 3, url: 'https://github.com/repo1', title: 'Repo 1 (duplicate)', groupId: -1, windowId: 2 },
+        { id: 4, url: 'https://example.com/page1', title: 'Page 1 (duplicate)', groupId: -1, windowId: 2 },
+        // Window 2 - unique
+        { id: 5, url: 'https://github.com/repo2', title: 'Repo 2', groupId: -1, windowId: 2 }
+      ];
+
+      chrome.tabs.query.mockResolvedValueOnce(mockTabs) // Initial all windows query
+                         .mockResolvedValueOnce([mockTabs[0], mockTabs[1], mockTabs[4]]); // After deduplication and moving
+      chrome.tabs.remove.mockResolvedValue(undefined);
+      chrome.tabs.move.mockResolvedValue(undefined);
+      chrome.tabs.group.mockResolvedValueOnce(1).mockResolvedValueOnce(2);
+
+      const result = await organizeTabs('domain', true);
+
+      // Should have removed duplicates (tabs 3 and 4)
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([3, 4]);
+      expect(result.duplicatesClosed).toBe(2);
+
+      // Should have moved unique tab from window 2 (tab 5)
+      expect(chrome.tabs.move).toHaveBeenCalledWith(5, { windowId: 1, index: -1 });
+      expect(result.tabsMoved).toBe(1);
+
+      // Should have 3 unique tabs remaining
+      expect(result.totalTabs).toBe(3);
+      // github.com has 2 tabs (grouped), example.com has 1 tab (not grouped)
+      expect(result.groupedTabs).toBe(2);
+    });
+
+    test('should skip chrome internal pages when removing duplicates', async () => {
+      const mockTabs = [
+        // Window 1
+        { id: 1, url: 'chrome://extensions/', title: 'Extensions', groupId: -1, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo1', title: 'Repo 1', groupId: -1, windowId: 1 },
+        // Window 2
+        { id: 3, url: 'chrome-extension://abc/popup.html', title: 'Extension', groupId: -1, windowId: 2 },
+        { id: 4, url: 'about:blank', title: 'Blank', groupId: -1, windowId: 2 },
+        { id: 5, url: 'https://github.com/repo2', title: 'Repo 2', groupId: -1, windowId: 2 }
+      ];
+
+      chrome.tabs.query.mockResolvedValueOnce(mockTabs) // Initial all windows query
+                         .mockResolvedValueOnce([mockTabs[0], mockTabs[1], mockTabs[2], mockTabs[3], mockTabs[4]]); // After moving
+      chrome.tabs.move.mockResolvedValue(undefined);
+      chrome.tabs.group.mockResolvedValue(1);
+
+      const result = await organizeTabs('domain', true);
+
+      // Should not try to remove chrome internal pages
+      expect(chrome.tabs.remove).not.toHaveBeenCalled();
+      expect(result.duplicatesClosed).toBe(0);
+
+      // Should group only the github tabs
+      expect(result.groupedTabs).toBe(2);
+    });
+
+    test('should handle when all tabs are already in current window', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: -1, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: -1, windowId: 1 },
+        { id: 3, url: 'https://example.com/page1', title: 'Page 1', groupId: -1, windowId: 1 }
+      ];
+
+      chrome.tabs.query.mockResolvedValueOnce(mockTabs) // Initial all windows query
+                         .mockResolvedValueOnce(mockTabs); // After moving (no changes)
+      chrome.tabs.group.mockResolvedValue(1);
+
+      const result = await organizeTabs('domain', true);
+
+      // Should not move any tabs (all already in window 1)
+      expect(chrome.tabs.move).not.toHaveBeenCalled();
+      expect(result.tabsMoved).toBe(0);
+
+      // Should not remove any duplicates
+      expect(chrome.tabs.remove).not.toHaveBeenCalled();
+      expect(result.duplicatesClosed).toBe(0);
+
+      // Should still group tabs normally
+      expect(result.groupedTabs).toBe(2);
+    });
+
+    test('should handle tab move errors gracefully', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: -1, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: -1, windowId: 2 },
+        { id: 3, url: 'https://github.com/repo3', title: 'Repo 3', groupId: -1, windowId: 2 }
+      ];
+
+      chrome.tabs.query.mockResolvedValueOnce(mockTabs) // Initial all windows query
+                         .mockResolvedValueOnce([mockTabs[0], mockTabs[2]]); // Tab 2 failed to move
+      chrome.tabs.move.mockRejectedValueOnce(new Error('Move failed')) // Tab 2 fails
+                       .mockResolvedValueOnce(undefined); // Tab 3 succeeds
+      chrome.tabs.group.mockResolvedValue(1);
+
+      const result = await organizeTabs('domain', true);
+
+      // Should still have moved 1 tab successfully
+      expect(result.tabsMoved).toBe(1);
+
+      // Should log error but continue
+      expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Error moving tab'), expect.any(Error));
+
+      // Should still group the successfully moved tabs
+      expect(result.groupedTabs).toBe(2);
+    });
+
+    test('should combine cross-window organization with category mode', async () => {
+      const mockTabs = [
+        // Window 1 - Development
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: -1, windowId: 1 },
+        { id: 2, url: 'https://stackoverflow.com/q/1', title: 'Q1', groupId: -1, windowId: 1 },
+        // Window 2 - Development
+        { id: 3, url: 'https://github.com/repo2', title: 'Repo 2', groupId: -1, windowId: 2 },
+        { id: 4, url: 'https://stackoverflow.com/q/2', title: 'Q2', groupId: -1, windowId: 2 }
+      ];
+
+      chrome.tabs.query.mockResolvedValueOnce(mockTabs) // Initial all windows query
+                         .mockResolvedValueOnce(mockTabs); // After moving
+      chrome.tabs.move.mockResolvedValue(undefined);
+      chrome.tabs.group.mockResolvedValue(1);
+
+      const result = await organizeTabs('category', true);
+
+      // Should have moved tabs from window 2
+      expect(result.tabsMoved).toBe(2);
+
+      // Should group all 4 tabs into "Development" category
+      expect(result.groupedTabs).toBe(4);
+      expect(result.groups).toBe(1);
+    });
+
+    test('should return 0 for duplicatesClosed and tabsMoved when allWindows is false', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: -1, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: -1, windowId: 1 }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.group.mockResolvedValue(1);
+
+      const result = await organizeTabs('domain', false);
+
+      // Should not have cross-window metrics when allWindows is false
+      expect(result.duplicatesClosed).toBe(0);
+      expect(result.tabsMoved).toBe(0);
+
+      // Should still group tabs normally
+      expect(result.groupedTabs).toBe(2);
     });
   });
 });
