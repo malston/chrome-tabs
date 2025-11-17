@@ -549,7 +549,7 @@ async function restoreFromBookmarks(bookmarkFolderId) {
           groupsCreated++;
 
           // Add to our tracking map
-          const [newGroup] = await chrome.tabGroups.query({ groupId: groupId });
+          const newGroup = await chrome.tabGroups.get(groupId);
           groupsByTitle.set(groupName, newGroup);
 
           console.log(`Created new group: ${groupName} with ${newTabIds.length} tabs`);
