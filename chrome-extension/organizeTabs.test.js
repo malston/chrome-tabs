@@ -21,6 +21,7 @@ global.chrome = {
   },
   tabGroups: {
     query: jest.fn(),
+    get: jest.fn(),
     update: jest.fn(),
     TAB_GROUP_ID_NONE: -1
   },
@@ -53,6 +54,9 @@ describe('organizeTabs', () => {
     // Reset mocks before each test
     jest.clearAllMocks();
     colorIndex = 0;
+
+    // Default: no existing groups (smart merging will create new groups)
+    chrome.tabGroups.query.mockResolvedValue([]);
   });
 
   describe('Domain Mode', () => {
@@ -146,20 +150,32 @@ describe('organizeTabs', () => {
       });
     });
 
-    test('should ungroup existing grouped tabs before regrouping', async () => {
+    test('should update existing groups instead of recreating them (smart merge)', async () => {
+      // Existing group for github.com with 2 tabs
+      const existingGroup = { id: 5, title: 'github.com (2)' };
+
       const mockTabs = [
         { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5 },
         { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5 }
       ];
 
-      chrome.tabs.query.mockResolvedValue(mockTabs);
-      chrome.tabs.group.mockResolvedValue(1);
+      chrome.tabs.query.mockResolvedValueOnce(mockTabs) // All tabs query
+                         .mockResolvedValueOnce(mockTabs); // Tabs in group 5
+      chrome.tabGroups.query.mockResolvedValue([existingGroup]);
 
       await organizeTabs('domain');
 
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(2);
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(1);
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(2);
+      // Should NOT ungroup these tabs since they're already in the right group
+      expect(chrome.tabs.ungroup).not.toHaveBeenCalledWith(1);
+      expect(chrome.tabs.ungroup).not.toHaveBeenCalledWith(2);
+
+      // Should update the existing group title (even though count didn't change)
+      expect(chrome.tabGroups.update).toHaveBeenCalledWith(5, {
+        title: 'github.com (2)'
+      });
+
+      // Should NOT create a new group
+      expect(chrome.tabs.group).not.toHaveBeenCalled();
     });
 
     test('should handle www prefix removal in domain grouping', async () => {
