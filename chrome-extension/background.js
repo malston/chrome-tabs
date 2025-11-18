@@ -461,6 +461,27 @@ async function removeDuplicateTabs() {
     }
   }
 
+  // Update group titles to reflect new tab counts after removing duplicates
+  if (closedCount > 0) {
+    const groups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+
+    for (const group of groups) {
+      // Count tabs currently in this group
+      const tabsInGroup = await chrome.tabs.query({ groupId: group.id });
+      const newCount = tabsInGroup.length;
+
+      // Extract base name (without count) and update with new count
+      const baseName = extractGroupBaseName(group.title);
+      const newTitle = `${baseName} (${newCount})`;
+
+      // Only update if the title has changed
+      if (group.title !== newTitle) {
+        await chrome.tabGroups.update(group.id, { title: newTitle });
+        console.log(`Updated group "${group.title}" to "${newTitle}"`);
+      }
+    }
+  }
+
   return {
     totalTabs: tabs.length,
     duplicatesFound: tabsToClose.length,

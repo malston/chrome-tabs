@@ -52,6 +52,8 @@ const { removeDuplicateTabs } = require('./background.js');
 describe('removeDuplicateTabs', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock empty groups by default (tests can override this)
+    chrome.tabGroups.query.mockResolvedValue([]);
   });
 
   describe('Basic Duplicate Detection', () => {
@@ -546,6 +548,109 @@ describe('removeDuplicateTabs', () => {
       await removeDuplicateTabs();
 
       expect(console.error).toHaveBeenCalledWith('Error closing tab:', error);
+    });
+  });
+
+  describe('Group Title Updates', () => {
+    test('should update group titles after removing duplicates', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5 },
+        { id: 3, url: 'https://github.com/repo1', title: 'Repo 1 Duplicate', groupId: 5 },
+        { id: 4, url: 'https://example.com/page1', title: 'Page 1', groupId: 6 },
+        { id: 5, url: 'https://example.com/page2', title: 'Page 2', groupId: 6 },
+        { id: 6, url: 'https://example.com/page1', title: 'Page 1 Duplicate', groupId: 6 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'github.com (3)' },
+        { id: 6, title: 'example.com (3)' }
+      ];
+
+      chrome.tabs.query
+        .mockResolvedValueOnce(mockTabs) // Initial query
+        .mockResolvedValueOnce([mockTabs[0], mockTabs[1]]) // Tabs in group 5 after removal
+        .mockResolvedValueOnce([mockTabs[3], mockTabs[4]]); // Tabs in group 6 after removal
+      chrome.tabs.remove.mockResolvedValue(undefined);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabGroups.update.mockResolvedValue(undefined);
+
+      const result = await removeDuplicateTabs();
+
+      // Should have closed 2 duplicates
+      expect(result.duplicatesClosed).toBe(2);
+
+      // Should have updated both group titles
+      expect(chrome.tabGroups.update).toHaveBeenCalledTimes(2);
+      expect(chrome.tabGroups.update).toHaveBeenCalledWith(5, { title: 'github.com (2)' });
+      expect(chrome.tabGroups.update).toHaveBeenCalledWith(6, { title: 'example.com (2)' });
+    });
+
+    test('should not update group titles if no duplicates removed', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5 }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.remove.mockResolvedValue(undefined);
+
+      await removeDuplicateTabs();
+
+      // Should not query or update groups if no duplicates were removed
+      expect(chrome.tabGroups.query).not.toHaveBeenCalled();
+      expect(chrome.tabGroups.update).not.toHaveBeenCalled();
+    });
+
+    test('should not update group title if count has not changed', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5 },
+        { id: 2, url: 'https://github.com/repo1', title: 'Repo 1 Duplicate', groupId: -1 }, // Ungrouped duplicate
+        { id: 3, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'github.com (2)' }
+      ];
+
+      chrome.tabs.query
+        .mockResolvedValueOnce(mockTabs) // Initial query
+        .mockResolvedValueOnce([mockTabs[0], mockTabs[2]]); // Tabs in group 5 (still 2)
+      chrome.tabs.remove.mockResolvedValue(undefined);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabGroups.update.mockResolvedValue(undefined);
+
+      await removeDuplicateTabs();
+
+      // Should have closed 1 duplicate
+      expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
+
+      // Should not update group title because count is still 2
+      expect(chrome.tabGroups.update).not.toHaveBeenCalled();
+    });
+
+    test('should handle groups with category names', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 7 },
+        { id: 2, url: 'https://stackoverflow.com/q1', title: 'Q1', groupId: 7 },
+        { id: 3, url: 'https://github.com/repo1', title: 'Repo 1 Duplicate', groupId: 7 }
+      ];
+
+      const mockGroups = [
+        { id: 7, title: 'Development (3)' }
+      ];
+
+      chrome.tabs.query
+        .mockResolvedValueOnce(mockTabs) // Initial query
+        .mockResolvedValueOnce([mockTabs[0], mockTabs[1]]); // Tabs in group 7 after removal
+      chrome.tabs.remove.mockResolvedValue(undefined);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabGroups.update.mockResolvedValue(undefined);
+
+      await removeDuplicateTabs();
+
+      // Should update the group title from "Development (3)" to "Development (2)"
+      expect(chrome.tabGroups.update).toHaveBeenCalledWith(7, { title: 'Development (2)' });
     });
   });
 });
