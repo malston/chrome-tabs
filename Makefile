@@ -1,4 +1,4 @@
-.PHONY: help install setup test test-e2e coverage install-hooks restore-history lint clean
+.PHONY: help install setup test test-e2e test-e2e-headless coverage install-hooks restore-history lint clean
 
 # Default target
 help:
@@ -10,7 +10,8 @@ help:
 	@echo "Chrome Extension Development:"
 	@echo "  make setup           - Install npm dependencies (Jest for testing)"
 	@echo "  make test            - Run Jest unit tests"
-	@echo "  make test-e2e        - Run Puppeteer end-to-end tests"
+	@echo "  make test-e2e        - Run Puppeteer E2E tests (headed - visible browser)"
+	@echo "  make test-e2e-headless - Run Puppeteer E2E tests (headless - no browser window)"
 	@echo "  make coverage        - Run Jest tests with code coverage report"
 	@echo "  make install-hooks   - Install Git pre-commit hooks"
 	@echo ""
@@ -42,11 +43,17 @@ test:
 	@command -v npm >/dev/null 2>&1 || { echo "Error: npm is not installed. Run 'make setup' first"; exit 1; }
 	cd chrome-extension && npm test
 
-# Run Puppeteer end-to-end tests
+# Run Puppeteer end-to-end tests (headed - visible browser)
 test-e2e:
-	@echo "Running Puppeteer end-to-end tests..."
+	@echo "Running Puppeteer end-to-end tests (headed mode - browser visible)..."
 	@command -v npm >/dev/null 2>&1 || { echo "Error: npm is not installed. Run 'make setup' first"; exit 1; }
 	cd chrome-extension && npm run test:e2e
+
+# Run Puppeteer end-to-end tests (headless - no browser window)
+test-e2e-headless:
+	@echo "Running Puppeteer end-to-end tests (headless mode - no browser window)..."
+	@command -v npm >/dev/null 2>&1 || { echo "Error: npm is not installed. Run 'make setup' first"; exit 1; }
+	cd chrome-extension && HEADLESS=true npm run test:e2e
 
 # Run Jest tests with code coverage
 coverage:
