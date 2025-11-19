@@ -786,14 +786,19 @@ describe('organizeTabs', () => {
         { id: 3, url: 'https://example.com/page1', title: 'Page 1', groupId: -1, windowId: 1 }
       ];
 
-      chrome.tabs.query.mockResolvedValueOnce(mockTabs) // Initial all windows query
-                         .mockResolvedValueOnce(mockTabs); // After moving (no changes)
+      const tabsAfterGrouping = [
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 1, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 1, windowId: 1 },
+        { id: 3, url: 'https://example.com/page1', title: 'Page 1', groupId: -1, windowId: 1 }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(tabsAfterGrouping); // All queries return the same state
       chrome.tabs.group.mockResolvedValue(1);
+      chrome.tabs.move.mockResolvedValue({});
 
       const result = await organizeTabs('domain', true);
 
-      // Should not move any tabs (all already in window 1)
-      expect(chrome.tabs.move).not.toHaveBeenCalled();
+      // Should not move any tabs between windows (all already in window 1)
       expect(result.tabsMoved).toBe(0);
 
       // Should not remove any duplicates
@@ -802,6 +807,10 @@ describe('organizeTabs', () => {
 
       // Should still group tabs normally
       expect(result.groupedTabs).toBe(2);
+
+      // Should move the ungrouped tab (example.com) to the end
+      expect(result.ungroupedTabsMoved).toBe(1);
+      expect(chrome.tabs.move).toHaveBeenCalledWith(3, { index: -1 });
     });
 
     test('should handle tab move errors gracefully', async () => {
@@ -1028,6 +1037,64 @@ describe('organizeTabs', () => {
       const allGroupCalls = chrome.tabs.group.mock.calls;
       const allTabIdsGrouped = allGroupCalls.flatMap(call => call[0].tabIds);
       expect(allTabIdsGrouped).not.toContain(3); // Tab 3 should not be grouped
+    });
+
+    test('should move ungrouped tabs to end of tab bar', async () => {
+      const mockTabs = [
+        // Grouped tabs
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5, windowId: 1 },
+        // Ungrouped tabs (should be moved to end)
+        { id: 3, url: 'https://example.com/page1', title: 'Example 1', groupId: -1, windowId: 1 },
+        { id: 4, url: 'https://news.com/article', title: 'News', groupId: -1, windowId: 1 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'github.com (2)' }
+      ];
+
+      // All queries return the same tabs
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.move.mockResolvedValue({});
+
+      const result = await organizeTabs('domain', false);
+
+      // Should have moved 2 ungrouped tabs
+      expect(result.ungroupedTabsMoved).toBe(2);
+
+      // Should have been called to move each ungrouped tab to index -1 (end)
+      expect(chrome.tabs.move).toHaveBeenCalledWith(3, { index: -1 });
+      expect(chrome.tabs.move).toHaveBeenCalledWith(4, { index: -1 });
+      expect(chrome.tabs.move).toHaveBeenCalledTimes(2);
+    });
+
+    test('should skip chrome internal pages when moving ungrouped tabs', async () => {
+      const mockTabs = [
+        // Grouped tabs
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5, windowId: 1 },
+        // Ungrouped regular tab (should be moved)
+        { id: 3, url: 'https://example.com', title: 'Example', groupId: -1, windowId: 1 },
+        // Chrome internal pages (should NOT be moved)
+        { id: 4, url: 'chrome://extensions/', title: 'Extensions', groupId: -1, windowId: 1 },
+        { id: 5, url: 'chrome-extension://abc/popup.html', title: 'Popup', groupId: -1, windowId: 1 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'github.com (2)' }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.move.mockResolvedValue({});
+
+      const result = await organizeTabs('domain', false);
+
+      // Should only move the 1 regular ungrouped tab (not chrome pages)
+      expect(result.ungroupedTabsMoved).toBe(1);
+      expect(chrome.tabs.move).toHaveBeenCalledWith(3, { index: -1 });
+      expect(chrome.tabs.move).toHaveBeenCalledTimes(1);
     });
   });
 });
