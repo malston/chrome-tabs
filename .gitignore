@@ -36,3 +36,6 @@ build/
 dist/
 *.egg-info/
 *.zip
+
+# AI
+.serena/

@@ -873,4 +873,161 @@ describe('organizeTabs', () => {
       expect(result.groupedTabs).toBe(2);
     });
   });
+
+  describe('Ungrouped Duplicates Detection', () => {
+    test('should detect ungrouped tabs that duplicate grouped tabs', async () => {
+      const mockTabs = [
+        // Grouped tabs
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5, windowId: 1 },
+        // Ungrouped duplicate of repo1
+        { id: 3, url: 'https://github.com/repo1', title: 'Repo 1 Duplicate', groupId: -1, windowId: 1 },
+        // Regular ungrouped tab (no duplicate)
+        { id: 4, url: 'https://example.com', title: 'Example', groupId: -1, windowId: 1 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'github.com (2)' }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.group.mockResolvedValue(5);
+
+      const result = await organizeTabs('domain', false);
+
+      // Should detect 1 ungrouped duplicate
+      expect(result.ungroupedDuplicates).toBe(1);
+    });
+
+    test('should count multiple ungrouped duplicates correctly', async () => {
+      const mockTabs = [
+        // Grouped tabs
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5, windowId: 1 },
+        // Multiple ungrouped duplicates
+        { id: 3, url: 'https://github.com/repo1', title: 'Repo 1 Dup 1', groupId: -1, windowId: 1 },
+        { id: 4, url: 'https://github.com/repo1', title: 'Repo 1 Dup 2', groupId: -1, windowId: 1 },
+        { id: 5, url: 'https://github.com/repo2', title: 'Repo 2 Dup', groupId: -1, windowId: 1 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'github.com (2)' }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.group.mockResolvedValue(5);
+
+      const result = await organizeTabs('domain', false);
+
+      // Should detect 3 ungrouped duplicates (2 of repo1, 1 of repo2)
+      expect(result.ungroupedDuplicates).toBe(3);
+    });
+
+    test('should return 0 ungrouped duplicates when none exist', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5, windowId: 1 },
+        { id: 3, url: 'https://example.com', title: 'Example', groupId: -1, windowId: 1 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'github.com (2)' }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.group.mockResolvedValue(5);
+
+      const result = await organizeTabs('domain', false);
+
+      // Should detect no ungrouped duplicates
+      expect(result.ungroupedDuplicates).toBe(0);
+    });
+
+    test('should skip chrome internal pages when detecting duplicates', async () => {
+      const mockTabs = [
+        // Grouped tab
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5, windowId: 1 },
+        // Ungrouped duplicate
+        { id: 2, url: 'https://github.com/repo1', title: 'Repo 1 Dup', groupId: -1, windowId: 1 },
+        // Chrome internal pages (should be skipped)
+        { id: 3, url: 'chrome://extensions/', title: 'Extensions', groupId: -1, windowId: 1 },
+        { id: 4, url: 'chrome-extension://abc123/popup.html', title: 'Popup', groupId: -1, windowId: 1 },
+        { id: 5, url: 'about:blank', title: 'Blank', groupId: -1, windowId: 1 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'github.com (1)' }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.group.mockResolvedValue(5);
+
+      const result = await organizeTabs('domain', false);
+
+      // Should only detect the github duplicate, not chrome pages
+      expect(result.ungroupedDuplicates).toBe(1);
+    });
+
+    test('should work correctly with category mode', async () => {
+      const mockTabs = [
+        // Grouped Development tabs
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 7, windowId: 1 },
+        { id: 2, url: 'https://stackoverflow.com/q/1', title: 'SO Q1', groupId: 7, windowId: 1 },
+        // Ungrouped duplicate
+        { id: 3, url: 'https://github.com/repo1', title: 'Repo 1 Dup', groupId: -1, windowId: 1 }
+      ];
+
+      const mockGroups = [
+        { id: 7, title: 'Development (2)' }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.group.mockResolvedValue(7);
+
+      const result = await organizeTabs('category', false);
+
+      // Should detect ungrouped duplicate in category mode too
+      expect(result.ungroupedDuplicates).toBe(1);
+    });
+
+    test('should skip ungrouped duplicates and not organize them', async () => {
+      const mockTabs = [
+        // Grouped tabs
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5, windowId: 1 },
+        // Ungrouped duplicate - should NOT be organized
+        { id: 3, url: 'https://github.com/repo1', title: 'Repo 1 Duplicate', groupId: -1, windowId: 1 },
+        // Regular ungrouped tabs (not duplicates) - should still be organized if eligible
+        { id: 4, url: 'https://example.com/page1', title: 'Example 1', groupId: -1, windowId: 1 },
+        { id: 5, url: 'https://example.com/page2', title: 'Example 2', groupId: -1, windowId: 1 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'github.com (2)' }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.group.mockResolvedValue(10);
+
+      const result = await organizeTabs('domain', false);
+
+      // Should detect 1 ungrouped duplicate
+      expect(result.ungroupedDuplicates).toBe(1);
+
+      // Should have been called to create a new example.com group (2 tabs)
+      // But NOT called to add the duplicate github tab (tab id 3)
+      expect(chrome.tabs.group).toHaveBeenCalledWith({ tabIds: [4, 5] }); // example.com group
+
+      // The ungrouped duplicate (tab 3) should NOT be in any group call
+      const allGroupCalls = chrome.tabs.group.mock.calls;
+      const allTabIdsGrouped = allGroupCalls.flatMap(call => call[0].tabIds);
+      expect(allTabIdsGrouped).not.toContain(3); // Tab 3 should not be grouped
+    });
+  });
 });

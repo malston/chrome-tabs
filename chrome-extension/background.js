@@ -270,13 +270,58 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
     tabs = await chrome.tabs.query({ currentWindow: true });
   }
 
+  // Detect ungrouped tabs that duplicate grouped tabs
+  let ungroupedDuplicates = 0;
+  const ungroupedDuplicateUrls = new Set();
+
+  // Build a map of grouped tab URLs
+  const groupedTabUrls = new Map(); // url -> tab
+  for (const tab of tabs) {
+    if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
+      // Skip chrome internal pages
+      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+        continue;
+      }
+      groupedTabUrls.set(tab.url, tab);
+    }
+  }
+
+  // Check ungrouped tabs for duplicates
+  for (const tab of tabs) {
+    if (tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE) {
+      // Skip chrome internal pages
+      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+        continue;
+      }
+
+      // Check if this ungrouped tab's URL already exists in a grouped tab
+      if (groupedTabUrls.has(tab.url)) {
+        ungroupedDuplicates++;
+        ungroupedDuplicateUrls.add(tab.url);
+        console.log(`Ungrouped duplicate found: ${tab.title} (${tab.url}) - grouped version exists`);
+      }
+    }
+  }
+
   // Group tabs by domain or category
   const groups = {};
   const skipDomains = new Set(['chrome://', 'chrome-extension://', 'about:']);
 
+  // Build a set of URLs that should be skipped (ungrouped duplicates)
+  const skippedUngroupedDuplicateUrls = new Set();
+  for (const url of ungroupedDuplicateUrls) {
+    skippedUngroupedDuplicateUrls.add(url);
+  }
+
   for (const tab of tabs) {
     // Skip chrome internal pages
     if (skipDomains.has(tab.url.substring(0, tab.url.indexOf('/')))) {
+      continue;
+    }
+
+    // Skip ungrouped duplicates - don't organize them
+    if (tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE && skippedUngroupedDuplicateUrls.has(tab.url)) {
+      console.log(`Skipping ungrouped duplicate: ${tab.title} (${tab.url})`);
       continue;
     }
 
@@ -401,7 +446,8 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
     groupsUpdated: groupsUpdated,
     ungroupedTabs: tabs.length - groupedCount,
     duplicatesClosed: duplicatesClosed,
-    tabsMoved: tabsMoved
+    tabsMoved: tabsMoved,
+    ungroupedDuplicates: ungroupedDuplicates
   };
 }
 

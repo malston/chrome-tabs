@@ -36,10 +36,11 @@ organizeBtn.addEventListener('click', async () => {
     if (response.error) {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
-      showStatus(
-        `✓ Organized ${response.groupedTabs} tabs into ${response.groups} groups!`,
-        'success'
-      );
+      let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} groups!`;
+      if (response.ungroupedDuplicates > 0) {
+        message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
+      }
+      showStatus(message, 'success');
     }
   } catch (error) {
     showStatus(`Error: ${error.message}`, 'error');
@@ -62,10 +63,11 @@ organizeCategoryBtn.addEventListener('click', async () => {
     if (response.error) {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
-      showStatus(
-        `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`,
-        'success'
-      );
+      let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`;
+      if (response.ungroupedDuplicates > 0) {
+        message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
+      }
+      showStatus(message, 'success');
     }
   } catch (error) {
     showStatus(`Error: ${error.message}`, 'error');
@@ -95,6 +97,9 @@ organizeAllWindowsBtn.addEventListener('click', async () => {
       }
       if (response.tabsMoved > 0) {
         message += ` Moved ${response.tabsMoved} tabs.`;
+      }
+      if (response.ungroupedDuplicates > 0) {
+        message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
       }
       showStatus(message, 'success');
     }
@@ -126,6 +131,9 @@ organizeAllWindowsCategoryBtn.addEventListener('click', async () => {
       }
       if (response.tabsMoved > 0) {
         message += ` Moved ${response.tabsMoved} tabs.`;
+      }
+      if (response.ungroupedDuplicates > 0) {
+        message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
       }
       showStatus(message, 'success');
     }
