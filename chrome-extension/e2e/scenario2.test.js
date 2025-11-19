@@ -27,8 +27,8 @@ const INITIAL_URLS = {
     'https://www.google.com/search?q=typescript'
   ],
   example: [
-    'https://example.com/page1',
-    'https://example.com/page2'
+    'https://example.com?page=1',
+    'https://example.com?page=2'
   ]
 };
 
@@ -42,7 +42,7 @@ const ADDITIONAL_URLS = {
     'https://www.google.com/maps'
   ],
   example: [
-    'https://example.com/page3'
+    'https://example.com?page=3'
   ]
 };
 

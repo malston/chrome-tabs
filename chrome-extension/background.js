@@ -438,6 +438,37 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
     }
   }
 
+  // Move all ungrouped tabs to the end of the tab bar
+  let ungroupedTabsMoved = 0;
+
+  // Re-query tabs to get current state after organization
+  const currentTabs = await chrome.tabs.query({ currentWindow: true });
+
+  // Identify ungrouped tabs (skip chrome internal pages)
+  const ungroupedTabsToMove = currentTabs.filter(tab =>
+    tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE &&
+    !tab.url.startsWith('chrome://') &&
+    !tab.url.startsWith('chrome-extension://') &&
+    tab.url !== 'about:blank'
+  );
+
+  if (ungroupedTabsToMove.length > 0) {
+    console.log(`Moving ${ungroupedTabsToMove.length} ungrouped tabs to end of tab bar...`);
+
+    // Move tabs to the end, preserving their relative order
+    // We move them one by one to index -1 (which means "end of tab bar")
+    for (const tab of ungroupedTabsToMove) {
+      try {
+        await chrome.tabs.move(tab.id, { index: -1 });
+        ungroupedTabsMoved++;
+      } catch (e) {
+        console.error(`Error moving ungrouped tab ${tab.id}:`, e);
+      }
+    }
+
+    console.log(`Moved ${ungroupedTabsMoved} ungrouped tabs to end`);
+  }
+
   return {
     totalTabs: tabs.length,
     groupedTabs: groupedCount,
@@ -447,7 +478,8 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
     ungroupedTabs: tabs.length - groupedCount,
     duplicatesClosed: duplicatesClosed,
     tabsMoved: tabsMoved,
-    ungroupedDuplicates: ungroupedDuplicates
+    ungroupedDuplicates: ungroupedDuplicates,
+    ungroupedTabsMoved: ungroupedTabsMoved
   };
 }
 

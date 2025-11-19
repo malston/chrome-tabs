@@ -37,6 +37,9 @@ organizeBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} groups!`;
+      if (response.ungroupedTabsMoved > 0) {
+        message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
+      }
       if (response.ungroupedDuplicates > 0) {
         message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
       }
@@ -64,6 +67,9 @@ organizeCategoryBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`;
+      if (response.ungroupedTabsMoved > 0) {
+        message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
+      }
       if (response.ungroupedDuplicates > 0) {
         message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
       }
@@ -98,6 +104,9 @@ organizeAllWindowsBtn.addEventListener('click', async () => {
       if (response.tabsMoved > 0) {
         message += ` Moved ${response.tabsMoved} tabs.`;
       }
+      if (response.ungroupedTabsMoved > 0) {
+        message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
+      }
       if (response.ungroupedDuplicates > 0) {
         message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
       }
@@ -131,6 +140,9 @@ organizeAllWindowsCategoryBtn.addEventListener('click', async () => {
       }
       if (response.tabsMoved > 0) {
         message += ` Moved ${response.tabsMoved} tabs.`;
+      }
+      if (response.ungroupedTabsMoved > 0) {
+        message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
       }
       if (response.ungroupedDuplicates > 0) {
         message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;

@@ -29,9 +29,9 @@ const TEST_URLS = {
     'https://www.google.com/maps'
   ],
   example: [
-    'https://example.com/page1',
-    'https://example.com/page2',
-    'https://example.com/page3'
+    'https://example.com?page=1',
+    'https://example.com?page=2',
+    'https://example.com?page=3'
   ]
 };
 
