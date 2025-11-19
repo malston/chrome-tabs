@@ -145,12 +145,12 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
   test('Scenario 5: should ungroup when domain drops to 1 tab', async () => {
     console.log('=== Scenario 5: Single Tabs (Ungrouping) ===');
 
-    // Open 2 example.com tabs
+    // Open 2 example.com tabs (use query params to make them unique)
     const examplePage1 = await browser.newPage();
-    await examplePage1.goto('https://example.com/page1', { waitUntil: 'networkidle2', timeout: 30000 });
+    await examplePage1.goto('https://example.com?page=1', { waitUntil: 'networkidle2', timeout: 30000 });
 
     const examplePage2 = await browser.newPage();
-    await examplePage2.goto('https://example.com/page2', { waitUntil: 'networkidle2', timeout: 30000 });
+    await examplePage2.goto('https://example.com?page=2', { waitUntil: 'networkidle2', timeout: 30000 });
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
