@@ -3,6 +3,7 @@
 // Import utility functions
 const path = require('path');
 const { shouldSkipUrl } = require(path.join(__dirname, './src/utils/shouldSkipUrl.js'));
+const { extractGroupBaseName } = require(path.join(__dirname, './src/utils/extractGroupBaseName.js'));
 
 // Color palette for tab groups
 const COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
@@ -37,24 +38,6 @@ async function getOtherBookmarksId() {
   return otherBookmarks.id;
 }
 
-/**
- * Extracts the base name from a group title by removing the tab count suffix.
- * This allows matching existing groups with new grouping operations.
- *
- * Examples:
- * - "github.com (15)" → "github.com"
- * - "markalston.net (5)" → "markalston.net"
- * - "Development (10)" → "Development"
- *
- * @param {string} groupTitle - The full group title with count
- * @returns {string} The base name without the count suffix
- */
-function extractGroupBaseName(groupTitle) {
-  if (!groupTitle) return '';
-  // Remove the " (count)" suffix using regex
-  // Matches: space, opening paren, one or more digits, closing paren, end of string
-  return groupTitle.replace(/\s*\(\d+\)$/, '');
-}
 
 /**
  * Checks if an IPv4 address is in a private range according to RFC 1918.
