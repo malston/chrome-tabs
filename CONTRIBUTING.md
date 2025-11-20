@@ -63,7 +63,6 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
    This installs a pre-commit hook that automatically:
    - Runs Jest tests for changed JavaScript files
-   - Runs Pylint for changed Python files
    - Validates manifest.json if changed
 
 4. **Make changes** to the extension code:
@@ -75,35 +74,21 @@ By participating in this project, you agree to maintain a respectful and inclusi
    - Go to `chrome://extensions/`
    - Click the refresh icon on the Tab Organizer extension
 
-### Python Tools Development
-
-1. **Install dependencies**:
-
-   ```bash
-   make install
-   ```
-
-2. **Run linting**:
-
-   ```bash
-   make lint
-   ```
-
 ## Project Structure
 
 ```
 chrome-tabs/
-├── chrome-extension/          # Chrome Extension (main tool)
+├── chrome-extension/          # Chrome Extension
 │   ├── manifest.json         # Extension configuration
-│   ├── background.js         # Service worker (core logic)
-│   ├── popup.html            # Extension UI
-│   ├── popup.js              # UI event handlers
+│   ├── background.js         # Service worker (message router)
+│   ├── src/
+│   │   ├── background/       # Feature modules
+│   │   ├── popup/            # Extension UI
+│   │   └── utils/            # Shared utilities
 │   ├── icon*.png             # Extension icons
 │   └── README.md             # Extension documentation
-├── restore_from_history.py   # History recovery tool
 ├── screenshots/              # Screenshots for documentation
-├── Makefile                  # Build and development commands
-├── pyproject.toml           # Python project configuration
+├── Makefile                  # Development commands
 ├── README.md                # Main documentation
 └── CONTRIBUTING.md          # This file
 ```
@@ -164,7 +149,7 @@ git commit -m "docs: Update installation instructions"
 All pull requests automatically run through our CI pipeline which includes:
 
 1. **Jest unit tests** for the Chrome Extension
-2. **Pylint** checks for Python code
+2. **Puppeteer E2E tests** for end-to-end testing
 3. **Manifest validation** to ensure extension compliance
 4. **Build verification** to ensure the extension packages correctly
 
@@ -177,8 +162,8 @@ make setup
 # Run extension unit tests
 make test
 
-# Run Python linting
-make lint
+# Run E2E tests
+make test-e2e-headless
 
 # Validate manifest
 python3 -m json.tool chrome-extension/manifest.json
@@ -229,16 +214,6 @@ Run your tests:
 ```bash
 cd chrome-extension
 npm test
-```
-
-### Testing Python Code
-
-```bash
-# Run pylint
-make lint
-
-# Test history recovery (requires Chrome with remote debugging)
-make restore-history
 ```
 
 ## Submitting Changes

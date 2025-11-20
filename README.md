@@ -3,7 +3,7 @@
 [![CI](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml/badge.svg)](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml)
 [![Coverage](.github/coverage-badge.svg)](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml)
 
-> Complete solution for managing Chrome tabs: organize by domain, remove duplicates, and recover from history.
+> Chrome extension for managing tabs: organize by domain, remove duplicates, and save to bookmarks.
 
 **Quick Links:** [Features](#features) • [Installation](#quick-start) • [Usage](#usage) • [Screenshots](#screenshots) • [Releases](#releases) • [Contributing](#contributing) • [Project Board](https://github.com/users/malston/projects/2)
 
@@ -37,7 +37,7 @@ Select and restore previously saved tab sessions:
 
 ## Features
 
-### 🎯 Chrome Extension (Primary Tool)
+### 🎯 Chrome Extension
 
 - **One-click organization** - Automatically group tabs by domain or category
 - **One-click deduplication** - Remove duplicate tabs instantly
@@ -47,10 +47,6 @@ Select and restore previously saved tab sessions:
 - **Shows tab counts** - See how many tabs in each group
 - **Works everywhere** - Use in any Chrome profile, anytime
 - **No setup required** - No remote debugging, no command line
-
-### 🔧 Command-Line Tools (Optional)
-
-- **History Recovery** - Restore tabs from your browsing history
 
 ## Quick Start
 
@@ -86,12 +82,6 @@ chrome://extensions/
 ```
 
 See [chrome-extension/README.md](chrome-extension/README.md) for detailed instructions.
-
-### Install Command-Line Tools (Optional)
-
-```bash
-make install
-```
 
 ## Usage
 
@@ -168,53 +158,27 @@ You can restore from any bookmark folder by following this naming convention:
 3. Organize bookmarks into subfolders (subfolder names become tab group names)
 4. The extension will detect and list your folder for restoration
 
-### Recover Lost Tabs from History
-
-**Use the command-line tool**:
-
-```bash
-# Restore from last 7 days of history
-make restore-history
-
-# Or with custom options
-uv run restore_from_history.py --days 30 --limit 500
-```
-
-Note: Requires Chrome to be running with remote debugging. See troubleshooting below.
-
 ## Requirements
 
-- **Chrome Extension**: Just Chrome browser
-- **Command-Line Tools** (optional, for history recovery):
-  - Python 3.8+
-  - [uv](https://github.com/astral-sh/uv) package manager
-
-## Available Commands
-
-```bash
-make help            # Show all available commands
-make install         # Install dependencies
-make restore-history # Restore tabs from history
-make clean           # Clean up
-```
+- Chrome browser
 
 ## Project Structure
 
 ```sh
 chrome-tabs/
-├── chrome-extension/       # Chrome Extension (main tool!)
+├── chrome-extension/       # Chrome Extension
 │   ├── manifest.json
-│   ├── background.js       # Tab grouping & dedupe logic
-│   ├── popup.html/js       # Extension UI (3 buttons)
+│   ├── background.js       # Service worker (message router)
+│   ├── src/
+│   │   ├── background/     # Feature modules
+│   │   ├── popup/          # Extension UI
+│   │   └── utils/          # Shared utilities
 │   └── README.md
-├── restore_from_history.py # History recovery script
-├── Makefile                # Easy command access
+├── Makefile                # Development commands
 └── README.md               # This file
 ```
 
 ## How It Works
-
-### Chrome Extension
 
 - Uses Chrome's native Tab Groups API for organization
 - Uses Chrome's Tabs API for deduplication
@@ -222,14 +186,6 @@ chrome-tabs/
 - Removes duplicates by tracking seen URLs
 - Assigns colors and counts automatically
 - **No remote debugging needed!**
-
-### History Recovery
-
-- Reads Chrome's History SQLite database
-- Filters by date range and limit
-- Creates new tabs via DevTools Protocol
-- Useful for recovering accidentally closed tabs
-- Requires Chrome with `--remote-debugging-port`
 
 ## Troubleshooting
 
@@ -239,27 +195,10 @@ chrome-tabs/
 - Reload the extension (click the refresh icon)
 - Check the service worker console for errors
 
-### Can't restore history?
-
-- History recovery requires Chrome with remote debugging
-- Make sure Chrome history isn't cleared
-- Try increasing `--days` or `--limit` parameters
-- Check: `~/Library/Application Support/Google/Chrome/Default/History`
-
-### How to enable remote debugging for history recovery
-
-```bash
-# Close all Chrome windows, then:
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-  --remote-debugging-port=9222 \
-  --user-data-dir=/tmp/chrome-debug-profile &
-```
-
 ## Tips
 
-- **Daily use**: Just use the Chrome Extension - it's instant and works everywhere
-- **Tab recovery**: Use `make restore-history` if you accidentally closed important tabs
-- **Session restore**: Chrome's built-in session restore (Cmd+Shift+T) also works great
+- **Daily use**: The Chrome Extension is instant and works everywhere
+- **Session restore**: Chrome's built-in session restore (Cmd+Shift+T) recovers closed tabs
 - **Pin the extension**: Pin it to your toolbar for easy access
 
 ## Workflow Examples
@@ -271,17 +210,11 @@ chrome-tabs/
 3. Manually close groups you don't need
 4. Done!
 
-### Recover Lost Tabs
-
-1. Run `make restore-history`
-2. Review and close unwanted tabs
-3. Click extension → "Organize by Domain"
-
 ### Before Closing Chrome
 
 1. Click extension → "Organize by Domain"
 2. Review your tab groups
-3. Bookmark important groups
+3. Click extension → "Save to Bookmarks" for important groups
 4. Close Chrome with confidence
 
 ## Releases
