@@ -107,18 +107,26 @@ Test coverage includes:
 - Cross-window operations (20+ tests)
 
 #### E2E Tests
-- All end-to-end tests passing
-- Manual extension testing complete
-- All features verified working
+- **Total E2E Tests:** 11 test suites, all passing (100% pass rate)
+- **Test Files:** scenario1-8, cross-window-organization, ungrouped-duplicates
+- **Key Scenarios Covered:**
+  - Initial tab organization by domain
+  - Smart group merging with existing groups
+  - Collapsed group state preservation
+  - Ungrouped duplicate detection and handling
+  - Cross-window tab organization and deduplication
+  - Edge cases (single tabs, empty groups, invalid URLs)
+- **Execution Time:** ~60-90 seconds (headless mode)
 
 ### Manifest Changes
 
-Updated `manifest.json` with new file paths:
+Updated `manifest.json` with new file paths and ES6 module support:
 
 ```json
 {
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "src/popup/popup.html",
@@ -173,9 +181,37 @@ Updated `manifest.json` with new file paths:
    - Self-documenting code organization
    - Easy for new developers to navigate
 
+## Key Technical Challenges and Fixes
+
+### ES6 Module Conversion
+**Challenge:** Initial implementation used CommonJS (`require`/`module.exports`) but Chrome's Manifest V3 service workers require ES6 modules.
+
+**Solution:**
+1. Converted all 15+ source files from CommonJS to ES6 syntax
+2. Added `"type": "module"` to manifest.json
+3. Configured Babel for Jest test compatibility
+4. Created `babel.config.js` to transpile ES6 → CommonJS for tests
+
+### Color Manager State Issue
+**Challenge:** `organizeTabs.js` directly accessed `colorIndex = 0` but the variable wasn't exported from `colorManager.js`, causing "colorIndex is not defined" error.
+
+**Solution:**
+- Created `resetColorIndex()` function in colorManager
+- Updated organizeTabs.js to import and call `resetColorIndex()`
+- Maintains proper module encapsulation
+
+**Commit:** `9195a0f - fix: Use resetColorIndex function instead of direct colorIndex access`
+
+### E2E Test Path Updates
+**Challenge:** After moving popup files to `src/popup/`, E2E tests failed with `ERR_FILE_NOT_FOUND`.
+
+**Solution:** Updated 14 popup.html path references across 7 E2E test files from `popup.html` to `src/popup/popup.html`
+
+**Commit:** `80ee612 - fix: Update E2E test popup paths after reorganization`
+
 ## Commits Summary
 
-Key commits for this reorganization (19 tasks, 20+ individual commits):
+Key commits for this reorganization (19 tasks, 25+ individual commits):
 
 1. Task 1: Create directory structure
 2. Tasks 2-6: Extract utility modules (extractDomain, shouldSkipUrl, extractGroupBaseName, getOtherBookmarksId, getTabOrganizerBookmarkFolders)
@@ -230,10 +266,16 @@ Branch contains atomic commits with clear messages for easy review.
 - **Clear dependencies**: Explicit imports show module relationships
 
 ### Import Patterns
-Modules use CommonJS require() for compatibility:
+Modules use ES6 imports with `.js` extensions:
 ```javascript
-const { functionName } = require('../path/to/module.js');
+import { functionName } from '../path/to/module.js';
+export { functionName };
 ```
+
+**Testing Configuration:**
+- Jest tests use Babel transpilation (`babel-jest`)
+- `babel.config.js` transforms ES6 modules to CommonJS for Node test environment
+- Service worker runs native ES6 modules (no transpilation needed)
 
 ### No Breaking Changes
 - Public API unchanged
