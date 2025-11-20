@@ -5,6 +5,7 @@ const path = require('path');
 const { shouldSkipUrl } = require(path.join(__dirname, './src/utils/shouldSkipUrl.js'));
 const { extractGroupBaseName } = require(path.join(__dirname, './src/utils/extractGroupBaseName.js'));
 const { getOtherBookmarksId } = require(path.join(__dirname, './src/utils/getOtherBookmarksId.js'));
+const { getTabOrganizerBookmarkFolders } = require(path.join(__dirname, './src/utils/getTabOrganizerBookmarkFolders.js'));
 
 // Color palette for tab groups
 const COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
@@ -821,27 +822,6 @@ async function restoreFromBookmarks(bookmarkFolderId) {
   };
 }
 
-async function getTabOrganizerBookmarkFolders() {
-  console.log('Getting Tab Organizer bookmark folders...');
-
-  // Get "Other Bookmarks" folder ID dynamically
-  const otherBookmarksId = await getOtherBookmarksId();
-  const children = await chrome.bookmarks.getChildren(otherBookmarksId);
-
-  // Find all folders that start with "Tab Organizer -"
-  const tabOrganizerFolders = children.filter(child =>
-    !child.url && child.title && child.title.startsWith('Tab Organizer -')
-  );
-
-  // Sort by title (which includes timestamp) in reverse order (newest first)
-  tabOrganizerFolders.sort((a, b) => b.title.localeCompare(a.title));
-
-  return tabOrganizerFolders.map(folder => ({
-    id: folder.id,
-    title: folder.title
-  }));
-}
-
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'organizeTabs') {
@@ -902,7 +882,6 @@ if (typeof module !== 'undefined' && module.exports) {
     removeAllGroups,
     saveTabsToBookmarks,
     restoreFromBookmarks,
-    getTabOrganizerBookmarkFolders,
     getNextColor,
     COLORS
   };
