@@ -58,9 +58,8 @@ global.Date = class extends Date {
   }
 };
 
-// Import function from background.js
-const background = require('./background.js');
-const { saveTabsToBookmarks } = background;
+// Import function from saveTabsToBookmarks.js
+const { saveTabsToBookmarks } = require('./saveTabsToBookmarks.js');
 
 describe('saveTabsToBookmarks', () => {
   beforeEach(() => {
