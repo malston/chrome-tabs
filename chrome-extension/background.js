@@ -4,6 +4,7 @@
 const path = require('path');
 const { shouldSkipUrl } = require(path.join(__dirname, './src/utils/shouldSkipUrl.js'));
 const { extractGroupBaseName } = require(path.join(__dirname, './src/utils/extractGroupBaseName.js'));
+const { getOtherBookmarksId } = require(path.join(__dirname, './src/utils/getOtherBookmarksId.js'));
 
 // Color palette for tab groups
 const COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
@@ -14,30 +15,6 @@ function getNextColor() {
   colorIndex++;
   return color;
 }
-
-/**
- * Gets the ID of the "Other Bookmarks" folder by searching the bookmark tree.
- * This avoids hardcoding "2" which could change across Chrome versions.
- *
- * @returns {Promise<string>} The ID of the "Other Bookmarks" folder
- * @throws {Error} If the "Other Bookmarks" folder is not found
- */
-async function getOtherBookmarksId() {
-  const tree = await chrome.bookmarks.getTree();
-
-  if (!tree || tree.length === 0 || !tree[0].children) {
-    throw new Error('Other Bookmarks folder not found');
-  }
-
-  const otherBookmarks = tree[0].children.find(node => node.title === 'Other Bookmarks');
-
-  if (!otherBookmarks) {
-    throw new Error('Other Bookmarks folder not found');
-  }
-
-  return otherBookmarks.id;
-}
-
 
 /**
  * Checks if an IPv4 address is in a private range according to RFC 1918.
@@ -915,7 +892,6 @@ console.log('Tab Organizer extension loaded');
 // Export functions for testing (Node.js environment)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    getOtherBookmarksId,
     isPrivateIPv4,
     extractDomain,
     extractBaseDomain,
