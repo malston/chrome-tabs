@@ -48,8 +48,8 @@ global.console = {
   error: jest.fn()
 };
 
-// Import functions from background.js
-const { organizeTabs } = require('./background.js');
+// Import functions from organizeTabs.js
+const { organizeTabs } = require('./organizeTabs.js');
 
 describe('organizeTabs', () => {
   beforeEach(() => {
