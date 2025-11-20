@@ -38,7 +38,7 @@ describe('Scenario 8 and Edge Cases', () => {
 
   async function organizeTabs() {
     const popupPage = await browser.newPage();
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage.waitForSelector('#organizeBtn');
     await popupPage.click('#organizeBtn');
     await popupPage.waitForFunction(

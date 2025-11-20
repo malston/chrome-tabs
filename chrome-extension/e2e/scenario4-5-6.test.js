@@ -43,7 +43,7 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
   // Helper function to organize tabs
   async function organizeTabs() {
     const popupPage = await browser.newPage();
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage.waitForSelector('#organizeBtn');
     await popupPage.click('#organizeBtn');
     await popupPage.waitForFunction(

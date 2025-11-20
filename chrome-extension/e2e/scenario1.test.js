@@ -106,7 +106,7 @@ describe('Scenario 1: First-Time Organization (Create New Groups)', () => {
 
     // Step 3: Open extension popup and click "Organize by Domain"
     console.log('Opening extension popup...');
-    const popupUrl = `chrome-extension://${extensionId}/popup.html`;
+    const popupUrl = `chrome-extension://${extensionId}/src/popup/popup.html`;
     const popupPage = await browser.newPage();
     await popupPage.goto(popupUrl);
 
