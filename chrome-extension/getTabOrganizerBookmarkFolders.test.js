@@ -19,6 +19,7 @@ global.chrome = {
     TAB_GROUP_ID_NONE: -1,
   },
   bookmarks: {
+    getTree: jest.fn(),
     getChildren: jest.fn(),
   },
   runtime: {
@@ -29,11 +30,22 @@ global.chrome = {
 };
 
 // Import the function to test
-const { getTabOrganizerBookmarkFolders } = require('./background');
+const background = require('./background');
+const { getTabOrganizerBookmarkFolders } = background;
 
 describe('getTabOrganizerBookmarkFolders', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock getTree to return proper bookmark tree structure
+    chrome.bookmarks.getTree.mockResolvedValue([
+      {
+        id: '0',
+        children: [
+          { id: '1', title: 'Bookmarks Bar' },
+          { id: '2', title: 'Other Bookmarks' }
+        ]
+      }
+    ]);
     console.log = jest.fn();
     console.error = jest.fn();
   });

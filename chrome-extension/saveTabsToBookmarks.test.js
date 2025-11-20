@@ -27,6 +27,7 @@ global.chrome = {
   },
   bookmarks: {
     get: jest.fn(),
+    getTree: jest.fn(),
     getChildren: jest.fn(),
     create: jest.fn()
   },
@@ -58,11 +59,22 @@ global.Date = class extends Date {
 };
 
 // Import function from background.js
-const { saveTabsToBookmarks } = require('./background.js');
+const background = require('./background.js');
+const { saveTabsToBookmarks } = background;
 
 describe('saveTabsToBookmarks', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock getTree to return proper bookmark tree structure
+    chrome.bookmarks.getTree.mockResolvedValue([
+      {
+        id: '0',
+        children: [
+          { id: '1', title: 'Bookmarks Bar' },
+          { id: '2', title: 'Other Bookmarks' }
+        ]
+      }
+    ]);
   });
 
   describe('Basic Functionality', () => {

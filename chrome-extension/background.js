@@ -11,6 +11,29 @@ function getNextColor() {
 }
 
 /**
+ * Gets the ID of the "Other Bookmarks" folder by searching the bookmark tree.
+ * This avoids hardcoding "2" which could change across Chrome versions.
+ *
+ * @returns {Promise<string>} The ID of the "Other Bookmarks" folder
+ * @throws {Error} If the "Other Bookmarks" folder is not found
+ */
+async function getOtherBookmarksId() {
+  const tree = await chrome.bookmarks.getTree();
+
+  if (!tree || tree.length === 0 || !tree[0].children) {
+    throw new Error('Other Bookmarks folder not found');
+  }
+
+  const otherBookmarks = tree[0].children.find(node => node.title === 'Other Bookmarks');
+
+  if (!otherBookmarks) {
+    throw new Error('Other Bookmarks folder not found');
+  }
+
+  return otherBookmarks.id;
+}
+
+/**
  * Determines if a URL should be skipped during tab organization.
  * Skips Chrome internal pages and invalid URLs.
  *
@@ -642,8 +665,9 @@ async function saveTabsToBookmarks() {
   const rootFolderName = `Tab Organizer - ${timestamp}`;
 
   // Create root bookmark folder in "Other Bookmarks"
+  const otherBookmarksId = await getOtherBookmarksId();
   const rootFolder = await chrome.bookmarks.create({
-    parentId: '2', // "2" is the ID for "Other Bookmarks" in Chrome
+    parentId: otherBookmarksId,
     title: rootFolderName
   });
 
@@ -851,8 +875,9 @@ async function restoreFromBookmarks(bookmarkFolderId) {
 async function getTabOrganizerBookmarkFolders() {
   console.log('Getting Tab Organizer bookmark folders...');
 
-  // Get "Other Bookmarks" (ID: "2")
-  const children = await chrome.bookmarks.getChildren('2');
+  // Get "Other Bookmarks" folder ID dynamically
+  const otherBookmarksId = await getOtherBookmarksId();
+  const children = await chrome.bookmarks.getChildren(otherBookmarksId);
 
   // Find all folders that start with "Tab Organizer -"
   const tabOrganizerFolders = children.filter(child =>
@@ -918,6 +943,7 @@ console.log('Tab Organizer extension loaded');
 // Export functions for testing (Node.js environment)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
+    getOtherBookmarksId,
     shouldSkipUrl,
     isPrivateIPv4,
     extractDomain,
