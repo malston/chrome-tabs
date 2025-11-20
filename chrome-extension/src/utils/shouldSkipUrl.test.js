@@ -5,41 +5,8 @@
  * during tab organization operations.
  */
 
-// Mock Chrome APIs (required for background.js to load)
-global.chrome = {
-  tabs: {
-    query: jest.fn(),
-    remove: jest.fn(),
-    group: jest.fn(),
-    ungroup: jest.fn(),
-    create: jest.fn(),
-    move: jest.fn(),
-    TAB_GROUP_ID_NONE: -1
-  },
-  tabGroups: {
-    query: jest.fn(),
-    update: jest.fn(),
-    get: jest.fn(),
-    TAB_GROUP_ID_NONE: -1
-  },
-  bookmarks: {
-    get: jest.fn(),
-    getChildren: jest.fn(),
-    create: jest.fn()
-  },
-  windows: {
-    getCurrent: jest.fn(),
-    WINDOW_ID_CURRENT: 1
-  },
-  runtime: {
-    onMessage: {
-      addListener: jest.fn()
-    }
-  }
-};
-
-// Import the shouldSkipUrl function from background.js
-const { shouldSkipUrl } = require('./background.js');
+// Import the shouldSkipUrl function
+const { shouldSkipUrl } = require('./shouldSkipUrl.js');
 
 describe('shouldSkipUrl', () => {
   describe('Chrome Internal URLs', () => {

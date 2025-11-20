@@ -1,5 +1,9 @@
 // Background service worker for Tab Organizer extension
 
+// Import utility functions
+const path = require('path');
+const { shouldSkipUrl } = require(path.join(__dirname, './src/utils/shouldSkipUrl.js'));
+
 // Color palette for tab groups
 const COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
 let colorIndex = 0;
@@ -31,21 +35,6 @@ async function getOtherBookmarksId() {
   }
 
   return otherBookmarks.id;
-}
-
-/**
- * Determines if a URL should be skipped during tab organization.
- * Skips Chrome internal pages and invalid URLs.
- *
- * @param {string} url - The URL to check
- * @returns {boolean} True if the URL should be skipped, false otherwise
- */
-function shouldSkipUrl(url) {
-  if (!url) return true;
-
-  return url.startsWith('chrome://') ||
-         url.startsWith('chrome-extension://') ||
-         url.startsWith('about:');
 }
 
 /**
@@ -944,7 +933,6 @@ console.log('Tab Organizer extension loaded');
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     getOtherBookmarksId,
-    shouldSkipUrl,
     isPrivateIPv4,
     extractDomain,
     extractBaseDomain,
