@@ -7,16 +7,7 @@ const { extractGroupBaseName } = require(path.join(__dirname, './src/utils/extra
 const { getOtherBookmarksId } = require(path.join(__dirname, './src/utils/getOtherBookmarksId.js'));
 const { getTabOrganizerBookmarkFolders } = require(path.join(__dirname, './src/utils/getTabOrganizerBookmarkFolders.js'));
 const { organizeTabs } = require(path.join(__dirname, './src/background/organizeTabs.js'));
-
-// Color palette for tab groups
-const COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
-let colorIndex = 0;
-
-function getNextColor() {
-  const color = COLORS[colorIndex % COLORS.length];
-  colorIndex++;
-  return color;
-}
+const { getNextColor } = require(path.join(__dirname, './src/utils/colorManager.js'));
 
 /**
  * Checks if an IPv4 address is in a private range according to RFC 1918.

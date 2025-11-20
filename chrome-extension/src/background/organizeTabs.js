@@ -5,16 +5,7 @@ const path = require('path');
 const { extractDomain } = require('../utils/extractDomain.js');
 const { shouldSkipUrl } = require('../utils/shouldSkipUrl.js');
 const { extractGroupBaseName } = require('../utils/extractGroupBaseName.js');
-
-// Color palette for tab groups
-const COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
-let colorIndex = 0;
-
-function getNextColor() {
-  const color = COLORS[colorIndex % COLORS.length];
-  colorIndex++;
-  return color;
-}
+const { getNextColor } = require('../utils/colorManager.js');
 
 function categorizeUrl(url) {
   try {
