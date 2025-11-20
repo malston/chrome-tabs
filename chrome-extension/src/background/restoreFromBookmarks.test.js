@@ -46,8 +46,9 @@ global.console = {
 };
 
 // Helper functions
-// Import functions from background.js
-const { restoreFromBookmarks, COLORS } = require('./background.js');
+// Import functions from restoreFromBookmarks.js
+const { restoreFromBookmarks } = require('./restoreFromBookmarks.js');
+const { COLORS } = require('../utils/colorManager.js');
 
 // Track colorIndex for tests
 let colorIndex = 0;
