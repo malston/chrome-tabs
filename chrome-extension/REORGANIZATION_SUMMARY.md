@@ -53,7 +53,7 @@ chrome-extension/
 │   ├── icon16.png
 │   ├── icon48.png
 │   └── icon128.png
-├── background.js             # Entry point (thin message router)
+├── e2e/                      # End-to-end tests
 └── manifest.json             # Updated paths
 ```
 
@@ -125,7 +125,7 @@ Updated `manifest.json` with new file paths and ES6 module support:
 ```json
 {
   "background": {
-    "service_worker": "background.js",
+    "service_worker": "src/background/background.js",
     "type": "module"
   },
   "action": {

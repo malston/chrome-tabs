@@ -209,7 +209,6 @@ chrome-extension/
 │   └── icon128.png
 ├── e2e/                         # End-to-end tests
 ├── manifest.json                # Extension configuration
-├── background.js                # Service worker entry point
 ├── package.json
 └── README.md
 ```
@@ -219,9 +218,9 @@ chrome-extension/
 The extension uses modular organization with feature-based directories:
 
 ### Service Worker (`background.js`)
-- **Location:** `/background.js` (entry point for manifest.json)
+- **Location:** `src/background/background.js` (entry point for manifest.json)
 - **Purpose:** Routes messages from popup to appropriate handlers
-- **Dependencies:** Imports feature modules from `src/background/`
+- **Dependencies:** Imports feature modules from same directory and `../utils/`
 
 ### Background Features (`src/background/`)
 Pure business logic modules with Chrome API dependencies:
