@@ -14,4 +14,4 @@ function resetColorIndex() {
   colorIndex = 0;
 }
 
-module.exports = { getNextColor, COLORS, resetColorIndex };
+export { getNextColor, COLORS, resetColorIndex };

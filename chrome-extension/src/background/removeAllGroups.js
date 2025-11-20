@@ -22,7 +22,4 @@ async function removeAllGroups() {
   return { ungrouped: groupedTabIds.length };
 }
 
-// Export for testing (Node.js environment)
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { removeAllGroups };
-}
+export { removeAllGroups };

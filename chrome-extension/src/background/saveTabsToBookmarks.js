@@ -1,8 +1,8 @@
 // ABOUTME: Saves current tabs to Chrome bookmarks organized by groups.
 // ABOUTME: Creates timestamped folder structure in Other Bookmarks.
 
-const { shouldSkipUrl } = require('../utils/shouldSkipUrl.js');
-const { getOtherBookmarksId } = require('../utils/getOtherBookmarksId.js');
+import { shouldSkipUrl } from '../utils/shouldSkipUrl.js';
+import { getOtherBookmarksId } from '../utils/getOtherBookmarksId.js';
 
 async function saveTabsToBookmarks() {
   console.log('Saving tabs to bookmarks...');
@@ -118,4 +118,4 @@ async function saveTabsToBookmarks() {
   };
 }
 
-module.exports = { saveTabsToBookmarks };
+export { saveTabsToBookmarks };

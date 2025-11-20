@@ -117,4 +117,4 @@ function extractDomain(url) {
   }
 }
 
-module.exports = { extractDomain };
+export { extractDomain };

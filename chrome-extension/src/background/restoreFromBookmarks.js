@@ -1,8 +1,8 @@
 // ABOUTME: Restores tabs from bookmark folders, merging with existing groups.
 // ABOUTME: Skips duplicates and Chrome internal URLs.
 
-const { shouldSkipUrl } = require('../utils/shouldSkipUrl.js');
-const { getNextColor } = require('../utils/colorManager.js');
+import { shouldSkipUrl } from '../utils/shouldSkipUrl.js';
+import { getNextColor } from '../utils/colorManager.js';
 
 /**
  * Restores tabs from a bookmark folder, creating or merging into existing tab groups.
@@ -129,7 +129,4 @@ async function restoreFromBookmarks(bookmarkFolderId) {
   };
 }
 
-// Export for testing (Node.js environment)
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { restoreFromBookmarks };
-}
+export { restoreFromBookmarks };

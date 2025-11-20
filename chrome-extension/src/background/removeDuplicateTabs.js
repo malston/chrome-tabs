@@ -1,8 +1,8 @@
 // ABOUTME: Removes duplicate tabs from the current window while maintaining group titles.
 // ABOUTME: Keeps the first occurrence of each URL and closes all subsequent duplicates.
 
-const { shouldSkipUrl } = require('../utils/shouldSkipUrl.js');
-const { extractGroupBaseName } = require('../utils/extractGroupBaseName.js');
+import { shouldSkipUrl } from '../utils/shouldSkipUrl.js';
+import { extractGroupBaseName } from '../utils/extractGroupBaseName.js';
 
 /**
  * Removes duplicate tabs from the current window.
@@ -82,4 +82,4 @@ async function removeDuplicateTabs() {
   };
 }
 
-module.exports = { removeDuplicateTabs };
+export { removeDuplicateTabs };

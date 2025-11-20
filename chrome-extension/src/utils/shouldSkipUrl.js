@@ -17,4 +17,4 @@ function shouldSkipUrl(url) {
          url.startsWith('about:');
 }
 
-module.exports = { shouldSkipUrl };
+export { shouldSkipUrl };

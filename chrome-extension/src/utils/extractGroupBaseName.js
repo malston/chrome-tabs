@@ -20,4 +20,4 @@ function extractGroupBaseName(groupTitle) {
   return groupTitle.replace(/\s*\(\d+\)$/, '');
 }
 
-module.exports = { extractGroupBaseName };
+export { extractGroupBaseName };

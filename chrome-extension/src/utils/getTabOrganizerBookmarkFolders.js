@@ -1,7 +1,7 @@
 // ABOUTME: Retrieves Tab Organizer bookmark folders from the "Other Bookmarks" folder.
 // ABOUTME: Filters folders by name prefix and sorts by timestamp (newest first).
 
-const { getOtherBookmarksId } = require('./getOtherBookmarksId.js');
+import { getOtherBookmarksId } from './getOtherBookmarksId.js';
 
 /**
  * Gets all Tab Organizer bookmark folders from the "Other Bookmarks" folder.
@@ -32,4 +32,4 @@ async function getTabOrganizerBookmarkFolders() {
   }));
 }
 
-module.exports = { getTabOrganizerBookmarkFolders };
+export { getTabOrganizerBookmarkFolders };

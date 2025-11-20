@@ -24,4 +24,4 @@ async function getOtherBookmarksId() {
   return otherBookmarks.id;
 }
 
-module.exports = { getOtherBookmarksId };
+export { getOtherBookmarksId };

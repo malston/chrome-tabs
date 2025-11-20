@@ -1,11 +1,10 @@
 // ABOUTME: Groups tabs by domain or category using Chrome Tab Groups API.
 // ABOUTME: Handles smart merging with existing groups and moves ungrouped tabs to end.
 
-const path = require('path');
-const { extractDomain } = require('../utils/extractDomain.js');
-const { shouldSkipUrl } = require('../utils/shouldSkipUrl.js');
-const { extractGroupBaseName } = require('../utils/extractGroupBaseName.js');
-const { getNextColor } = require('../utils/colorManager.js');
+import { extractDomain } from '../utils/extractDomain.js';
+import { shouldSkipUrl } from '../utils/shouldSkipUrl.js';
+import { extractGroupBaseName } from '../utils/extractGroupBaseName.js';
+import { getNextColor } from '../utils/colorManager.js';
 
 function categorizeUrl(url) {
   try {
@@ -376,4 +375,4 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
   };
 }
 
-module.exports = { organizeTabs };
+export { organizeTabs };
