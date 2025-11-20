@@ -18,7 +18,8 @@ Chrome Tab Manager is a Chrome extension for managing Chrome tabs:
 ```
 chrome-extension/
 ├── src/
-│   ├── background/           # Service worker feature modules
+│   ├── background/           # Service worker and feature modules
+│   │   ├── background.js     # Service worker entry point (message router)
 │   │   ├── organizeTabs.js   # Tab grouping by domain or category
 │   │   ├── removeDuplicateTabs.js
 │   │   ├── removeAllGroups.js
@@ -40,7 +41,6 @@ chrome-extension/
 ├── assets/                   # Static resources
 ├── e2e/                      # End-to-end tests
 ├── manifest.json
-├── background.js             # Service worker entry point (message router)
 └── package.json
 ```
 
@@ -48,12 +48,12 @@ chrome-extension/
 
 - **manifest.json** - Extension configuration
   - Requires `tabs`, `tabGroups`, and `bookmarks` permissions
-  - Service worker: `background.js`
+  - Service worker: `src/background/background.js`
   - Popup UI: `src/popup/popup.html`
 
-- **background.js** - Service worker entry point (message router)
+- **src/background/background.js** - Service worker entry point (message router)
   - Routes messages from popup to feature handler functions
-  - Imports feature modules from `src/background/`
+  - Imports feature modules from same directory
 
 - **Feature Modules** (`src/background/`)
   - `organizeTabs()` - Groups tabs by domain or category using Chrome Tab Groups API
@@ -103,8 +103,8 @@ chrome-extension/
 3. Click refresh icon
 
 **Debug extension:**
-- Click "service worker" link on `chrome://extensions/` for background.js console
-- Right-click popup → Inspect for popup.js console
+- Click "service worker" link on `chrome://extensions/` for service worker console
+- Right-click popup → Inspect for popup console
 
 ## Testing
 
@@ -148,9 +148,9 @@ Edit `organizeTabs()` function in `chrome-extension/src/background/organizeTabs.
 ### Add New Extension Action
 1. Add button to `chrome-extension/src/popup/popup.html`
 2. Add event listener in `chrome-extension/src/popup/popup.js`
-3. Add message handler in `chrome-extension/background.js` (message router)
+3. Add message handler in `chrome-extension/src/background/background.js` (message router)
 4. Create new feature module in `chrome-extension/src/background/` or use existing modules
-5. Import and wire up the feature module in `background.js`
+5. Import and wire up the feature module in `src/background/background.js`
 
 ### Modify Duplicate Removal Logic
 Edit `removeDuplicateTabs()` function in `chrome-extension/src/background/removeDuplicateTabs.js`
