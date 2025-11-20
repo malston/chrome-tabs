@@ -168,9 +168,8 @@ You can restore from any bookmark folder by following this naming convention:
 chrome-tabs/
 ├── chrome-extension/       # Chrome Extension
 │   ├── manifest.json
-│   ├── background.js       # Service worker (message router)
 │   ├── src/
-│   │   ├── background/     # Feature modules
+│   │   ├── background/     # Service worker and feature modules
 │   │   ├── popup/          # Extension UI
 │   │   └── utils/          # Shared utilities
 │   └── README.md
