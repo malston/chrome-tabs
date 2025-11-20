@@ -27,8 +27,9 @@
     },
     "verbose": true,
     "collectCoverageFrom": [
-      "background.js",
-      "popup.js"
+      "src/**/*.js",
+      "!src/**/*.test.js",
+      "!src/**/test-*.js"
     ],
     "coverageThreshold": {
       "global": {
