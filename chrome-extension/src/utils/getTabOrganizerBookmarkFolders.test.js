@@ -30,8 +30,7 @@ global.chrome = {
 };
 
 // Import the function to test
-const background = require('./background');
-const { getTabOrganizerBookmarkFolders } = background;
+const { getTabOrganizerBookmarkFolders } = require('./getTabOrganizerBookmarkFolders.js');
 
 describe('getTabOrganizerBookmarkFolders', () => {
   beforeEach(() => {

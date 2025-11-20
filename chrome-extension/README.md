@@ -178,6 +178,85 @@ Other Bookmarks
 - Existing groups have new tabs added to them
 - Duplicate tabs are not created
 
+## Directory Structure
+
+```
+chrome-extension/
+├── src/
+│   ├── background/              # Service worker and feature logic
+│   │   ├── background.js        # Main service worker (message router)
+│   │   ├── organizeTabs.js      # Tab grouping logic
+│   │   ├── removeDuplicateTabs.js
+│   │   ├── removeAllGroups.js
+│   │   ├── saveTabsToBookmarks.js
+│   │   ├── restoreFromBookmarks.js
+│   │   └── *.test.js            # Unit tests (colocated with source)
+│   ├── popup/                   # Extension UI
+│   │   ├── popup.html           # Popup interface
+│   │   ├── popup.js             # Popup interaction logic
+│   │   └── popup.test.js
+│   └── utils/                   # Shared utilities
+│       ├── extractDomain.js
+│       ├── shouldSkipUrl.js
+│       ├── extractGroupBaseName.js
+│       ├── getOtherBookmarksId.js
+│       ├── getTabOrganizerBookmarkFolders.js
+│       ├── colorManager.js
+│       └── *.test.js            # Unit tests
+├── assets/                      # Static resources
+│   ├── icon16.png
+│   ├── icon48.png
+│   └── icon128.png
+├── e2e/                         # End-to-end tests
+├── manifest.json                # Extension configuration
+├── package.json
+└── README.md
+```
+
+## Code Organization
+
+The extension uses modular organization with feature-based directories:
+
+### Service Worker (`background.js`)
+- **Location:** `src/background/background.js` (entry point for manifest.json)
+- **Purpose:** Routes messages from popup to appropriate handlers
+- **Dependencies:** Imports feature modules from same directory and `../utils/`
+
+### Background Features (`src/background/`)
+Pure business logic modules with Chrome API dependencies:
+
+- **organizeTabs.js** - Groups tabs by domain or category
+- **removeDuplicateTabs.js** - Closes duplicate URLs
+- **removeAllGroups.js** - Ungroups all tabs
+- **saveTabsToBookmarks.js** - Saves tab groups to bookmarks
+- **restoreFromBookmarks.js** - Restores tabs from saved bookmarks
+
+Each module exports a single async function and is tested with colocated `.test.js` files.
+
+### Popup UI (`src/popup/`)
+- **popup.html** - User interface with buttons and status display
+- **popup.js** - Handles button clicks, sends messages to background worker
+- **popup.test.js** - Tests UI interactions
+
+### Utilities (`src/utils/`)
+Pure utility functions with no Chrome API dependencies:
+
+- **extractDomain.js** - Extracts domain from URLs (handles localhost, IPs)
+- **shouldSkipUrl.js** - Filters chrome://, chrome-extension://, about: URLs
+- **extractGroupBaseName.js** - Extracts group name from grouped tabs
+- **getOtherBookmarksId.js** - Gets the "Other Bookmarks" folder ID
+- **getTabOrganizerBookmarkFolders.js** - Lists saved Tab Organizer bookmark folders
+- **colorManager.js** - Manages tab group colors
+
+Each utility is tested independently with colocated `.test.js` files.
+
+### Test Structure
+Tests are colocated with their source files:
+- Unit tests for utilities in `src/utils/*.test.js`
+- Unit tests for features in `src/background/*.test.js`
+- UI tests in `src/popup/popup.test.js`
+- End-to-end tests in `e2e/` directory
+
 ## Troubleshooting
 
 ### Extension doesn't appear
@@ -189,9 +268,9 @@ Other Bookmarks
 - Check the extension console for errors (click "service worker" link on chrome://extensions/)
 
 ### Want to change grouping behavior?
-- Edit domain grouping: Modify `extractDomain()` in `chrome-extension/background.js`
-- Edit category grouping: Modify `categorizeUrl()` in `chrome-extension/background.js`
-- Add new categories: Add conditions to `categorizeUrl()` function
+- Edit domain grouping: Modify `extractDomain()` in `src/utils/extractDomain.js`
+- Edit category grouping: Modify `categorizeUrl()` logic in `src/background/organizeTabs.js`
+- Add new categories: Extend the categorization logic in `src/background/organizeTabs.js`
 
 ## Uninstall
 

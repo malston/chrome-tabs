@@ -118,7 +118,7 @@ describe('Scenario 2: Re-Organization (Update Existing Groups)', () => {
     // Step 3: First organization - create initial groups
     console.log('First organization - creating initial groups...');
     const popupPage1 = await browser.newPage();
-    await popupPage1.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage1.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage1.waitForSelector('#organizeBtn');
     await popupPage1.click('#organizeBtn');
 
@@ -169,7 +169,7 @@ describe('Scenario 2: Re-Organization (Update Existing Groups)', () => {
     // Step 6: Second organization - update existing groups
     console.log('Second organization - updating existing groups...');
     const popupPage2 = await browser.newPage();
-    await popupPage2.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage2.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage2.waitForSelector('#organizeBtn');
     await popupPage2.click('#organizeBtn');
 

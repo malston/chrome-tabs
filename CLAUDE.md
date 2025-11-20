@@ -15,35 +15,80 @@ The Chrome Extension is the main user-facing tool and handles 99% of use cases. 
 
 ### Chrome Extension (`chrome-extension/`)
 
-**Manifest V3 Extension** with service worker architecture:
+**Manifest V3 Extension** with modular service worker architecture:
+
+**Directory Structure:**
+```
+chrome-extension/
+├── src/
+│   ├── background/           # Service worker feature modules
+│   │   ├── organizeTabs.js   # Tab grouping by domain or category
+│   │   ├── removeDuplicateTabs.js
+│   │   ├── removeAllGroups.js
+│   │   ├── saveTabsToBookmarks.js
+│   │   ├── restoreFromBookmarks.js
+│   │   └── *.test.js         # Colocated unit tests
+│   ├── popup/                # Popup UI
+│   │   ├── popup.html
+│   │   ├── popup.js
+│   │   └── popup.test.js
+│   └── utils/                # Shared utility functions
+│       ├── extractDomain.js
+│       ├── shouldSkipUrl.js
+│       ├── extractGroupBaseName.js
+│       ├── getOtherBookmarksId.js
+│       ├── getTabOrganizerBookmarkFolders.js
+│       ├── colorManager.js
+│       └── *.test.js
+├── assets/                   # Static resources
+├── e2e/                      # End-to-end tests
+├── manifest.json
+├── background.js             # Service worker entry point (message router)
+└── package.json
+```
+
+**Main Components:**
 
 - **manifest.json** - Extension configuration
-  - Requires `tabs` and `tabGroups` permissions
+  - Requires `tabs`, `tabGroups`, and `bookmarks` permissions
   - Service worker: `background.js`
-  - Popup UI: `popup.html`
+  - Popup UI: `src/popup/popup.html`
 
-- **background.js** - Core business logic (service worker)
-  - `organizeTabs()` - Groups tabs by domain using Chrome Tab Groups API
+- **background.js** - Service worker entry point (message router)
+  - Routes messages from popup to feature handler functions
+  - Imports feature modules from `src/background/`
+
+- **Feature Modules** (`src/background/`)
+  - `organizeTabs()` - Groups tabs by domain or category using Chrome Tab Groups API
+  - `removeDuplicateTabs()` - Closes duplicate tabs (keeps first occurrence)
+  - `removeAllGroups()` - Ungroups all tabs
+  - `saveTabsToBookmarks()` - Saves tab groups to bookmarks
+  - `restoreFromBookmarks()` - Restores tabs from saved bookmarks
+
+- **Utility Functions** (`src/utils/`)
   - `extractDomain()` - Extracts domain from URLs with special handling for:
     - localhost → "localhost"
     - Private IPs (192.168.x.x, 10.x.x.x, 172.x.x.x) → "local-network"
     - Public IPs → "ip-addresses"
-  - `removeDuplicateTabs()` - Closes duplicate tabs (keeps first occurrence)
-  - `removeAllGroups()` - Ungroups all tabs
-  - Message listener for popup communication
+  - `shouldSkipUrl()` - Filters chrome://, chrome-extension://, about: URLs
+  - `extractGroupBaseName()` - Extracts group name from grouped tabs
+  - `getOtherBookmarksId()` - Gets the "Other Bookmarks" folder ID
+  - `getTabOrganizerBookmarkFolders()` - Lists saved Tab Organizer bookmark folders
+  - `colorManager()` - Manages tab group colors
 
-- **popup.html/js** - Extension UI
-  - Three buttons: Organize by Domain, Remove Duplicates, Remove All Groups
+- **popup.html/js** (`src/popup/`) - Extension UI
+  - Buttons: Organize by Domain, Organize by Category, Remove Duplicates, Save to Bookmarks, Restore from Bookmarks, Remove All Groups
   - Status feedback with success/error states
   - Communication with background service worker via `chrome.runtime.sendMessage()`
 
 **Key Implementation Details:**
 
-- Tabs are sorted alphabetically by title within each domain group
-- Only domains with 2+ tabs are grouped (singles remain ungrouped)
+- Tabs are sorted alphabetically by title within each group
+- Only groups with 2+ tabs are created (singles remain ungrouped)
 - Chrome internal pages (`chrome://`, `chrome-extension://`, `about:`) are skipped
-- Each group shows domain name and tab count: `github.com (25)`
+- Each group shows name and tab count: `github.com (25)`
 - Colors rotate through: blue, red, yellow, green, pink, purple, cyan, orange
+- Bookmark save/restore automatically manages Tab Organizer bookmark folders with timestamps
 
 ### History Recovery Tool (`restore_from_history.py`)
 
@@ -101,29 +146,56 @@ uv run restore_from_history.py --days 30 --limit 500
 
 ## Testing
 
-No automated tests currently. Manual testing workflow:
+The extension includes comprehensive unit tests colocated with source files:
+
+**Running Tests:**
+```bash
+npm test                # Run all unit tests
+npm run test:e2e       # Run end-to-end tests
+npm run test:coverage  # Generate coverage report
+```
+
+**Test Organization:**
+- Unit tests for utilities: `chrome-extension/src/utils/*.test.js`
+- Unit tests for features: `chrome-extension/src/background/*.test.js`
+- UI tests: `chrome-extension/src/popup/popup.test.js`
+- End-to-end tests: `chrome-extension/e2e/`
+
+**Manual Testing Workflow:**
 
 1. Open Chrome with many tabs across multiple domains
 2. Click extension icon → "Organize by Domain"
 3. Verify tabs are grouped by domain, sorted alphabetically
 4. Click "Remove Duplicates"
 5. Verify duplicate URLs are closed (first occurrence kept)
-6. Click "Remove All Groups"
-7. Verify groups are removed but tabs remain open
+6. Click "Save to Bookmarks"
+7. Verify bookmarks created in "Other Bookmarks"
+8. Click "Restore from Bookmarks" and select a folder
+9. Verify tabs restored and grouped correctly
+10. Click "Remove All Groups"
+11. Verify groups are removed but tabs remain open
 
 ## Common Development Tasks
 
 ### Modify Domain Grouping Logic
-Edit `extractDomain()` function in `chrome-extension/background.js:13-40`
+Edit `extractDomain()` function in `chrome-extension/src/utils/extractDomain.js`
 
-### Modify Tab Sorting
-Edit sorting logic in `chrome-extension/background.js:91-95`
+### Modify Tab Organization (Domain or Category)
+Edit `organizeTabs()` function in `chrome-extension/src/background/organizeTabs.js`
 
 ### Add New Extension Action
-1. Add button to `chrome-extension/popup.html`
-2. Add event listener in `chrome-extension/popup.js`
-3. Add message handler in `chrome-extension/background.js` (line 191+)
-4. Implement new function in `background.js`
+1. Add button to `chrome-extension/src/popup/popup.html`
+2. Add event listener in `chrome-extension/src/popup/popup.js`
+3. Add message handler in `chrome-extension/background.js` (message router)
+4. Create new feature module in `chrome-extension/src/background/` or use existing modules
+5. Import and wire up the feature module in `background.js`
+
+### Modify Duplicate Removal Logic
+Edit `removeDuplicateTabs()` function in `chrome-extension/src/background/removeDuplicateTabs.js`
+
+### Modify Bookmark Save/Restore Behavior
+- Edit `saveTabsToBookmarks()` in `chrome-extension/src/background/saveTabsToBookmarks.js`
+- Edit `restoreFromBookmarks()` in `chrome-extension/src/background/restoreFromBookmarks.js`
 
 ### Modify History Recovery Behavior
 Edit `restore_from_history.py:47-118` (database query and filtering)

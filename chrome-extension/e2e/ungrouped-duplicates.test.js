@@ -80,7 +80,7 @@ describe('Ungrouped Duplicates Detection', () => {
     // Step 2: Organize tabs into groups
     console.log('First organization - creating groups...');
     let popupPage = await browser.newPage();
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage.waitForSelector('#organizeBtn');
     await popupPage.click('#organizeBtn');
 
@@ -136,7 +136,7 @@ describe('Ungrouped Duplicates Detection', () => {
     // Step 4: Organize again and check for ungrouped duplicate warning
     console.log('Second organization - should detect ungrouped duplicates...');
     popupPage = await browser.newPage();
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage.waitForSelector('#organizeBtn');
     await popupPage.click('#organizeBtn');
 
@@ -256,7 +256,7 @@ describe('Ungrouped Duplicates Detection', () => {
     // Step 2: Organize by category
     console.log('Organizing by category...');
     let popupPage = await browser.newPage();
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage.waitForSelector('#organizeCategoryBtn');
     await popupPage.click('#organizeCategoryBtn');
 
@@ -294,7 +294,7 @@ describe('Ungrouped Duplicates Detection', () => {
     // Step 4: Organize again and verify warning
     console.log('Re-organizing by category...');
     popupPage = await browser.newPage();
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage.waitForSelector('#organizeCategoryBtn');
     await popupPage.click('#organizeCategoryBtn');
 
@@ -365,7 +365,7 @@ describe('Ungrouped Duplicates Detection', () => {
     // Step 2: Organize tabs
     console.log('Organizing tabs...');
     const popupPage = await browser.newPage();
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage.waitForSelector('#organizeBtn');
     await popupPage.click('#organizeBtn');
 

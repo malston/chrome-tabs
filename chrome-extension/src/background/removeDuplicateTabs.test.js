@@ -46,8 +46,8 @@ global.console = {
   error: jest.fn()
 };
 
-// Import function from background.js
-const { removeDuplicateTabs } = require('./background.js');
+// Import function from removeDuplicateTabs module
+const { removeDuplicateTabs } = require('./removeDuplicateTabs.js');
 
 describe('removeDuplicateTabs', () => {
   beforeEach(() => {

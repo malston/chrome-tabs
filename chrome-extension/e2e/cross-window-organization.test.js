@@ -50,7 +50,7 @@ describe('Cross-Window Tab Organization', () => {
 
   async function organizeTabs(allWindows = false) {
     const popupPage = await browser.newPage();
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage.waitForSelector('#organizeBtn');
 
     // Click appropriate button based on allWindows flag
@@ -193,7 +193,7 @@ describe('Cross-Window Tab Organization', () => {
 
     // Organize by category across all windows
     const popupPage = await browser.newPage();
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage.waitForSelector('#organizeAllWindowsCategoryBtn');
     await popupPage.click('#organizeAllWindowsCategoryBtn');
     await popupPage.waitForFunction(

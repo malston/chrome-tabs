@@ -39,8 +39,9 @@ global.chrome = {
   }
 };
 
-// Import the extractDomain function from background.js
-const { extractDomain } = require('./background.js');
+// Import the extractDomain function from extractDomain.js
+// Need to require it since Jest is configured for CommonJS
+const { extractDomain } = require('./extractDomain.js');
 
 // Test suite
 describe('extractDomain', () => {

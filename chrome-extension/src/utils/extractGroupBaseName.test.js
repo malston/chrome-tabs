@@ -9,46 +9,11 @@
  * - Special characters
  */
 
-// Mock Chrome APIs (required for background.js to load)
-global.chrome = {
-  tabs: {
-    query: jest.fn(),
-    remove: jest.fn(),
-    group: jest.fn(),
-    ungroup: jest.fn(),
-    create: jest.fn(),
-    TAB_GROUP_ID_NONE: -1
-  },
-  tabGroups: {
-    query: jest.fn(),
-    get: jest.fn(),
-    update: jest.fn(),
-    TAB_GROUP_ID_NONE: -1
-  },
-  bookmarks: {
-    get: jest.fn(),
-    getChildren: jest.fn(),
-    create: jest.fn()
-  },
-  windows: {
-    WINDOW_ID_CURRENT: 1
-  },
-  runtime: {
-    onMessage: {
-      addListener: jest.fn()
-    }
-  }
-};
-
-// Import the extractGroupBaseName function from background.js
-const { extractGroupBaseName } = require('./background.js');
+// Import the extractGroupBaseName function
+const { extractGroupBaseName } = require('./extractGroupBaseName.js');
 
 // Test suite
 describe('extractGroupBaseName', () => {
-  beforeEach(() => {
-    // Reset mocks before each test (for consistency with other test files)
-    jest.clearAllMocks();
-  });
 
   describe('Standard Group Names', () => {
     test('should extract base name from domain with count', () => {

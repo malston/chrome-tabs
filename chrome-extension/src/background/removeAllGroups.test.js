@@ -15,7 +15,7 @@ global.chrome = {
 };
 
 // Import the function to test
-const { removeAllGroups } = require('./background');
+const { removeAllGroups } = require('./removeAllGroups');
 
 describe('removeAllGroups', () => {
   beforeEach(() => {

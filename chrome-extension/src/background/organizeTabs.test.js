@@ -48,13 +48,16 @@ global.console = {
   error: jest.fn()
 };
 
-// Import functions from background.js
-const { organizeTabs } = require('./background.js');
+// Import functions from organizeTabs.js
+const { organizeTabs } = require('./organizeTabs.js');
+const { resetColorIndex } = require('../utils/colorManager.js');
 
 describe('organizeTabs', () => {
   beforeEach(() => {
     // Reset mocks before each test
     jest.clearAllMocks();
+    // Reset color index for consistent color assignment across tests
+    resetColorIndex();
 
     // Default: no existing groups (smart merging will create new groups)
     chrome.tabGroups.query.mockResolvedValue([]);

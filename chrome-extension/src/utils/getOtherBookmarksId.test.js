@@ -18,7 +18,7 @@ global.chrome = {
 };
 
 // Import the function
-const { getOtherBookmarksId } = require('./background.js');
+const { getOtherBookmarksId } = require('./getOtherBookmarksId.js');
 
 describe('getOtherBookmarksId', () => {
   beforeEach(() => {
