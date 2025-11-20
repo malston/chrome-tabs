@@ -75,10 +75,9 @@ describe('removeDuplicateTabs', () => {
       expect(result.duplicatesClosed).toBe(2);
       expect(result.remainingTabs).toBe(2);
 
-      // Should close tabs 3 and 4, keep tab 1
-      expect(chrome.tabs.remove).toHaveBeenCalledTimes(2);
-      expect(chrome.tabs.remove).toHaveBeenCalledWith(3);
-      expect(chrome.tabs.remove).toHaveBeenCalledWith(4);
+      // Should close tabs 3 and 4 in a single batched call
+      expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([3, 4]);
     });
 
     test('should keep first occurrence and remove subsequent duplicates', async () => {
@@ -92,10 +91,10 @@ describe('removeDuplicateTabs', () => {
 
       await removeDuplicateTabs();
 
-      // Should keep tab 1, remove tab 2
+      // Should keep tab 1, remove tab 2 in a batched call
       expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
-      expect(chrome.tabs.remove).toHaveBeenCalledWith(2);
-      expect(chrome.tabs.remove).not.toHaveBeenCalledWith(1);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([2]);
+      expect(chrome.tabs.remove).not.toHaveBeenCalledWith([1]);
     });
 
     test('should handle no duplicates', async () => {
@@ -135,7 +134,8 @@ describe('removeDuplicateTabs', () => {
       expect(result.duplicatesClosed).toBe(3);
       expect(result.remainingTabs).toBe(1);
 
-      expect(chrome.tabs.remove).toHaveBeenCalledTimes(3);
+      expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([2, 3, 4]);
     });
   });
 
@@ -201,7 +201,7 @@ describe('removeDuplicateTabs', () => {
 
       expect(result.duplicatesFound).toBe(1);
       expect(result.duplicatesClosed).toBe(1);
-      expect(chrome.tabs.remove).toHaveBeenCalledWith(4);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([4]);
     });
   });
 
@@ -374,7 +374,9 @@ describe('removeDuplicateTabs', () => {
       expect(result.duplicatesClosed).toBe(99);
       expect(result.remainingTabs).toBe(1);
 
-      expect(chrome.tabs.remove).toHaveBeenCalledTimes(99);
+      expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
+      const expectedIds = Array.from({ length: 99 }, (_, i) => i + 1);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith(expectedIds);
     });
   });
 
@@ -385,29 +387,7 @@ describe('removeDuplicateTabs', () => {
       await expect(removeDuplicateTabs()).rejects.toThrow('Query failed');
     });
 
-    test('should continue if some tab removals fail', async () => {
-      const mockTabs = [
-        { id: 1, url: 'https://github.com', title: 'First' },
-        { id: 2, url: 'https://github.com', title: 'Second' },
-        { id: 3, url: 'https://github.com', title: 'Third' }
-      ];
-
-      chrome.tabs.query.mockResolvedValue(mockTabs);
-      chrome.tabs.remove
-        .mockRejectedValueOnce(new Error('Cannot close tab'))
-        .mockResolvedValueOnce(undefined);
-
-      const result = await removeDuplicateTabs();
-
-      expect(result.duplicatesFound).toBe(2);
-      expect(result.duplicatesClosed).toBe(1); // Only 1 succeeded
-      expect(result.remainingTabs).toBe(2); // 3 - 1 = 2
-
-      expect(chrome.tabs.remove).toHaveBeenCalledTimes(2);
-      expect(console.error).toHaveBeenCalledWith('Error closing tab:', expect.any(Error));
-    });
-
-    test('should handle all tab removals failing', async () => {
+    test('should handle tab removal failure', async () => {
       const mockTabs = [
         { id: 1, url: 'https://github.com', title: 'First' },
         { id: 2, url: 'https://github.com', title: 'Second' },
@@ -420,11 +400,32 @@ describe('removeDuplicateTabs', () => {
       const result = await removeDuplicateTabs();
 
       expect(result.duplicatesFound).toBe(2);
-      expect(result.duplicatesClosed).toBe(0); // All failed
+      expect(result.duplicatesClosed).toBe(0); // Failed
       expect(result.remainingTabs).toBe(3); // All remain
 
-      expect(chrome.tabs.remove).toHaveBeenCalledTimes(2);
-      expect(console.error).toHaveBeenCalledTimes(2);
+      expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([2, 3]);
+      expect(console.error).toHaveBeenCalledWith('Error closing tabs:', expect.any(Error));
+    });
+
+    test('should handle batch removal with successful operation', async () => {
+      const mockTabs = [
+        { id: 1, url: 'https://github.com', title: 'First' },
+        { id: 2, url: 'https://github.com', title: 'Second' },
+        { id: 3, url: 'https://github.com', title: 'Third' }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.remove.mockResolvedValue(undefined);
+
+      const result = await removeDuplicateTabs();
+
+      expect(result.duplicatesFound).toBe(2);
+      expect(result.duplicatesClosed).toBe(2); // All succeeded
+      expect(result.remainingTabs).toBe(1);
+
+      expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([2, 3]);
     });
 
     test('should handle protected tabs that cannot be closed', async () => {
@@ -440,6 +441,8 @@ describe('removeDuplicateTabs', () => {
 
       expect(result.duplicatesFound).toBe(1);
       expect(result.duplicatesClosed).toBe(0);
+      expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([2]);
       expect(console.error).toHaveBeenCalled();
     });
   });
@@ -541,13 +544,13 @@ describe('removeDuplicateTabs', () => {
         { id: 2, url: 'https://github.com', title: 'Second' }
       ];
 
-      const error = new Error('Cannot close tab');
+      const error = new Error('Cannot close tabs');
       chrome.tabs.query.mockResolvedValue(mockTabs);
       chrome.tabs.remove.mockRejectedValue(error);
 
       await removeDuplicateTabs();
 
-      expect(console.error).toHaveBeenCalledWith('Error closing tab:', error);
+      expect(console.error).toHaveBeenCalledWith('Error closing tabs:', error);
     });
   });
 
@@ -577,8 +580,10 @@ describe('removeDuplicateTabs', () => {
 
       const result = await removeDuplicateTabs();
 
-      // Should have closed 2 duplicates
+      // Should have closed 2 duplicates in one batched call
       expect(result.duplicatesClosed).toBe(2);
+      expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([3, 6]);
 
       // Should have updated both group titles
       expect(chrome.tabGroups.update).toHaveBeenCalledTimes(2);
@@ -624,6 +629,7 @@ describe('removeDuplicateTabs', () => {
 
       // Should have closed 1 duplicate
       expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([2]);
 
       // Should not update group title because count is still 2
       expect(chrome.tabGroups.update).not.toHaveBeenCalled();
@@ -648,6 +654,10 @@ describe('removeDuplicateTabs', () => {
       chrome.tabGroups.update.mockResolvedValue(undefined);
 
       await removeDuplicateTabs();
+
+      // Should have closed 1 duplicate
+      expect(chrome.tabs.remove).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([3]);
 
       // Should update the group title from "Development (3)" to "Development (2)"
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(7, { title: 'Development (2)' });

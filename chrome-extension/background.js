@@ -11,6 +11,44 @@ function getNextColor() {
 }
 
 /**
+ * Gets the ID of the "Other Bookmarks" folder by searching the bookmark tree.
+ * This avoids hardcoding "2" which could change across Chrome versions.
+ *
+ * @returns {Promise<string>} The ID of the "Other Bookmarks" folder
+ * @throws {Error} If the "Other Bookmarks" folder is not found
+ */
+async function getOtherBookmarksId() {
+  const tree = await chrome.bookmarks.getTree();
+
+  if (!tree || tree.length === 0 || !tree[0].children) {
+    throw new Error('Other Bookmarks folder not found');
+  }
+
+  const otherBookmarks = tree[0].children.find(node => node.title === 'Other Bookmarks');
+
+  if (!otherBookmarks) {
+    throw new Error('Other Bookmarks folder not found');
+  }
+
+  return otherBookmarks.id;
+}
+
+/**
+ * Determines if a URL should be skipped during tab organization.
+ * Skips Chrome internal pages and invalid URLs.
+ *
+ * @param {string} url - The URL to check
+ * @returns {boolean} True if the URL should be skipped, false otherwise
+ */
+function shouldSkipUrl(url) {
+  if (!url) return true;
+
+  return url.startsWith('chrome://') ||
+         url.startsWith('chrome-extension://') ||
+         url.startsWith('about:');
+}
+
+/**
  * Extracts the base name from a group title by removing the tab count suffix.
  * This allows matching existing groups with new grouping operations.
  *
@@ -27,6 +65,39 @@ function extractGroupBaseName(groupTitle) {
   // Remove the " (count)" suffix using regex
   // Matches: space, opening paren, one or more digits, closing paren, end of string
   return groupTitle.replace(/\s*\(\d+\)$/, '');
+}
+
+/**
+ * Checks if an IPv4 address is in a private range according to RFC 1918.
+ * Private ranges:
+ * - 10.0.0.0/8 (10.0.0.0 - 10.255.255.255)
+ * - 172.16.0.0/12 (172.16.0.0 - 172.31.255.255)
+ * - 192.168.0.0/16 (192.168.0.0 - 192.168.255.255)
+ *
+ * @param {string} ip - The IP address to check
+ * @returns {boolean} True if the IP is in a private range
+ */
+function isPrivateIPv4(ip) {
+  // 192.168.0.0/16 - All 192.168.x.x addresses
+  if (ip.startsWith('192.168.')) {
+    return true;
+  }
+
+  // 10.0.0.0/8 - All 10.x.x.x addresses
+  if (ip.startsWith('10.')) {
+    return true;
+  }
+
+  // 172.16.0.0/12 - Only 172.16.x.x through 172.31.x.x
+  if (ip.startsWith('172.')) {
+    const parts = ip.split('.');
+    if (parts.length >= 2) {
+      const secondOctet = parseInt(parts[1], 10);
+      return secondOctet >= 16 && secondOctet <= 31;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -57,7 +128,8 @@ function extractDomain(url) {
 
     // Handle IP addresses - group private IPs together
     if (/^[\d.:]+$/.test(domain)) {
-      if (domain.startsWith('192.168.') || domain.startsWith('172.') || domain.startsWith('10.')) {
+      // Check for RFC 1918 private IP ranges
+      if (isPrivateIPv4(domain)) {
         return 'local-network';
       }
       return 'ip-addresses';
@@ -227,7 +299,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
 
     for (const tab of tabs) {
       // Skip chrome internal pages
-      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+      if (shouldSkipUrl(tab.url)) {
         continue;
       }
 
@@ -279,7 +351,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
   for (const tab of tabs) {
     if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
       // Skip chrome internal pages
-      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+      if (shouldSkipUrl(tab.url)) {
         continue;
       }
       groupedTabUrls.set(tab.url, tab);
@@ -290,7 +362,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
   for (const tab of tabs) {
     if (tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE) {
       // Skip chrome internal pages
-      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+      if (shouldSkipUrl(tab.url)) {
         continue;
       }
 
@@ -305,7 +377,6 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
 
   // Group tabs by domain or category
   const groups = {};
-  const skipDomains = new Set(['chrome://', 'chrome-extension://', 'about:']);
 
   // Build a set of URLs that should be skipped (ungrouped duplicates)
   const skippedUngroupedDuplicateUrls = new Set();
@@ -315,7 +386,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
 
   for (const tab of tabs) {
     // Skip chrome internal pages
-    if (skipDomains.has(tab.url.substring(0, tab.url.indexOf('/')))) {
+    if (shouldSkipUrl(tab.url)) {
       continue;
     }
 
@@ -447,9 +518,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
   // Identify ungrouped tabs (skip chrome internal pages)
   const ungroupedTabsToMove = currentTabs.filter(tab =>
     tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE &&
-    !tab.url.startsWith('chrome://') &&
-    !tab.url.startsWith('chrome-extension://') &&
-    tab.url !== 'about:blank'
+    !shouldSkipUrl(tab.url)
   );
 
   if (ungroupedTabsToMove.length > 0) {
@@ -488,17 +557,20 @@ async function removeAllGroups() {
 
   const tabs = await chrome.tabs.query({ currentWindow: true });
 
-  for (const tab of tabs) {
-    if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
-      try {
-        await chrome.tabs.ungroup(tab.id);
-      } catch (e) {
-        console.error('Error ungrouping tab:', e);
-      }
+  // Batch ungroup operation for better performance
+  const groupedTabIds = tabs
+    .filter(tab => tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE)
+    .map(tab => tab.id);
+
+  if (groupedTabIds.length > 0) {
+    try {
+      await chrome.tabs.ungroup(groupedTabIds);
+    } catch (e) {
+      console.error('Error ungrouping tabs:', e);
     }
   }
 
-  return { ungrouped: tabs.filter(t => t.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE).length };
+  return { ungrouped: groupedTabIds.length };
 }
 
 async function removeDuplicateTabs() {
@@ -514,7 +586,7 @@ async function removeDuplicateTabs() {
     const url = tab.url;
 
     // Skip chrome internal pages
-    if (url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url === 'about:blank') {
+    if (shouldSkipUrl(url)) {
       continue;
     }
 
@@ -528,14 +600,14 @@ async function removeDuplicateTabs() {
     }
   }
 
-  // Close duplicate tabs
+  // Close duplicate tabs (batch operation for better performance)
   let closedCount = 0;
-  for (const tabId of tabsToClose) {
+  if (tabsToClose.length > 0) {
     try {
-      await chrome.tabs.remove(tabId);
-      closedCount++;
+      await chrome.tabs.remove(tabsToClose);
+      closedCount = tabsToClose.length;
     } catch (e) {
-      console.error('Error closing tab:', e);
+      console.error('Error closing tabs:', e);
     }
   }
 
@@ -593,8 +665,9 @@ async function saveTabsToBookmarks() {
   const rootFolderName = `Tab Organizer - ${timestamp}`;
 
   // Create root bookmark folder in "Other Bookmarks"
+  const otherBookmarksId = await getOtherBookmarksId();
   const rootFolder = await chrome.bookmarks.create({
-    parentId: '2', // "2" is the ID for "Other Bookmarks" in Chrome
+    parentId: otherBookmarksId,
     title: rootFolderName
   });
 
@@ -604,7 +677,7 @@ async function saveTabsToBookmarks() {
 
   for (const tab of tabs) {
     // Skip chrome internal pages
-    if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+    if (shouldSkipUrl(tab.url)) {
       continue;
     }
 
@@ -633,19 +706,19 @@ async function saveTabsToBookmarks() {
     });
     folderCount++;
 
-    // Add bookmarks for each tab in the group
-    for (const tab of groupTabs) {
-      try {
-        await chrome.bookmarks.create({
-          parentId: groupFolder.id,
-          title: tab.title || tab.url,
-          url: tab.url
-        });
-        savedCount++;
-      } catch (e) {
+    // Add bookmarks for each tab in the group (parallel for better performance)
+    const bookmarkPromises = groupTabs.map(tab =>
+      chrome.bookmarks.create({
+        parentId: groupFolder.id,
+        title: tab.title || tab.url,
+        url: tab.url
+      }).catch(e => {
         console.error(`Error saving bookmark for ${tab.url}:`, e);
-      }
-    }
+        return null;
+      })
+    );
+    const results = await Promise.all(bookmarkPromises);
+    savedCount += results.filter(r => r !== null).length;
   }
 
   // Save ungrouped tabs if any exist
@@ -656,18 +729,19 @@ async function saveTabsToBookmarks() {
     });
     folderCount++;
 
-    for (const tab of ungroupedTabs) {
-      try {
-        await chrome.bookmarks.create({
-          parentId: ungroupedFolder.id,
-          title: tab.title || tab.url,
-          url: tab.url
-        });
-        savedCount++;
-      } catch (e) {
+    // Add bookmarks for ungrouped tabs (parallel for better performance)
+    const bookmarkPromises = ungroupedTabs.map(tab =>
+      chrome.bookmarks.create({
+        parentId: ungroupedFolder.id,
+        title: tab.title || tab.url,
+        url: tab.url
+      }).catch(e => {
         console.error(`Error saving bookmark for ${tab.url}:`, e);
-      }
-    }
+        return null;
+      })
+    );
+    const results = await Promise.all(bookmarkPromises);
+    savedCount += results.filter(r => r !== null).length;
   }
 
   console.log(`Saved ${savedCount} bookmarks in ${folderCount} folders`);
@@ -718,10 +792,7 @@ async function restoreFromBookmarks(bookmarkFolderId) {
       // Filter out non-URL bookmarks and duplicates
       const urlsToRestore = [];
       for (const bookmark of bookmarks) {
-        if (bookmark.url &&
-            !bookmark.url.startsWith('chrome://') &&
-            !bookmark.url.startsWith('chrome-extension://')) {
-
+        if (bookmark.url && !shouldSkipUrl(bookmark.url)) {
           if (existingUrls.has(bookmark.url)) {
             duplicatesSkipped++;
           } else {
@@ -735,20 +806,19 @@ async function restoreFromBookmarks(bookmarkFolderId) {
         continue; // Skip empty folders
       }
 
-      // Create tabs for these URLs
-      const newTabIds = [];
-      for (const url of urlsToRestore) {
-        try {
-          const tab = await chrome.tabs.create({
-            url: url,
-            active: false
-          });
-          newTabIds.push(tab.id);
-          totalRestored++;
-        } catch (e) {
+      // Create tabs for these URLs (parallel for better performance)
+      const tabPromises = urlsToRestore.map(url =>
+        chrome.tabs.create({
+          url: url,
+          active: false
+        }).catch(e => {
           console.error(`Error creating tab for ${url}:`, e);
-        }
-      }
+          return null;
+        })
+      );
+      const tabs = await Promise.all(tabPromises);
+      const newTabIds = tabs.filter(t => t !== null).map(t => t.id);
+      totalRestored += newTabIds.length;
 
       if (newTabIds.length === 0) {
         continue; // No tabs created
@@ -805,8 +875,9 @@ async function restoreFromBookmarks(bookmarkFolderId) {
 async function getTabOrganizerBookmarkFolders() {
   console.log('Getting Tab Organizer bookmark folders...');
 
-  // Get "Other Bookmarks" (ID: "2")
-  const children = await chrome.bookmarks.getChildren('2');
+  // Get "Other Bookmarks" folder ID dynamically
+  const otherBookmarksId = await getOtherBookmarksId();
+  const children = await chrome.bookmarks.getChildren(otherBookmarksId);
 
   // Find all folders that start with "Tab Organizer -"
   const tabOrganizerFolders = children.filter(child =>
@@ -872,6 +943,9 @@ console.log('Tab Organizer extension loaded');
 // Export functions for testing (Node.js environment)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
+    getOtherBookmarksId,
+    shouldSkipUrl,
+    isPrivateIPv4,
     extractDomain,
     extractBaseDomain,
     extractGroupBaseName,

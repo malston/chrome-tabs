@@ -130,7 +130,8 @@ describe('extractDomain', () => {
   describe('IP Address Handling', () => {
 
     // Private IP addresses
-    describe('Private IP Addresses', () => {
+    describe('Private IP Addresses (RFC 1918)', () => {
+      // 192.168.0.0/16 - All 192.168.x.x addresses are private
       test('should return "local-network" for 192.168.x.x', () => {
         expect(extractDomain('http://192.168.1.1')).toBe('local-network');
       });
@@ -139,6 +140,15 @@ describe('extractDomain', () => {
         expect(extractDomain('http://192.168.1.100:8080')).toBe('local-network');
       });
 
+      test('should return "local-network" for 192.168.0.0 (start of range)', () => {
+        expect(extractDomain('http://192.168.0.0')).toBe('local-network');
+      });
+
+      test('should return "local-network" for 192.168.255.255 (end of range)', () => {
+        expect(extractDomain('http://192.168.255.255')).toBe('local-network');
+      });
+
+      // 10.0.0.0/8 - All 10.x.x.x addresses are private
       test('should return "local-network" for 10.x.x.x', () => {
         expect(extractDomain('http://10.0.0.1')).toBe('local-network');
       });
@@ -147,12 +157,50 @@ describe('extractDomain', () => {
         expect(extractDomain('http://10.1.2.3/admin')).toBe('local-network');
       });
 
-      test('should return "local-network" for 172.x.x.x', () => {
+      test('should return "local-network" for 10.0.0.0 (start of range)', () => {
+        expect(extractDomain('http://10.0.0.0')).toBe('local-network');
+      });
+
+      test('should return "local-network" for 10.255.255.255 (end of range)', () => {
+        expect(extractDomain('http://10.255.255.255')).toBe('local-network');
+      });
+
+      // 172.16.0.0/12 - Only 172.16.x.x through 172.31.x.x are private
+      test('should return "local-network" for 172.16.x.x (start of private range)', () => {
         expect(extractDomain('http://172.16.0.1')).toBe('local-network');
       });
 
-      test('should return "local-network" for 172.x.x.x with port and path', () => {
+      test('should return "local-network" for 172.20.x.x (middle of private range)', () => {
         expect(extractDomain('http://172.20.10.5:3000/api')).toBe('local-network');
+      });
+
+      test('should return "local-network" for 172.31.x.x (end of private range)', () => {
+        expect(extractDomain('http://172.31.255.255')).toBe('local-network');
+      });
+
+      test('should return "local-network" for 172.16.0.0 (start of range)', () => {
+        expect(extractDomain('http://172.16.0.0')).toBe('local-network');
+      });
+
+      // Public 172.x.x.x addresses (NOT in 172.16-31 range)
+      test('should return "ip-addresses" for 172.15.x.x (public - before private range)', () => {
+        expect(extractDomain('http://172.15.0.1')).toBe('ip-addresses');
+      });
+
+      test('should return "ip-addresses" for 172.32.x.x (public - after private range)', () => {
+        expect(extractDomain('http://172.32.0.1')).toBe('ip-addresses');
+      });
+
+      test('should return "ip-addresses" for 172.0.x.x (public)', () => {
+        expect(extractDomain('http://172.0.0.1')).toBe('ip-addresses');
+      });
+
+      test('should return "ip-addresses" for 172.100.x.x (public)', () => {
+        expect(extractDomain('http://172.100.1.1')).toBe('ip-addresses');
+      });
+
+      test('should return "ip-addresses" for 172.255.x.x (public)', () => {
+        expect(extractDomain('http://172.255.255.255')).toBe('ip-addresses');
       });
     });
 
