@@ -1,12 +1,12 @@
 // ABOUTME: Main service worker for Tab Organizer extension.
 // ABOUTME: Routes messages from popup to appropriate handler functions.
 
-import { organizeTabs } from './src/background/organizeTabs.js';
-import { removeDuplicateTabs } from './src/background/removeDuplicateTabs.js';
-import { removeAllGroups } from './src/background/removeAllGroups.js';
-import { saveTabsToBookmarks } from './src/background/saveTabsToBookmarks.js';
-import { restoreFromBookmarks } from './src/background/restoreFromBookmarks.js';
-import { getTabOrganizerBookmarkFolders } from './src/utils/getTabOrganizerBookmarkFolders.js';
+import { organizeTabs } from './organizeTabs.js';
+import { removeDuplicateTabs } from './removeDuplicateTabs.js';
+import { removeAllGroups } from './removeAllGroups.js';
+import { saveTabsToBookmarks } from './saveTabsToBookmarks.js';
+import { restoreFromBookmarks } from './restoreFromBookmarks.js';
+import { getTabOrganizerBookmarkFolders } from '../utils/getTabOrganizerBookmarkFolders.js';
 
 console.log('Tab Organizer extension loaded');
 
