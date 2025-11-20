@@ -4,7 +4,7 @@
 import { extractDomain } from '../utils/extractDomain.js';
 import { shouldSkipUrl } from '../utils/shouldSkipUrl.js';
 import { extractGroupBaseName } from '../utils/extractGroupBaseName.js';
-import { getNextColor } from '../utils/colorManager.js';
+import { getNextColor, resetColorIndex } from '../utils/colorManager.js';
 
 function categorizeUrl(url) {
   try {
@@ -244,7 +244,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
   let groupedCount = 0;
   let groupsCreated = 0;
   let groupsUpdated = 0;
-  colorIndex = 0; // Reset color index for new groups
+  resetColorIndex(); // Reset color index for new groups
 
   // Sort groups by tab count (most tabs first)
   const sortedGroups = Object.entries(groups)
