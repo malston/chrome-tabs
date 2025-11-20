@@ -11,6 +11,21 @@ function getNextColor() {
 }
 
 /**
+ * Determines if a URL should be skipped during tab organization.
+ * Skips Chrome internal pages and invalid URLs.
+ *
+ * @param {string} url - The URL to check
+ * @returns {boolean} True if the URL should be skipped, false otherwise
+ */
+function shouldSkipUrl(url) {
+  if (!url) return true;
+
+  return url.startsWith('chrome://') ||
+         url.startsWith('chrome-extension://') ||
+         url.startsWith('about:');
+}
+
+/**
  * Extracts the base name from a group title by removing the tab count suffix.
  * This allows matching existing groups with new grouping operations.
  *
@@ -27,6 +42,39 @@ function extractGroupBaseName(groupTitle) {
   // Remove the " (count)" suffix using regex
   // Matches: space, opening paren, one or more digits, closing paren, end of string
   return groupTitle.replace(/\s*\(\d+\)$/, '');
+}
+
+/**
+ * Checks if an IPv4 address is in a private range according to RFC 1918.
+ * Private ranges:
+ * - 10.0.0.0/8 (10.0.0.0 - 10.255.255.255)
+ * - 172.16.0.0/12 (172.16.0.0 - 172.31.255.255)
+ * - 192.168.0.0/16 (192.168.0.0 - 192.168.255.255)
+ *
+ * @param {string} ip - The IP address to check
+ * @returns {boolean} True if the IP is in a private range
+ */
+function isPrivateIPv4(ip) {
+  // 192.168.0.0/16 - All 192.168.x.x addresses
+  if (ip.startsWith('192.168.')) {
+    return true;
+  }
+
+  // 10.0.0.0/8 - All 10.x.x.x addresses
+  if (ip.startsWith('10.')) {
+    return true;
+  }
+
+  // 172.16.0.0/12 - Only 172.16.x.x through 172.31.x.x
+  if (ip.startsWith('172.')) {
+    const parts = ip.split('.');
+    if (parts.length >= 2) {
+      const secondOctet = parseInt(parts[1], 10);
+      return secondOctet >= 16 && secondOctet <= 31;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -57,7 +105,8 @@ function extractDomain(url) {
 
     // Handle IP addresses - group private IPs together
     if (/^[\d.:]+$/.test(domain)) {
-      if (domain.startsWith('192.168.') || domain.startsWith('172.') || domain.startsWith('10.')) {
+      // Check for RFC 1918 private IP ranges
+      if (isPrivateIPv4(domain)) {
         return 'local-network';
       }
       return 'ip-addresses';
@@ -227,7 +276,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
 
     for (const tab of tabs) {
       // Skip chrome internal pages
-      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+      if (shouldSkipUrl(tab.url)) {
         continue;
       }
 
@@ -279,7 +328,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
   for (const tab of tabs) {
     if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
       // Skip chrome internal pages
-      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+      if (shouldSkipUrl(tab.url)) {
         continue;
       }
       groupedTabUrls.set(tab.url, tab);
@@ -290,7 +339,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
   for (const tab of tabs) {
     if (tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE) {
       // Skip chrome internal pages
-      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+      if (shouldSkipUrl(tab.url)) {
         continue;
       }
 
@@ -305,7 +354,6 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
 
   // Group tabs by domain or category
   const groups = {};
-  const skipDomains = new Set(['chrome://', 'chrome-extension://', 'about:']);
 
   // Build a set of URLs that should be skipped (ungrouped duplicates)
   const skippedUngroupedDuplicateUrls = new Set();
@@ -315,7 +363,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
 
   for (const tab of tabs) {
     // Skip chrome internal pages
-    if (skipDomains.has(tab.url.substring(0, tab.url.indexOf('/')))) {
+    if (shouldSkipUrl(tab.url)) {
       continue;
     }
 
@@ -447,9 +495,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
   // Identify ungrouped tabs (skip chrome internal pages)
   const ungroupedTabsToMove = currentTabs.filter(tab =>
     tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE &&
-    !tab.url.startsWith('chrome://') &&
-    !tab.url.startsWith('chrome-extension://') &&
-    tab.url !== 'about:blank'
+    !shouldSkipUrl(tab.url)
   );
 
   if (ungroupedTabsToMove.length > 0) {
@@ -514,7 +560,7 @@ async function removeDuplicateTabs() {
     const url = tab.url;
 
     // Skip chrome internal pages
-    if (url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url === 'about:blank') {
+    if (shouldSkipUrl(url)) {
       continue;
     }
 
@@ -604,7 +650,7 @@ async function saveTabsToBookmarks() {
 
   for (const tab of tabs) {
     // Skip chrome internal pages
-    if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url === 'about:blank') {
+    if (shouldSkipUrl(tab.url)) {
       continue;
     }
 
@@ -718,10 +764,7 @@ async function restoreFromBookmarks(bookmarkFolderId) {
       // Filter out non-URL bookmarks and duplicates
       const urlsToRestore = [];
       for (const bookmark of bookmarks) {
-        if (bookmark.url &&
-            !bookmark.url.startsWith('chrome://') &&
-            !bookmark.url.startsWith('chrome-extension://')) {
-
+        if (bookmark.url && !shouldSkipUrl(bookmark.url)) {
           if (existingUrls.has(bookmark.url)) {
             duplicatesSkipped++;
           } else {
@@ -872,6 +915,8 @@ console.log('Tab Organizer extension loaded');
 // Export functions for testing (Node.js environment)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
+    shouldSkipUrl,
+    isPrivateIPv4,
     extractDomain,
     extractBaseDomain,
     extractGroupBaseName,
