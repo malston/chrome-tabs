@@ -39,10 +39,8 @@ describe('removeAllGroups', () => {
       const result = await removeAllGroups();
 
       expect(chrome.tabs.query).toHaveBeenCalledWith({ currentWindow: true });
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(3); // Three grouped tabs
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(1);
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(2);
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(3);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1); // Single batched call
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1, 2, 3]);
       expect(result.ungrouped).toBe(3);
     });
 
@@ -74,7 +72,8 @@ describe('removeAllGroups', () => {
 
       const result = await removeAllGroups();
 
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(5);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1, 2, 3, 4, 5]);
       expect(result.ungrouped).toBe(5);
     });
 
@@ -89,7 +88,7 @@ describe('removeAllGroups', () => {
       const result = await removeAllGroups();
 
       expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1]);
       expect(result.ungrouped).toBe(1);
     });
   });
@@ -117,7 +116,7 @@ describe('removeAllGroups', () => {
 
       // groupId 0 is a valid group (not TAB_GROUP_ID_NONE which is -1)
       expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1]);
       expect(result.ungrouped).toBe(1);
     });
 
@@ -132,7 +131,8 @@ describe('removeAllGroups', () => {
 
       const result = await removeAllGroups();
 
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(2);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1, 2]);
       expect(result.ungrouped).toBe(2);
     });
 
@@ -150,7 +150,9 @@ describe('removeAllGroups', () => {
 
       const result = await removeAllGroups();
 
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(100);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      const expectedIds = Array.from({ length: 100 }, (_, i) => i + 1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(expectedIds);
       expect(result.ungrouped).toBe(100);
     });
 
@@ -165,8 +167,9 @@ describe('removeAllGroups', () => {
 
       const result = await removeAllGroups();
 
-      // Only tab 2 should be ungrouped (tab 1 has undefined groupId which !== -1)
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(2);
+      // Both tabs should be ungrouped (tab 1 has undefined groupId which !== -1, tab 2 has groupId 1)
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1, 2]);
     });
 
     test('should handle tabs with null groupId', async () => {
@@ -181,7 +184,8 @@ describe('removeAllGroups', () => {
       const result = await removeAllGroups();
 
       // null !== -1, so null groupId tabs should be ungrouped
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(2);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1, 2]);
     });
   });
 
@@ -194,7 +198,7 @@ describe('removeAllGroups', () => {
       expect(chrome.tabs.ungroup).not.toHaveBeenCalled();
     });
 
-    test('should continue if some ungroup operations fail', async () => {
+    test('should handle ungroup operation failure', async () => {
       const mockTabs = [
         { id: 1, groupId: 1, title: 'Tab 1', url: 'https://example.com/1' },
         { id: 2, groupId: 2, title: 'Tab 2', url: 'https://example.com/2' },
@@ -202,31 +206,29 @@ describe('removeAllGroups', () => {
       ];
 
       chrome.tabs.query.mockResolvedValue(mockTabs);
-      chrome.tabs.ungroup
-        .mockResolvedValueOnce(undefined) // Tab 1 succeeds
-        .mockRejectedValueOnce(new Error('Tab 2 failed')) // Tab 2 fails
-        .mockResolvedValueOnce(undefined); // Tab 3 succeeds
+      chrome.tabs.ungroup.mockRejectedValue(new Error('Ungroup failed'));
 
       const result = await removeAllGroups();
 
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(3);
-      expect(console.error).toHaveBeenCalledWith('Error ungrouping tab:', expect.any(Error));
-      expect(result.ungrouped).toBe(3); // Count includes all grouped tabs, even failed ones
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1, 2, 3]);
+      expect(console.error).toHaveBeenCalledWith('Error ungrouping tabs:', expect.any(Error));
+      expect(result.ungrouped).toBe(3); // Count includes all grouped tabs, even if operation failed
     });
 
-    test('should handle all ungroup operations failing', async () => {
+    test('should handle batch ungroup with successful operation', async () => {
       const mockTabs = [
         { id: 1, groupId: 1, title: 'Tab 1', url: 'https://example.com/1' },
         { id: 2, groupId: 2, title: 'Tab 2', url: 'https://example.com/2' },
       ];
 
       chrome.tabs.query.mockResolvedValue(mockTabs);
-      chrome.tabs.ungroup.mockRejectedValue(new Error('Ungroup failed'));
+      chrome.tabs.ungroup.mockResolvedValue(undefined);
 
       const result = await removeAllGroups();
 
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(2);
-      expect(console.error).toHaveBeenCalledTimes(2);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1, 2]);
       expect(result.ungrouped).toBe(2);
     });
 
@@ -238,14 +240,13 @@ describe('removeAllGroups', () => {
       ];
 
       chrome.tabs.query.mockResolvedValue(mockTabs);
-      chrome.tabs.ungroup
-        .mockRejectedValueOnce(new Error('Permission denied'))
-        .mockRejectedValueOnce(new TypeError('Invalid tab ID'))
-        .mockRejectedValueOnce('String error');
+      chrome.tabs.ungroup.mockRejectedValue(new Error('Permission denied'));
 
       const result = await removeAllGroups();
 
-      expect(console.error).toHaveBeenCalledTimes(3);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1, 2, 3]);
+      expect(console.error).toHaveBeenCalledTimes(1);
       expect(result.ungrouped).toBe(3);
     });
 
@@ -260,9 +261,9 @@ describe('removeAllGroups', () => {
 
       const result = await removeAllGroups();
 
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(-1);
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(0);
-      expect(console.error).toHaveBeenCalledTimes(2);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([-1, 0]);
+      expect(console.error).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -322,7 +323,7 @@ describe('removeAllGroups', () => {
 
       await removeAllGroups();
 
-      expect(console.error).toHaveBeenCalledWith('Error ungrouping tab:', error);
+      expect(console.error).toHaveBeenCalledWith('Error ungrouping tabs:', error);
     });
   });
 
@@ -341,11 +342,9 @@ describe('removeAllGroups', () => {
 
       const result = await removeAllGroups();
 
-      // Should only ungroup tabs 1, 3, and 5
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(3);
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(1);
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(3);
-      expect(chrome.tabs.ungroup).toHaveBeenCalledWith(5);
+      // Should only ungroup tabs 1, 3, and 5 in a single batched call
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1, 3, 5]);
       expect(result.ungrouped).toBe(3);
     });
 
@@ -363,7 +362,8 @@ describe('removeAllGroups', () => {
 
       const result = await removeAllGroups();
 
-      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(4);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledTimes(1);
+      expect(chrome.tabs.ungroup).toHaveBeenCalledWith([1, 2, 3, 4]);
       expect(result.ungrouped).toBe(4);
     });
   });

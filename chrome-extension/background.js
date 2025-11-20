@@ -534,17 +534,20 @@ async function removeAllGroups() {
 
   const tabs = await chrome.tabs.query({ currentWindow: true });
 
-  for (const tab of tabs) {
-    if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
-      try {
-        await chrome.tabs.ungroup(tab.id);
-      } catch (e) {
-        console.error('Error ungrouping tab:', e);
-      }
+  // Batch ungroup operation for better performance
+  const groupedTabIds = tabs
+    .filter(tab => tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE)
+    .map(tab => tab.id);
+
+  if (groupedTabIds.length > 0) {
+    try {
+      await chrome.tabs.ungroup(groupedTabIds);
+    } catch (e) {
+      console.error('Error ungrouping tabs:', e);
     }
   }
 
-  return { ungrouped: tabs.filter(t => t.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE).length };
+  return { ungrouped: groupedTabIds.length };
 }
 
 async function removeDuplicateTabs() {
@@ -574,14 +577,14 @@ async function removeDuplicateTabs() {
     }
   }
 
-  // Close duplicate tabs
+  // Close duplicate tabs (batch operation for better performance)
   let closedCount = 0;
-  for (const tabId of tabsToClose) {
+  if (tabsToClose.length > 0) {
     try {
-      await chrome.tabs.remove(tabId);
-      closedCount++;
+      await chrome.tabs.remove(tabsToClose);
+      closedCount = tabsToClose.length;
     } catch (e) {
-      console.error('Error closing tab:', e);
+      console.error('Error closing tabs:', e);
     }
   }
 
@@ -679,19 +682,19 @@ async function saveTabsToBookmarks() {
     });
     folderCount++;
 
-    // Add bookmarks for each tab in the group
-    for (const tab of groupTabs) {
-      try {
-        await chrome.bookmarks.create({
-          parentId: groupFolder.id,
-          title: tab.title || tab.url,
-          url: tab.url
-        });
-        savedCount++;
-      } catch (e) {
+    // Add bookmarks for each tab in the group (parallel for better performance)
+    const bookmarkPromises = groupTabs.map(tab =>
+      chrome.bookmarks.create({
+        parentId: groupFolder.id,
+        title: tab.title || tab.url,
+        url: tab.url
+      }).catch(e => {
         console.error(`Error saving bookmark for ${tab.url}:`, e);
-      }
-    }
+        return null;
+      })
+    );
+    const results = await Promise.all(bookmarkPromises);
+    savedCount += results.filter(r => r !== null).length;
   }
 
   // Save ungrouped tabs if any exist
@@ -702,18 +705,19 @@ async function saveTabsToBookmarks() {
     });
     folderCount++;
 
-    for (const tab of ungroupedTabs) {
-      try {
-        await chrome.bookmarks.create({
-          parentId: ungroupedFolder.id,
-          title: tab.title || tab.url,
-          url: tab.url
-        });
-        savedCount++;
-      } catch (e) {
+    // Add bookmarks for ungrouped tabs (parallel for better performance)
+    const bookmarkPromises = ungroupedTabs.map(tab =>
+      chrome.bookmarks.create({
+        parentId: ungroupedFolder.id,
+        title: tab.title || tab.url,
+        url: tab.url
+      }).catch(e => {
         console.error(`Error saving bookmark for ${tab.url}:`, e);
-      }
-    }
+        return null;
+      })
+    );
+    const results = await Promise.all(bookmarkPromises);
+    savedCount += results.filter(r => r !== null).length;
   }
 
   console.log(`Saved ${savedCount} bookmarks in ${folderCount} folders`);
@@ -778,20 +782,19 @@ async function restoreFromBookmarks(bookmarkFolderId) {
         continue; // Skip empty folders
       }
 
-      // Create tabs for these URLs
-      const newTabIds = [];
-      for (const url of urlsToRestore) {
-        try {
-          const tab = await chrome.tabs.create({
-            url: url,
-            active: false
-          });
-          newTabIds.push(tab.id);
-          totalRestored++;
-        } catch (e) {
+      // Create tabs for these URLs (parallel for better performance)
+      const tabPromises = urlsToRestore.map(url =>
+        chrome.tabs.create({
+          url: url,
+          active: false
+        }).catch(e => {
           console.error(`Error creating tab for ${url}:`, e);
-        }
-      }
+          return null;
+        })
+      );
+      const tabs = await Promise.all(tabPromises);
+      const newTabIds = tabs.filter(t => t !== null).map(t => t.id);
+      totalRestored += newTabIds.length;
 
       if (newTabIds.length === 0) {
         continue; // No tabs created
