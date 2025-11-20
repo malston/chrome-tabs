@@ -8,6 +8,7 @@ const { getOtherBookmarksId } = require(path.join(__dirname, './src/utils/getOth
 const { getTabOrganizerBookmarkFolders } = require(path.join(__dirname, './src/utils/getTabOrganizerBookmarkFolders.js'));
 const { organizeTabs } = require(path.join(__dirname, './src/background/organizeTabs.js'));
 const { removeDuplicateTabs } = require(path.join(__dirname, './src/background/removeDuplicateTabs.js'));
+const { removeAllGroups } = require(path.join(__dirname, './src/background/removeAllGroups.js'));
 const { getNextColor } = require(path.join(__dirname, './src/utils/colorManager.js'));
 
 /**
@@ -124,27 +125,6 @@ function extractBaseDomain(hostname) {
   // Default: keep last 2 parts for standard TLDs
   // Example: vcsa.markalston.net → markalston.net
   return parts.slice(-2).join('.');
-}
-
-async function removeAllGroups() {
-  console.log('Removing all tab groups...');
-
-  const tabs = await chrome.tabs.query({ currentWindow: true });
-
-  // Batch ungroup operation for better performance
-  const groupedTabIds = tabs
-    .filter(tab => tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE)
-    .map(tab => tab.id);
-
-  if (groupedTabIds.length > 0) {
-    try {
-      await chrome.tabs.ungroup(groupedTabIds);
-    } catch (e) {
-      console.error('Error ungrouping tabs:', e);
-    }
-  }
-
-  return { ungrouped: groupedTabIds.length };
 }
 
 async function saveTabsToBookmarks() {
