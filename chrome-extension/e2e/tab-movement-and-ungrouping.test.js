@@ -4,6 +4,8 @@
  * Scenario 4: Tab Movement Between Groups (Add/Remove)
  * Scenario 5: Single Tabs (Ungrouping)
  * Scenario 6: Mixed Create and Update
+ *
+ * Each test is independent and cleans up state before running.
  */
 
 const puppeteer = require('puppeteer');
@@ -32,6 +34,9 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
 
     const pages = await browser.pages();
     page = pages[0];
+
+    // Get service worker reference
+    serviceWorker = await extensionTarget.worker();
   }, 60000);
 
   afterAll(async () => {
@@ -39,6 +44,19 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
       await browser.close();
     }
   });
+
+  // Helper function to clean up all tabs and groups before each test
+  async function cleanupTabs() {
+    // Close all pages except the first one
+    const allPages = await browser.pages();
+    for (let i = 1; i < allPages.length; i++) {
+      await allPages[i].close();
+    }
+
+    // Navigate first page to about:blank
+    await page.goto('about:blank');
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
 
   // Helper function to organize tabs
   async function organizeTabs() {
@@ -60,6 +78,9 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
   test('Scenario 4: should move tabs between groups when domain changes', async () => {
     console.log('=== Scenario 4: Tab Movement Between Groups ===');
 
+    // Clean up from any previous test
+    await cleanupTabs();
+
     // Open initial tabs
     const urls = [
       'https://github.com/facebook/react',
@@ -79,12 +100,6 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
     }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Get service worker
-    const serviceWorkerTarget = await browser.waitForTarget(
-      target => target.type() === 'service_worker' && target.url().includes(extensionId)
-    );
-    serviceWorker = await serviceWorkerTarget.worker();
 
     // Organize
     await organizeTabs();
@@ -145,9 +160,11 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
   test('Scenario 5: should ungroup when domain drops to 1 tab', async () => {
     console.log('=== Scenario 5: Single Tabs (Ungrouping) ===');
 
+    // Clean up from any previous test
+    await cleanupTabs();
+
     // Open 2 example.com tabs (use query params to make them unique)
-    const examplePage1 = await browser.newPage();
-    await examplePage1.goto('https://example.com?page=1', { waitUntil: 'load', timeout: 60000 });
+    await page.goto('https://example.com?page=1', { waitUntil: 'load', timeout: 60000 });
 
     const examplePage2 = await browser.newPage();
     await examplePage2.goto('https://example.com?page=2', { waitUntil: 'load', timeout: 60000 });
@@ -201,9 +218,32 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
   test('Scenario 6: should handle mixed create and update operations', async () => {
     console.log('=== Scenario 6: Mixed Create and Update ===');
 
-    // We already have github and google groups from Scenario 4
-    // Add stackoverflow tabs (new domain) and more github tabs
+    // Clean up from any previous test
+    await cleanupTabs();
 
+    // Set up initial state: create github and google groups
+    const initialUrls = [
+      'https://github.com/facebook/react',
+      'https://github.com/vuejs/vue',
+      'https://www.google.com/search?q=javascript',
+      'https://www.google.com/search?q=typescript'
+    ];
+
+    for (let i = 0; i < initialUrls.length; i++) {
+      if (i === 0) {
+        await page.goto(initialUrls[i], { waitUntil: 'load', timeout: 60000 });
+      } else {
+        const newPage = await browser.newPage();
+        await newPage.goto(initialUrls[i], { waitUntil: 'load', timeout: 60000 });
+      }
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Organize to create initial groups
+    await organizeTabs();
+
+    // Add stackoverflow tabs (new domain) and more github tabs
     const newUrls = [
       'https://stackoverflow.com/questions/1',
       'https://stackoverflow.com/questions/2',
@@ -219,7 +259,7 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Get groups before
+    // Get groups before mixed operation
     const groupsBefore = await serviceWorker.evaluate(async () => {
       const groups = await chrome.tabGroups.query({});
       return groups.map(g => ({ id: g.id, title: g.title }));
@@ -244,9 +284,9 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
     expect(stackoverflowGroup).toBeDefined();
     expect(stackoverflowGroup.title).toBe('stackoverflow.com (3)');
 
-    // Should have updated github group
+    // Should have updated github group (2 initial + 2 new = 4)
     const githubGroup = groupsAfter.find(g => g.title.includes('github.com'));
-    expect(githubGroup.title).toBe('github.com (4)'); // 2 from scenario 4 + 2 new
+    expect(githubGroup.title).toBe('github.com (4)');
 
     console.log('✅ Scenario 6 passed! Mixed create and update worked correctly.');
   }, 120000);
