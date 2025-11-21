@@ -184,7 +184,6 @@ chrome-tabs/
 - Groups tabs by extracting domain from URLs
 - Removes duplicates by tracking seen URLs
 - Assigns colors and counts automatically
-- **No remote debugging needed!**
 
 ## Troubleshooting
 
