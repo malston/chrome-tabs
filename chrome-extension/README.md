@@ -26,7 +26,7 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 
 3. **Load the Extension**
    - Click "Load unpacked"
-   - Navigate to: `/Users/markalston/workspace/chrome-tabs/chrome-extension`
+   - Navigate to: `~~/workspace/chrome-tabs/chrome-extension`
    - Click "Select"
 
 4. **Pin the Extension** (Optional but recommended)
@@ -37,21 +37,25 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 ## Usage
 
 ### Organize Tabs by Domain
+
 1. Click the Tab Organizer extension icon
 2. Click "Organize by Domain"
 3. All tabs automatically grouped by domain!
 
 ### Organize Tabs by Category
+
 1. Click the Tab Organizer extension icon
 2. Click "Organize by Category"
 3. All tabs automatically grouped by category (Development, Social Media, Shopping, etc.)!
 
 ### Remove Duplicate Tabs
+
 1. Click the Tab Organizer extension icon
 2. Click "Remove Duplicates"
 3. All duplicate URLs are removed (keeps the first occurrence)
 
 ### Save to Bookmarks
+
 1. Organize your tabs first (by Domain or Category)
 2. Click the Tab Organizer extension icon
 3. Click "Save to Bookmarks"
@@ -60,6 +64,7 @@ Complete tab management in one extension: organize by domain AND remove duplicat
 The bookmarks are saved in "Other Bookmarks" under a timestamped folder like "Tab Organizer - 2025-01-15 14:30". Each tab group becomes a folder, and ungrouped tabs go into an "Ungrouped Tabs" folder.
 
 ### Restore from Bookmarks
+
 1. Click the Tab Organizer extension icon
 2. Click "Restore from Bookmarks"
 3. Select a previously saved bookmark folder from the list
@@ -67,6 +72,7 @@ The bookmarks are saved in "Other Bookmarks" under a timestamped folder like "Ta
 5. Tabs are restored and grouped automatically!
 
 **Smart Restore Features:**
+
 - If a group with the same name already exists, new tabs are added to that group
 - Duplicate tabs (URLs already open) are automatically skipped
 - New groups are created for groups that don't exist yet
@@ -82,6 +88,7 @@ The extension looks for bookmark folders in "Other Bookmarks" that start with "T
 4. The subfolder names will be used as tab group names
 
 Example structure:
+
 ```
 Other Bookmarks
 └── Tab Organizer - My Work Tabs
@@ -91,6 +98,7 @@ Other Bookmarks
 ```
 
 ### Remove All Groups
+
 1. Click the Tab Organizer extension icon
 2. Click "Remove All Groups"
 3. All groups ungrouped (tabs remain open)
@@ -98,6 +106,7 @@ Other Bookmarks
 ## How It Works
 
 **Organize by Domain:**
+
 1. Scans all tabs in the current window
 2. Groups them by domain (e.g., github.com, acme.com)
 3. Creates colored tab groups with domain names and tab counts
@@ -106,6 +115,7 @@ Other Bookmarks
 6. Skips chrome:// internal pages
 
 **Organize by Category:**
+
 1. Scans all tabs in the current window
 2. Categorizes tabs based on their domain and URL:
    - **Development**: GitHub, GitLab, Stack Overflow, localhost, IP addresses
@@ -124,12 +134,14 @@ Other Bookmarks
 5. Skips categories with only 1 tab
 
 **Remove Duplicates:**
+
 1. Scans all tabs in the current window
 2. Tracks URLs that have been seen
 3. Closes tabs with duplicate URLs (keeps the first one)
 4. Skips chrome:// internal pages
 
 **Save to Bookmarks:**
+
 1. Scans all tabs in the current window
 2. Gets all tab groups and their names
 3. Creates a root bookmark folder with timestamp
@@ -140,6 +152,7 @@ Other Bookmarks
 6. All bookmarks saved under "Other Bookmarks"
 
 **Restore from Bookmarks:**
+
 1. Lists all "Tab Organizer" bookmark folders
 2. User selects which folder to restore
 3. For each bookmark folder in the selected save:
@@ -153,26 +166,31 @@ Other Bookmarks
 ## Examples
 
 **After "Organize by Domain":**
+
 - `github.com (25)` - All GitHub tabs in a blue group
 - `acme.com (24)` - All acme.com tabs in a red group
 - `local-network (7)` - All lab IPs (192.168.x.x) in a yellow group
 
 **After "Organize by Category":**
+
 - `Development (32)` - GitHub, Stack Overflow, localhost tabs in a blue group
 - `Documentation (18)` - All docs sites in a red group
 - `Social Media (12)` - Twitter, LinkedIn, Reddit tabs in a yellow group
 - `Shopping (8)` - Amazon, eBay tabs in a green group
 
 **After "Remove Duplicates":**
+
 - "Removed 15 duplicate tabs!" - All duplicate URLs closed
 
 **After "Save to Bookmarks":**
+
 - Bookmarks saved in "Other Bookmarks" → "Tab Organizer - 2025-01-15 14:30"
   - Folder: "github.com (25)" with 25 bookmarks
   - Folder: "acme.com (24)" with 24 bookmarks
   - Folder: "Ungrouped Tabs" with 12 bookmarks
 
 **After "Restore from Bookmarks":**
+
 - "Restored 61 tabs! Created 2 new groups. Merged into 1 existing groups. Skipped 5 duplicates."
 - Tab groups recreated with the same names as the bookmark folders
 - Existing groups have new tabs added to them
@@ -218,11 +236,13 @@ chrome-extension/
 The extension uses modular organization with feature-based directories:
 
 ### Service Worker (`background.js`)
+
 - **Location:** `src/background/background.js` (entry point for manifest.json)
 - **Purpose:** Routes messages from popup to appropriate handlers
 - **Dependencies:** Imports feature modules from same directory and `../utils/`
 
 ### Background Features (`src/background/`)
+
 Pure business logic modules with Chrome API dependencies:
 
 - **organizeTabs.js** - Groups tabs by domain or category
@@ -234,11 +254,13 @@ Pure business logic modules with Chrome API dependencies:
 Each module exports a single async function and is tested with colocated `.test.js` files.
 
 ### Popup UI (`src/popup/`)
+
 - **popup.html** - User interface with buttons and status display
 - **popup.js** - Handles button clicks, sends messages to background worker
 - **popup.test.js** - Tests UI interactions
 
 ### Utilities (`src/utils/`)
+
 Pure utility functions with no Chrome API dependencies:
 
 - **extractDomain.js** - Extracts domain from URLs (handles localhost, IPs)
@@ -251,7 +273,9 @@ Pure utility functions with no Chrome API dependencies:
 Each utility is tested independently with colocated `.test.js` files.
 
 ### Test Structure
+
 Tests are colocated with their source files:
+
 - Unit tests for utilities in `src/utils/*.test.js`
 - Unit tests for features in `src/background/*.test.js`
 - UI tests in `src/popup/popup.test.js`
@@ -260,14 +284,17 @@ Tests are colocated with their source files:
 ## Troubleshooting
 
 ### Extension doesn't appear
+
 - Make sure Developer Mode is enabled
 - Try reloading the extension (click the refresh icon on chrome://extensions/)
 
 ### Groups not being created
+
 - Make sure you have tabs from at least 2 different domains
 - Check the extension console for errors (click "service worker" link on chrome://extensions/)
 
 ### Want to change grouping behavior?
+
 - Edit domain grouping: Modify `extractDomain()` in `src/utils/extractDomain.js`
 - Edit category grouping: Modify `categorizeUrl()` logic in `src/background/organizeTabs.js`
 - Add new categories: Extend the categorization logic in `src/background/organizeTabs.js`

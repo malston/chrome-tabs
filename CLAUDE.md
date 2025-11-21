@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Instructions
+
+Please read and follow the coding rules defined in `chrome-extension/.cursor/rules`.
+
 ## Project Overview
 
 Chrome Tab Manager is a Chrome extension for managing Chrome tabs:
@@ -15,7 +19,8 @@ Chrome Tab Manager is a Chrome extension for managing Chrome tabs:
 **Manifest V3 Extension** with modular service worker architecture:
 
 **Directory Structure:**
-```
+
+```sh
 chrome-extension/
 ├── src/
 │   ├── background/           # Service worker and feature modules
@@ -92,17 +97,20 @@ chrome-extension/
 ### Chrome Extension Development
 
 **Install the extension:**
+
 1. Go to `chrome://extensions/`
 2. Enable "Developer mode"
 3. Click "Load unpacked"
-4. Select `/Users/markalston/workspace/chrome-tabs/chrome-extension`
+4. Select `~/workspace/chrome-tabs/chrome-extension`
 
 **Reload after changes:**
+
 1. Go to `chrome://extensions/`
 2. Find "Tab Organizer"
 3. Click refresh icon
 
 **Debug extension:**
+
 - Click "service worker" link on `chrome://extensions/` for service worker console
 - Right-click popup → Inspect for popup console
 
@@ -111,6 +119,7 @@ chrome-extension/
 The extension includes comprehensive unit tests colocated with source files:
 
 **Running Tests:**
+
 ```bash
 npm test                # Run all unit tests
 npm run test:e2e       # Run end-to-end tests
@@ -118,6 +127,7 @@ npm run test:coverage  # Generate coverage report
 ```
 
 **Test Organization:**
+
 - Unit tests for utilities: `chrome-extension/src/utils/*.test.js`
 - Unit tests for features: `chrome-extension/src/background/*.test.js`
 - UI tests: `chrome-extension/src/popup/popup.test.js`
@@ -140,12 +150,15 @@ npm run test:coverage  # Generate coverage report
 ## Common Development Tasks
 
 ### Modify Domain Grouping Logic
+
 Edit `extractDomain()` function in `chrome-extension/src/utils/extractDomain.js`
 
 ### Modify Tab Organization (Domain or Category)
+
 Edit `organizeTabs()` function in `chrome-extension/src/background/organizeTabs.js`
 
 ### Add New Extension Action
+
 1. Add button to `chrome-extension/src/popup/popup.html`
 2. Add event listener in `chrome-extension/src/popup/popup.js`
 3. Add message handler in `chrome-extension/src/background/background.js` (message router)
@@ -153,9 +166,11 @@ Edit `organizeTabs()` function in `chrome-extension/src/background/organizeTabs.
 5. Import and wire up the feature module in `src/background/background.js`
 
 ### Modify Duplicate Removal Logic
+
 Edit `removeDuplicateTabs()` function in `chrome-extension/src/background/removeDuplicateTabs.js`
 
 ### Modify Bookmark Save/Restore Behavior
+
 - Edit `saveTabsToBookmarks()` in `chrome-extension/src/background/saveTabsToBookmarks.js`
 - Edit `restoreFromBookmarks()` in `chrome-extension/src/background/restoreFromBookmarks.js`
 
@@ -173,6 +188,7 @@ Edit `removeDuplicateTabs()` function in `chrome-extension/src/background/remove
 ## Troubleshooting
 
 ### Extension not working
+
 - Ensure Developer Mode enabled on `chrome://extensions/`
 - Reload extension (refresh icon)
 - Check service worker console for errors
