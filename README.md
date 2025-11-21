@@ -220,7 +220,7 @@ chrome-tabs/
 
 ### For Users
 
-**Latest Release:** [v0.9.0 Beta](https://github.com/malston/chrome-tabs/releases/latest)
+**[Latest Release](https://github.com/malston/chrome-tabs/releases/latest)**
 
 All releases include:
 - Ready-to-install extension zip file
