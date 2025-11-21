@@ -348,14 +348,13 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
     console.log(`Moving ${ungroupedTabsToMove.length} ungrouped tabs to end of tab bar...`);
 
     // Move tabs to the end, preserving their relative order
-    // We move them one by one to index -1 (which means "end of tab bar")
-    for (const tab of ungroupedTabsToMove) {
-      try {
-        await chrome.tabs.move(tab.id, { index: -1 });
-        ungroupedTabsMoved++;
-      } catch (e) {
-        console.error(`Error moving ungrouped tab ${tab.id}:`, e);
-      }
+    // Batch move for better performance - Chrome API accepts array of tab IDs
+    const tabIdsToMove = ungroupedTabsToMove.map(tab => tab.id);
+    try {
+      await chrome.tabs.move(tabIdsToMove, { index: -1 });
+      ungroupedTabsMoved = tabIdsToMove.length;
+    } catch (e) {
+      console.error('Error moving ungrouped tabs:', e);
     }
 
     console.log(`Moved ${ungroupedTabsMoved} ungrouped tabs to end`);

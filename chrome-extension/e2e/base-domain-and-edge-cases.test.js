@@ -55,22 +55,19 @@ describe('Scenario 8 and Edge Cases', () => {
   test('Scenario 8: should group subdomains by base domain', async () => {
     console.log('=== Scenario 8: Base Domain Grouping ===');
 
-    // Open tabs with different subdomains of markalston.net
+    // Open tabs with different GitHub subdomains to test base domain grouping
     const urls = [
-      'https://vcsa.markalston.net',
-      'https://opsman.lab.markalston.net',
-      'https://minio.lab.markalston.net',
-      'https://concourse.lab.markalston.net'
+      'https://github.com/facebook/react',
+      'https://gist.github.com/',
+      'https://docs.github.com/'
     ];
 
     for (let i = 0; i < urls.length; i++) {
       if (i === 0) {
-        // Note: These domains likely don't exist, so navigation will fail
-        // We'll use a workaround by navigating to about:blank and updating the URL
-        await page.goto('about:blank');
+        await page.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
       } else {
         const newPage = await browser.newPage();
-        await newPage.goto('about:blank');
+        await newPage.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
       }
     }
 
@@ -79,31 +76,6 @@ describe('Scenario 8 and Edge Cases', () => {
       target => target.type() === 'service_worker' && target.url().includes(extensionId)
     );
     serviceWorker = await serviceWorkerTarget.worker();
-
-    // Update tabs to the subdomain URLs (we can't actually navigate to them, but we can test the logic)
-    // Instead, let's test with GitHub subdomains (more reliable)
-    const realUrls = [
-      'https://github.com/facebook/react',
-      'https://gist.github.com/',
-      'https://docs.github.com/'
-    ];
-
-    // Close existing tabs and open new ones
-    const allPages = await browser.pages();
-    for (const p of allPages) {
-      if (p !== page) {
-        await p.close();
-      }
-    }
-
-    for (let i = 0; i < realUrls.length; i++) {
-      if (i === 0) {
-        await page.goto(realUrls[i], { waitUntil: 'networkidle2', timeout: 30000 });
-      } else {
-        const newPage = await browser.newPage();
-        await newPage.goto(realUrls[i], { waitUntil: 'networkidle2', timeout: 30000 });
-      }
-    }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 

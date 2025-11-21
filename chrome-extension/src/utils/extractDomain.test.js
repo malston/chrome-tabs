@@ -317,10 +317,10 @@ describe('extractDomain', () => {
 
   describe('Base Domain Extraction (Subdomain Grouping)', () => {
     test('should group subdomains under base domain', () => {
-      expect(extractDomain('https://vcsa.markalston.net')).toBe('markalston.net');
-      expect(extractDomain('https://opsman.lab.markalston.net')).toBe('markalston.net');
-      expect(extractDomain('https://minio.lab.markalston.net')).toBe('markalston.net');
-      expect(extractDomain('https://concourse.lab.markalston.net')).toBe('markalston.net');
+      expect(extractDomain('https://app.acme.com')).toBe('acme.com');
+      expect(extractDomain('https://api.dev.acme.com')).toBe('acme.com');
+      expect(extractDomain('https://docs.staging.acme.com')).toBe('acme.com');
+      expect(extractDomain('https://admin.internal.acme.com')).toBe('acme.com');
     });
 
     test('should handle single subdomain', () => {
@@ -374,19 +374,19 @@ describe('extractDomain', () => {
       expect(extractDomain('https://localhost')).toBe('localhost');
     });
 
-    test('should group all markalston.net subdomains together', () => {
+    test('should group all acme.com subdomains together', () => {
       const urls = [
-        'https://vcsa.markalston.net/ui',
-        'https://opsman.lab.markalston.net/login',
-        'https://minio.lab.markalston.net:9001',
-        'https://concourse.lab.markalston.net/',
-        'https://esxi-nuc-01.lab.markalston.net/ui',
+        'https://app.acme.com/ui',
+        'https://api.dev.acme.com/login',
+        'https://docs.staging.acme.com:9001',
+        'https://admin.internal.acme.com/',
+        'https://portal.corp.acme.com/ui',
       ];
 
       const domains = urls.map(url => extractDomain(url));
 
-      // All should resolve to 'markalston.net'
-      expect(domains.every(domain => domain === 'markalston.net')).toBe(true);
+      // All should resolve to 'acme.com'
+      expect(domains.every(domain => domain === 'acme.com')).toBe(true);
     });
 
     test('should maintain distinct groups for different base domains', () => {

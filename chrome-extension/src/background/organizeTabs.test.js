@@ -813,7 +813,7 @@ describe('organizeTabs', () => {
 
       // Should move the ungrouped tab (example.com) to the end
       expect(result.ungroupedTabsMoved).toBe(1);
-      expect(chrome.tabs.move).toHaveBeenCalledWith(3, { index: -1 });
+      expect(chrome.tabs.move).toHaveBeenCalledWith([3], { index: -1 });
     });
 
     test('should handle tab move errors gracefully', async () => {
@@ -1066,10 +1066,9 @@ describe('organizeTabs', () => {
       // Should have moved 2 ungrouped tabs
       expect(result.ungroupedTabsMoved).toBe(2);
 
-      // Should have been called to move each ungrouped tab to index -1 (end)
-      expect(chrome.tabs.move).toHaveBeenCalledWith(3, { index: -1 });
-      expect(chrome.tabs.move).toHaveBeenCalledWith(4, { index: -1 });
-      expect(chrome.tabs.move).toHaveBeenCalledTimes(2);
+      // Should have been called once with array of ungrouped tab IDs (batch move)
+      expect(chrome.tabs.move).toHaveBeenCalledWith([3, 4], { index: -1 });
+      expect(chrome.tabs.move).toHaveBeenCalledTimes(1);
     });
 
     test('should skip chrome internal pages when moving ungrouped tabs', async () => {
@@ -1096,7 +1095,7 @@ describe('organizeTabs', () => {
 
       // Should only move the 1 regular ungrouped tab (not chrome pages)
       expect(result.ungroupedTabsMoved).toBe(1);
-      expect(chrome.tabs.move).toHaveBeenCalledWith(3, { index: -1 });
+      expect(chrome.tabs.move).toHaveBeenCalledWith([3], { index: -1 });
       expect(chrome.tabs.move).toHaveBeenCalledTimes(1);
     });
   });
