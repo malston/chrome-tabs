@@ -1,14 +1,13 @@
 /**
- * E2E Tests: Scenario 8 and Edge Cases
+ * E2E Tests: Base Domain Grouping and Edge Cases
  *
- * Scenario 8: Base Domain Grouping
- * Edge Cases: Empty tabs, All single tabs, Chrome internal pages
+ * Tests: Base Domain Grouping, Empty tabs, All single tabs, Chrome internal pages
  */
 
 const puppeteer = require('puppeteer');
 const { getPuppeteerConfig } = require('./test-config');
 
-describe('Scenario 8 and Edge Cases', () => {
+describe('Base Domain Grouping and Edge Cases', () => {
   let browser;
   let page;
   let extensionId;
@@ -52,25 +51,22 @@ describe('Scenario 8 and Edge Cases', () => {
     await popupPage.close();
   }
 
-  test('Scenario 8: should group subdomains by base domain', async () => {
-    console.log('=== Scenario 8: Base Domain Grouping ===');
+  test('should group subdomains by base domain', async () => {
+    console.log('=== Base Domain Grouping ===');
 
-    // Open tabs with different subdomains of markalston.net
+    // Open tabs with different GitHub subdomains to test base domain grouping
     const urls = [
-      'https://vcsa.markalston.net',
-      'https://opsman.lab.markalston.net',
-      'https://minio.lab.markalston.net',
-      'https://concourse.lab.markalston.net'
+      'https://github.com/facebook/react',
+      'https://gist.github.com/',
+      'https://docs.github.com/'
     ];
 
     for (let i = 0; i < urls.length; i++) {
       if (i === 0) {
-        // Note: These domains likely don't exist, so navigation will fail
-        // We'll use a workaround by navigating to about:blank and updating the URL
-        await page.goto('about:blank');
+        await page.goto(urls[i], { waitUntil: 'load', timeout: 60000 });
       } else {
         const newPage = await browser.newPage();
-        await newPage.goto('about:blank');
+        await newPage.goto(urls[i], { waitUntil: 'load', timeout: 60000 });
       }
     }
 
@@ -79,31 +75,6 @@ describe('Scenario 8 and Edge Cases', () => {
       target => target.type() === 'service_worker' && target.url().includes(extensionId)
     );
     serviceWorker = await serviceWorkerTarget.worker();
-
-    // Update tabs to the subdomain URLs (we can't actually navigate to them, but we can test the logic)
-    // Instead, let's test with GitHub subdomains (more reliable)
-    const realUrls = [
-      'https://github.com/facebook/react',
-      'https://gist.github.com/',
-      'https://docs.github.com/'
-    ];
-
-    // Close existing tabs and open new ones
-    const allPages = await browser.pages();
-    for (const p of allPages) {
-      if (p !== page) {
-        await p.close();
-      }
-    }
-
-    for (let i = 0; i < realUrls.length; i++) {
-      if (i === 0) {
-        await page.goto(realUrls[i], { waitUntil: 'networkidle2', timeout: 30000 });
-      } else {
-        const newPage = await browser.newPage();
-        await newPage.goto(realUrls[i], { waitUntil: 'networkidle2', timeout: 30000 });
-      }
-    }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -123,11 +94,11 @@ describe('Scenario 8 and Edge Cases', () => {
     expect(githubGroup).toBeDefined();
     expect(githubGroup.title).toBe('github.com (3)');
 
-    console.log('✅ Scenario 8 passed! Subdomains grouped by base domain.');
+    console.log('✅ Subdomains grouped by base domain.');
   }, 90000);
 
-  test('Edge Case 1: should handle empty tab set gracefully', async () => {
-    console.log('=== Edge Case 1: Empty Tab Set ===');
+  test('should handle empty tab set gracefully', async () => {
+    console.log('=== Empty Tab Set ===');
 
     // Close all tabs except one (can't close the last tab)
     const allPages = await browser.pages();
@@ -151,11 +122,11 @@ describe('Scenario 8 and Edge Cases', () => {
     console.log('Groups after organizing empty set:', groups);
     expect(groups.length).toBe(0); // No groups should be created
 
-    console.log('✅ Edge Case 1 passed! Empty tab set handled gracefully.');
+    console.log('✅ Empty tab set handled gracefully.');
   }, 60000);
 
-  test('Edge Case 2: should handle all single tabs (no groups created)', async () => {
-    console.log('=== Edge Case 2: All Single Tabs ===');
+  test('should handle all single tabs (no groups created)', async () => {
+    console.log('=== All Single Tabs ===');
 
     // Open 5 tabs from different domains
     const urls = [
@@ -168,10 +139,10 @@ describe('Scenario 8 and Edge Cases', () => {
 
     for (let i = 0; i < urls.length; i++) {
       if (i === 0) {
-        await page.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.goto(urls[i], { waitUntil: 'load', timeout: 60000 });
       } else {
         const newPage = await browser.newPage();
-        await newPage.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
+        await newPage.goto(urls[i], { waitUntil: 'load', timeout: 60000 });
       }
     }
 
@@ -198,11 +169,11 @@ describe('Scenario 8 and Edge Cases', () => {
     const ungroupedCount = allTabs.filter(t => t.groupId === -1).length;
     expect(ungroupedCount).toBe(allTabs.length);
 
-    console.log('✅ Edge Case 2 passed! All single tabs remain ungrouped.');
+    console.log('✅ All single tabs remain ungrouped.');
   }, 90000);
 
-  test('Edge Case 3: should skip chrome:// internal pages', async () => {
-    console.log('=== Edge Case 3: Chrome Internal Pages ===');
+  test('should skip chrome:// internal pages', async () => {
+    console.log('=== Chrome Internal Pages ===');
 
     // Close all existing tabs first
     const allPages = await browser.pages();
@@ -218,10 +189,10 @@ describe('Scenario 8 and Edge Cases', () => {
 
     for (let i = 0; i < urls.length; i++) {
       if (i === 0) {
-        await page.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.goto(urls[i], { waitUntil: 'load', timeout: 60000 });
       } else {
         const newPage = await browser.newPage();
-        await newPage.goto(urls[i], { waitUntil: 'networkidle2', timeout: 30000 });
+        await newPage.goto(urls[i], { waitUntil: 'load', timeout: 60000 });
       }
     }
 
@@ -244,6 +215,6 @@ describe('Scenario 8 and Edge Cases', () => {
     expect(githubGroup).toBeDefined();
     expect(githubGroup.title).toBe('github.com (2)');
 
-    console.log('✅ Edge Case 3 passed! Chrome internal pages skipped.');
+    console.log('✅ Chrome internal pages skipped.');
   }, 90000);
 });

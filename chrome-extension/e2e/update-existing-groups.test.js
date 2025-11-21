@@ -1,5 +1,5 @@
 /**
- * E2E Test: Scenario 2 - Re-Organization (Update Existing Groups)
+ * E2E Test: Re-Organization (Update Existing Groups)
  *
  * Tests the tab re-organization flow:
  * - Opens multiple tabs across different domains
@@ -46,7 +46,7 @@ const ADDITIONAL_URLS = {
   ]
 };
 
-describe('Scenario 2: Re-Organization (Update Existing Groups)', () => {
+describe('Re-Organization (Update Existing Groups)', () => {
   let browser;
   let page;
   let extensionId;
@@ -96,11 +96,11 @@ describe('Scenario 2: Re-Organization (Update Existing Groups)', () => {
       const url = initialUrls[i];
       if (i === 0) {
         // Use the first page
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.goto(url, { waitUntil: 'load', timeout: 60000 });
       } else {
         // Create new tabs for the rest
         const newPage = await browser.newPage();
-        await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+        await newPage.goto(url, { waitUntil: 'load', timeout: 60000 });
       }
     }
 
@@ -158,7 +158,7 @@ describe('Scenario 2: Re-Organization (Update Existing Groups)', () => {
     // Open additional tabs
     for (const url of additionalUrls) {
       const newPage = await browser.newPage();
-      await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+      await newPage.goto(url, { waitUntil: 'load', timeout: 60000 });
     }
 
     console.log(`Opened ${additionalUrls.length} additional tabs`);
@@ -243,6 +243,6 @@ describe('Scenario 2: Re-Organization (Update Existing Groups)', () => {
     const totalGroupedTabs = Object.values(tabsByGroup).reduce((sum, tabs) => sum + tabs.length, 0);
     expect(totalGroupedTabs).toBe(12); // 5 github + 4 google + 3 example
 
-    console.log('✅ Scenario 2 test passed! Groups were updated, not recreated.');
+    console.log('✅ Groups were updated, not recreated.');
   }, 90000); // 90 second timeout for this test (longer than scenario 1)
 });

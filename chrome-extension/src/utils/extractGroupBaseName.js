@@ -7,7 +7,7 @@
  *
  * Examples:
  * - "github.com (15)" → "github.com"
- * - "markalston.net (5)" → "markalston.net"
+ * - "acme.com (5)" → "acme.com"
  * - "Development (10)" → "Development"
  *
  * @param {string} groupTitle - The full group title with count

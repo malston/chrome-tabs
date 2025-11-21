@@ -29,7 +29,7 @@ describe('extractGroupBaseName', () => {
     });
 
     test('should extract base name from subdomain with count', () => {
-      expect(extractGroupBaseName('markalston.net (10)')).toBe('markalston.net');
+      expect(extractGroupBaseName('acme.com (10)')).toBe('acme.com');
     });
 
     test('should extract base name from custom group name', () => {
@@ -188,11 +188,11 @@ describe('extractGroupBaseName', () => {
       });
     });
 
-    test('should handle markalston.net subdomains', () => {
+    test('should handle acme.com subdomains', () => {
       const examples = [
-        ['markalston.net (5)', 'markalston.net'],
-        ['markalston.net (10)', 'markalston.net'],
-        ['markalston.net (1)', 'markalston.net']
+        ['acme.com (5)', 'acme.com'],
+        ['acme.com (10)', 'acme.com'],
+        ['acme.com (1)', 'acme.com']
       ];
 
       examples.forEach(([input, expected]) => {

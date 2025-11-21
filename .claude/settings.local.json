@@ -7,7 +7,8 @@
       "Skill(code-reviewer)",
       "Bash(npm run test:coverage:*)",
       "Bash(npm run coverage:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(HEADLESS=true npm run test:e2e:*)"
     ],
     "deny": [],
     "ask": []

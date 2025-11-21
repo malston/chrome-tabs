@@ -70,7 +70,7 @@ function extractBaseDomain(hostname) {
   }
 
   // Default: keep last 2 parts for standard TLDs
-  // Example: vcsa.markalston.net → markalston.net
+  // Example: app.acme.com → acme.com
   return parts.slice(-2).join('.');
 }
 
@@ -78,7 +78,7 @@ function extractBaseDomain(hostname) {
  * Extracts the base domain from a URL, grouping subdomains together.
  *
  * Examples:
- * - vcsa.markalston.net → markalston.net
+ * - app.acme.com → acme.com
  * - api.github.com → github.com
  * - www.example.co.uk → example.co.uk
  *
@@ -110,7 +110,7 @@ function extractDomain(url) {
     }
 
     // Extract base domain (eTLD+1) to group subdomains together
-    // This groups vcsa.markalston.net, opsman.lab.markalston.net → markalston.net
+    // This groups app.acme.com, api.dev.acme.com → acme.com
     return extractBaseDomain(domain);
   } catch (e) {
     return 'unknown';
