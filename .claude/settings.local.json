@@ -3,7 +3,11 @@
     "allow": [
       "Bash(gh issue list:*)",
       "Bash(npm test:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Skill(code-reviewer)",
+      "Bash(npm run test:coverage:*)",
+      "Bash(npm run coverage:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
