@@ -356,7 +356,7 @@ if (domain.includes('your-pattern') || domain.includes('another-pattern')) {
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the ISC License.
 
 ---
 

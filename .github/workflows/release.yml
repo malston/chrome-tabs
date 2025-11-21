@@ -120,7 +120,7 @@ jobs:
 
           ## 📄 License
 
-          MIT License - See [LICENSE](https://github.com/${{ github.repository }}/blob/main/LICENSE) for details.
+          ISC License - See [LICENSE](https://github.com/${{ github.repository }}/blob/main/LICENSE) for details.
 
           ---
 

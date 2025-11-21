@@ -324,4 +324,4 @@ All contributions are appreciated, whether it's code, documentation, bug reports
 
 ## License
 
-MIT License - feel free to modify and use as needed.
+ISC License - See [LICENSE](LICENSE) for details.
