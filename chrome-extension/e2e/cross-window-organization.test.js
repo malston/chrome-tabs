@@ -72,15 +72,15 @@ describe('Cross-Window Tab Organization', () => {
     console.log('=== Cross-Window: Consolidate Tabs ===');
 
     // Open tabs in window 1
-    await window1Page.goto('https://github.com/facebook/react', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window1Page.goto('https://github.com/facebook/react', { waitUntil: 'load', timeout: 60000 });
     const window1Tab2 = await browser.newPage();
-    await window1Tab2.goto('https://github.com/vuejs/vue', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window1Tab2.goto('https://github.com/vuejs/vue', { waitUntil: 'load', timeout: 60000 });
 
     // Create window 2 with new tabs
     window2Page = await browser.newPage();
-    await window2Page.goto('https://github.com/angular/angular', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window2Page.goto('https://github.com/angular/angular', { waitUntil: 'load', timeout: 60000 });
     const window2Tab2 = await browser.newPage();
-    await window2Tab2.goto('https://example.com?page=1', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window2Tab2.goto('https://example.com?page=1', { waitUntil: 'load', timeout: 60000 });
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -117,17 +117,17 @@ describe('Cross-Window Tab Organization', () => {
     }
 
     // Open tabs in window 1
-    await window1Page.goto('https://github.com/facebook/react', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window1Page.goto('https://github.com/facebook/react', { waitUntil: 'load', timeout: 60000 });
     const window1Tab2 = await browser.newPage();
-    await window1Tab2.goto('https://example.com?page=1', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window1Tab2.goto('https://example.com?page=1', { waitUntil: 'load', timeout: 60000 });
 
     // Create tabs in window 2 (with duplicates)
     const window2Tab1 = await browser.newPage();
-    await window2Tab1.goto('https://github.com/facebook/react', { waitUntil: 'networkidle2', timeout: 30000 }); // Duplicate
+    await window2Tab1.goto('https://github.com/facebook/react', { waitUntil: 'load', timeout: 60000 }); // Duplicate
     const window2Tab2 = await browser.newPage();
-    await window2Tab2.goto('https://github.com/vuejs/vue', { waitUntil: 'networkidle2', timeout: 30000 }); // Unique
+    await window2Tab2.goto('https://github.com/vuejs/vue', { waitUntil: 'load', timeout: 60000 }); // Unique
     const window2Tab3 = await browser.newPage();
-    await window2Tab3.goto('https://example.com?page=1', { waitUntil: 'networkidle2', timeout: 30000 }); // Duplicate
+    await window2Tab3.goto('https://example.com?page=1', { waitUntil: 'load', timeout: 60000 }); // Duplicate
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -179,15 +179,15 @@ describe('Cross-Window Tab Organization', () => {
     }
 
     // Window 1 - Development sites
-    await window1Page.goto('https://github.com/facebook/react', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window1Page.goto('https://github.com/facebook/react', { waitUntil: 'load', timeout: 60000 });
     const window1Tab2 = await browser.newPage();
-    await window1Tab2.goto('https://stackoverflow.com/questions/1', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window1Tab2.goto('https://stackoverflow.com/questions/1', { waitUntil: 'load', timeout: 60000 });
 
     // Window 2 - More development sites
     const window2Tab1 = await browser.newPage();
-    await window2Tab1.goto('https://github.com/vuejs/vue', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window2Tab1.goto('https://github.com/vuejs/vue', { waitUntil: 'load', timeout: 60000 });
     const window2Tab2 = await browser.newPage();
-    await window2Tab2.goto('https://stackoverflow.com/questions/2', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window2Tab2.goto('https://stackoverflow.com/questions/2', { waitUntil: 'load', timeout: 60000 });
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -257,15 +257,15 @@ describe('Cross-Window Tab Organization', () => {
     }
 
     // Window 1 - Regular tabs
-    await window1Page.goto('https://github.com/facebook/react', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window1Page.goto('https://github.com/facebook/react', { waitUntil: 'load', timeout: 60000 });
     const window1Tab2 = await browser.newPage();
-    await window1Tab2.goto('https://github.com/vuejs/vue', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window1Tab2.goto('https://github.com/vuejs/vue', { waitUntil: 'load', timeout: 60000 });
 
     // Window 2 - Mix of regular and special tabs
     const window2Tab1 = await browser.newPage();
     await window2Tab1.goto('about:blank');
     const window2Tab2 = await browser.newPage();
-    await window2Tab2.goto('https://github.com/angular/angular', { waitUntil: 'networkidle2', timeout: 30000 });
+    await window2Tab2.goto('https://github.com/angular/angular', { waitUntil: 'load', timeout: 60000 });
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
