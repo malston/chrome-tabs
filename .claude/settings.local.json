@@ -8,7 +8,8 @@
       "Bash(npm run test:coverage:*)",
       "Bash(npm run coverage:*)",
       "Bash(git add:*)",
-      "Bash(HEADLESS=true npm run test:e2e:*)"
+      "Bash(HEADLESS=true npm run test:e2e:*)",
+      "mcp__serena__list_dir"
     ],
     "deny": [],
     "ask": []
