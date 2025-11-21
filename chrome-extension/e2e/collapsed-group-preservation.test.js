@@ -1,5 +1,5 @@
 /**
- * E2E Test: Scenario 3 - Group State Preservation (Collapsed Groups)
+ * E2E Test: Group State Preservation (Collapsed Groups)
  *
  * Tests that collapsed groups remain collapsed after re-organization:
  * - Creates groups with tabs
@@ -33,7 +33,7 @@ const ADDITIONAL_GITHUB_URLS = [
   'https://github.com/microsoft/vscode'
 ];
 
-describe('Scenario 3: Group State Preservation (Collapsed Groups)', () => {
+describe('Group State Preservation (Collapsed Groups)', () => {
   let browser;
   let page;
   let extensionId;
@@ -193,6 +193,6 @@ describe('Scenario 3: Group State Preservation (Collapsed Groups)', () => {
     // Verify tab count updated
     expect(updatedGroup.title).toBe('github.com (5)'); // 3 initial + 2 additional
 
-    console.log('✅ Scenario 3 test passed! Collapsed state was preserved.');
+    console.log('✅ Collapsed state was preserved.');
   }, 90000);
 });

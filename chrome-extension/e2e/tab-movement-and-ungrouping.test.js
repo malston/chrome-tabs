@@ -1,9 +1,10 @@
 /**
- * E2E Tests: Scenarios 4, 5, and 6
+ * E2E Tests: Tab Movement, Ungrouping, Mixed Operations
  *
- * Scenario 4: Tab Movement Between Groups (Add/Remove)
- * Scenario 5: Single Tabs (Ungrouping)
- * Scenario 6: Mixed Create and Update
+ * Tests:
+ * - Tab Movement Between Groups (Add/Remove)
+ * - Single Tabs (Ungrouping)
+ * - Mixed Create and Update
  *
  * Each test is independent and cleans up state before running.
  */
@@ -11,7 +12,7 @@
 const puppeteer = require('puppeteer');
 const { getPuppeteerConfig } = require('./test-config');
 
-describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => {
+describe('Tab Movement, Ungrouping, Mixed Operations', () => {
   let browser;
   let page;
   let extensionId;
@@ -75,8 +76,8 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
     await popupPage.close();
   }
 
-  test('Scenario 4: should move tabs between groups when domain changes', async () => {
-    console.log('=== Scenario 4: Tab Movement Between Groups ===');
+  test('should move tabs between groups when domain changes', async () => {
+    console.log('=== Tab Movement Between Groups ===');
 
     // Clean up from any previous test
     await cleanupTabs();
@@ -154,11 +155,11 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
     expect(updatedGithub.title).toBe('github.com (2)');
     expect(updatedGoogle.title).toBe('google.com (3)');
 
-    console.log('✅ Scenario 4 passed! Tab moved between groups correctly.');
+    console.log('✅ Tab moved between groups correctly.');
   }, 120000);
 
-  test('Scenario 5: should ungroup when domain drops to 1 tab', async () => {
-    console.log('=== Scenario 5: Single Tabs (Ungrouping) ===');
+  test('should ungroup when domain drops to 1 tab', async () => {
+    console.log('=== Single Tabs (Ungrouping) ===');
 
     // Clean up from any previous test
     await cleanupTabs();
@@ -212,11 +213,11 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
     expect(exampleTabs.length).toBe(1);
     expect(exampleTabs[0].groupId).toBe(-1); // -1 means ungrouped
 
-    console.log('✅ Scenario 5 passed! Single tab was ungrouped correctly.');
+    console.log('✅ Single tab was ungrouped correctly.');
   }, 120000);
 
-  test('Scenario 6: should handle mixed create and update operations', async () => {
-    console.log('=== Scenario 6: Mixed Create and Update ===');
+  test('should handle mixed create and update operations', async () => {
+    console.log('=== Mixed Create and Update ===');
 
     // Clean up from any previous test
     await cleanupTabs();
@@ -288,6 +289,6 @@ describe('Scenarios 4, 5, 6: Tab Movement, Ungrouping, Mixed Operations', () => 
     const githubGroup = groupsAfter.find(g => g.title.includes('github.com'));
     expect(githubGroup.title).toBe('github.com (4)');
 
-    console.log('✅ Scenario 6 passed! Mixed create and update worked correctly.');
+    console.log('✅ Mixed create and update worked correctly.');
   }, 120000);
 });

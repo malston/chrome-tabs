@@ -1,5 +1,5 @@
 /**
- * E2E Test: Scenario 1 - First-Time Organization (Create New Groups)
+ * E2E Test: First-Time Organization (Create New Groups)
  *
  * Tests the initial tab organization flow:
  * - Opens multiple tabs across different domains
@@ -35,7 +35,7 @@ const TEST_URLS = {
   ]
 };
 
-describe('Scenario 1: First-Time Organization (Create New Groups)', () => {
+describe('First-Time Organization (Create New Groups)', () => {
   let browser;
   let page;
   let extensionId;
@@ -186,6 +186,6 @@ describe('Scenario 1: First-Time Organization (Create New Groups)', () => {
     const totalGroupedTabs = Object.values(tabsByGroup).reduce((sum, tabs) => sum + tabs.length, 0);
     expect(totalGroupedTabs).toBe(12); // 5 github + 4 google + 3 example
 
-    console.log('✅ Scenario 1 test passed! New groups were created.');
+    console.log('✅ New groups were created.');
   }, 60000); // 60 second timeout for this test
 });
