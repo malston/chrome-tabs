@@ -67,10 +67,10 @@ describe('Ungrouped Duplicates Detection', () => {
 
     for (let i = 0; i < initialUrls.length; i++) {
       if (i === 0) {
-        await page.goto(initialUrls[i], { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.goto(initialUrls[i], { waitUntil: 'load', timeout: 60000 });
       } else {
         const newPage = await browser.newPage();
-        await newPage.goto(initialUrls[i], { waitUntil: 'networkidle2', timeout: 30000 });
+        await newPage.goto(initialUrls[i], { waitUntil: 'load', timeout: 60000 });
       }
     }
 
@@ -117,7 +117,7 @@ describe('Ungrouped Duplicates Detection', () => {
 
     for (const url of duplicateUrls) {
       const newPage = await browser.newPage();
-      await newPage.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+      await newPage.goto(url, { waitUntil: 'load', timeout: 60000 });
     }
 
     console.log(`Opened ${duplicateUrls.length} new tabs (2 duplicates, 1 unique)`);
@@ -243,11 +243,11 @@ describe('Ungrouped Duplicates Detection', () => {
     ];
 
     const pages = await browser.pages();
-    await pages[0].goto(devUrls[0], { waitUntil: 'networkidle2', timeout: 30000 });
+    await pages[0].goto(devUrls[0], { waitUntil: 'load', timeout: 60000 });
 
     for (let i = 1; i < devUrls.length; i++) {
       const newPage = await browser.newPage();
-      await newPage.goto(devUrls[i], { waitUntil: 'networkidle2', timeout: 30000 });
+      await newPage.goto(devUrls[i], { waitUntil: 'load', timeout: 60000 });
     }
 
     console.log(`Opened ${devUrls.length} Development tabs`);
@@ -285,8 +285,8 @@ describe('Ungrouped Duplicates Detection', () => {
     console.log('Opening ungrouped duplicate (Development category)...');
     const duplicatePage = await browser.newPage();
     await duplicatePage.goto('https://github.com/facebook/react', {
-      waitUntil: 'networkidle2',
-      timeout: 30000
+      waitUntil: 'load',
+      timeout: 60000
     });
 
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -353,11 +353,11 @@ describe('Ungrouped Duplicates Detection', () => {
     ];
 
     const pages = await browser.pages();
-    await pages[0].goto(uniqueUrls[0], { waitUntil: 'networkidle2', timeout: 30000 });
+    await pages[0].goto(uniqueUrls[0], { waitUntil: 'load', timeout: 60000 });
 
     for (let i = 1; i < uniqueUrls.length; i++) {
       const newPage = await browser.newPage();
-      await newPage.goto(uniqueUrls[i], { waitUntil: 'networkidle2', timeout: 30000 });
+      await newPage.goto(uniqueUrls[i], { waitUntil: 'load', timeout: 60000 });
     }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
