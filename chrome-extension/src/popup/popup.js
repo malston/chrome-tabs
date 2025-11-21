@@ -1,4 +1,5 @@
-// Popup script for Tab Organizer extension
+// ABOUTME: Popup UI for Tab Organizer extension.
+// ABOUTME: Handles button interactions and communicates with background service worker.
 
 const organizeBtn = document.getElementById('organizeBtn');
 const organizeCategoryBtn = document.getElementById('organizeCategoryBtn');
