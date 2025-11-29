@@ -374,8 +374,8 @@ describe('organizeTabs', () => {
         { id: 1, url: 'https://github.com/malston', title: 'Repo 1', groupId: -1, windowId: 1 },
         { id: 2, url: 'https://stackoverflow.com/legal/terms-of-service/public', title: 'Terms of Service', groupId: -1, windowId: 1 },
         { id: 3, url: 'https://npmjs.com/package/test', title: 'Package', groupId: -1, windowId: 1 },
-        // Documentation category
-        { id: 4, url: 'https://docs.google.com', title: 'Docs', groupId: -1, windowId: 1 },
+        // Documentation category (note: docs.google.com is Productivity, not Documentation)
+        { id: 4, url: 'https://readthedocs.org/projects/test', title: 'ReadTheDocs', groupId: -1, windowId: 1 },
         { id: 5, url: 'https://developer.mozilla.org', title: 'MDN', groupId: -1, windowId: 1 }
       ];
 

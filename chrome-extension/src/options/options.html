@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Tab Organizer - Settings</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background-color: #f8f9fa;
+      color: #202124;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 0 0 24px 0;
+      color: #202124;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .primary {
+      background-color: #1a73e8;
+      color: white;
+    }
+
+    .primary:hover {
+      background-color: #1557b0;
+    }
+
+    .secondary {
+      background-color: #f1f3f4;
+      color: #202124;
+    }
+
+    .secondary:hover {
+      background-color: #e8eaed;
+    }
+
+    .danger {
+      background-color: #ea4335;
+      color: white;
+    }
+
+    .danger:hover {
+      background-color: #c5221f;
+    }
+
+    .category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .category-card {
+      background: white;
+      border: 1px solid #e8eaed;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .category-card.disabled {
+      opacity: 0.6;
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .category-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .category-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #5f6368;
+      cursor: pointer;
+    }
+
+    .toggle-label input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .category-patterns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .category-patterns code {
+      background-color: #f1f3f4;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #5f6368;
+    }
+
+    .category-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .category-actions button {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      margin: 0 0 20px 0;
+      font-size: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .form-group input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e8eaed;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-group input[type="text"]:focus {
+      outline: none;
+      border-color: #1a73e8;
+    }
+
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e8eaed;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: monospace;
+      resize: vertical;
+      min-height: 150px;
+    }
+
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #1a73e8;
+    }
+
+    .form-group small {
+      display: block;
+      margin-top: 6px;
+      font-size: 12px;
+      color: #5f6368;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    /* Status Messages */
+    .status {
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background-color: #e6f4ea;
+      color: #137333;
+    }
+
+    .status.error {
+      background-color: #fce8e6;
+      color: #c5221f;
+    }
+
+    .footer {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #e8eaed;
+    }
+
+    /* Hidden file input */
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tab Organizer - Category Settings</h1>
+
+  <div id="status" class="status"></div>
+
+  <div class="actions">
+    <button id="addCategoryBtn" class="primary">+ Add Category</button>
+    <button id="importBtn" class="secondary">Import</button>
+    <button id="exportBtn" class="secondary">Export</button>
+  </div>
+
+  <div id="categoryList" class="category-list">
+    <!-- Categories will be rendered here -->
+  </div>
+
+  <div class="footer">
+    <button id="resetBtn" class="secondary">Reset to Defaults</button>
+  </div>
+
+  <!-- Hidden file input for import -->
+  <input type="file" id="importFileInput" accept=".json" class="hidden">
+
+  <!-- Add/Edit Category Modal -->
+  <div id="categoryModal" class="modal-overlay">
+    <div class="modal">
+      <h2 id="modalTitle">Add Category</h2>
+
+      <div class="form-group">
+        <label for="categoryName">Category Name</label>
+        <input type="text" id="categoryName" placeholder="e.g., Work Projects">
+      </div>
+
+      <div class="form-group">
+        <label for="categoryPatterns">Patterns (one per line)</label>
+        <textarea id="categoryPatterns" placeholder="*github*&#10;*.acme.com&#10;localhost*"></textarea>
+        <small>
+          Use * as wildcard. Examples:<br>
+          <code>*github*</code> - contains "github"<br>
+          <code>*.acme.com</code> - subdomains of acme.com<br>
+          <code>localhost*</code> - starts with "localhost"
+        </small>
+      </div>
+
+      <div class="modal-actions">
+        <button id="cancelModalBtn" class="secondary">Cancel</button>
+        <button id="saveModalBtn" class="primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="options.js" type="module"></script>
+</body>
+</html>
