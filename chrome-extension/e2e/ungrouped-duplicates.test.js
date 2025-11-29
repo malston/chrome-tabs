@@ -215,6 +215,13 @@ describe('Ungrouped Duplicates Detection', () => {
   test('should work with category mode', async () => {
     console.log('=== Test: Ungrouped Duplicates with Category Mode ===');
 
+    // Re-establish service worker connection (may have terminated between tests)
+    let swTarget = await browser.waitForTarget(
+      target => target.type() === 'service_worker' && target.url().includes(extensionId),
+      { timeout: 10000 }
+    );
+    serviceWorker = await swTarget.worker();
+
     // Close all tabs and start fresh
     await serviceWorker.evaluate(async () => {
       const tabs = await chrome.tabs.query({});
@@ -235,6 +242,7 @@ describe('Ungrouped Duplicates Detection', () => {
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Step 1: Open tabs that will be categorized as "Development"
+    // Open all tabs as NEW pages to ensure consistent state
     console.log('Opening Development category tabs...');
     const devUrls = [
       'https://github.com/facebook/react',
@@ -242,12 +250,14 @@ describe('Ungrouped Duplicates Detection', () => {
       'https://github.com/vuejs/vue'
     ];
 
+    // Keep the existing tab on about:blank (won't be organized since it's skipped)
     const pages = await browser.pages();
-    await pages[0].goto(devUrls[0], { waitUntil: 'load', timeout: 60000 });
+    await pages[0].goto('about:blank', { waitUntil: 'load' });
 
-    for (let i = 1; i < devUrls.length; i++) {
+    // Open ALL dev URLs as new pages for consistent state
+    for (const url of devUrls) {
       const newPage = await browser.newPage();
-      await newPage.goto(devUrls[i], { waitUntil: 'load', timeout: 60000 });
+      await newPage.goto(url, { waitUntil: 'load', timeout: 60000 });
     }
 
     console.log(`Opened ${devUrls.length} Development tabs`);
@@ -268,7 +278,23 @@ describe('Ungrouped Duplicates Detection', () => {
       { timeout: 10000 }
     );
 
+    await popupPage.close();
+
     await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Re-establish service worker connection after organization
+    let swTarget3 = await browser.waitForTarget(
+      target => target.type() === 'service_worker' && target.url().includes(extensionId),
+      { timeout: 10000 }
+    );
+    serviceWorker = await swTarget3.worker();
+
+    // Debug: Check all tabs and their group status
+    const allTabs = await serviceWorker.evaluate(async () => {
+      const tabs = await chrome.tabs.query({});
+      return tabs.map(t => ({ url: t.url, groupId: t.groupId, title: t.title }));
+    });
+    console.log('All tabs after organization:', allTabs);
 
     // Verify Development group was created
     const groups = await serviceWorker.evaluate(async () => {
@@ -278,8 +304,6 @@ describe('Ungrouped Duplicates Detection', () => {
 
     console.log('Groups after category organization:', groups);
     expect(groups.some(g => g.title.startsWith('Development'))).toBe(true);
-
-    await popupPage.close();
 
     // Step 3: Open ungrouped duplicate
     console.log('Opening ungrouped duplicate (Development category)...');
