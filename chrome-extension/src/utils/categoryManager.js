@@ -101,6 +101,9 @@ const DEFAULT_CATEGORIES = [
     id: 'productivity',
     name: 'Productivity',
     patterns: [
+      '*drive.google*',
+      '*docs.google*',
+      '*sheets.google*',
       '*dropbox*',
       '*onedrive*',
       '*icloud*',

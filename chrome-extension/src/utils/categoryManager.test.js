@@ -196,6 +196,13 @@ describe('categoryManager', () => {
       expect(categorizeUrl('https://stackoverflow.com/questions', DEFAULT_CATEGORIES)).toBe('Development');
       expect(categorizeUrl('http://localhost:3000', DEFAULT_CATEGORIES)).toBe('Development');
     });
+
+    test('Productivity category matches Google productivity tools', () => {
+      // Google productivity tools should be categorized as Productivity, not Documentation
+      expect(categorizeUrl('https://drive.google.com/drive/my-drive', DEFAULT_CATEGORIES)).toBe('Productivity');
+      expect(categorizeUrl('https://docs.google.com/document/d/123', DEFAULT_CATEGORIES)).toBe('Productivity');
+      expect(categorizeUrl('https://sheets.google.com/spreadsheets/d/456', DEFAULT_CATEGORIES)).toBe('Productivity');
+    });
   });
 
   describe('loadCategories', () => {
