@@ -314,3 +314,12 @@ removeGroupsBtn.addEventListener('click', async () => {
     removeGroupsBtn.textContent = 'Remove All Groups';
   }
 });
+
+// Settings link - open options page
+const settingsLink = document.getElementById('settingsLink');
+if (settingsLink) {
+  settingsLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    chrome.runtime.openOptionsPage();
+  });
+}

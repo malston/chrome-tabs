@@ -7,8 +7,20 @@ import { removeAllGroups } from './removeAllGroups.js';
 import { saveTabsToBookmarks } from './saveTabsToBookmarks.js';
 import { restoreFromBookmarks } from './restoreFromBookmarks.js';
 import { getTabOrganizerBookmarkFolders } from '../utils/getTabOrganizerBookmarkFolders.js';
+import {
+  loadCategories,
+  saveCategories,
+  getCategories,
+  resetCategories,
+  DEFAULT_CATEGORIES
+} from '../utils/categoryManager.js';
 
 console.log('Tab Organizer extension loaded');
+
+// Initialize categories on startup
+loadCategories()
+  .then(() => console.log('Categories loaded'))
+  .catch(error => console.error('Failed to load categories:', error));
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -50,6 +62,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'restoreFromBookmarks') {
     restoreFromBookmarks(request.folderId)
       .then(result => sendResponse(result))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'getCategories') {
+    loadCategories()
+      .then(categories => sendResponse(categories))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'saveCategories') {
+    saveCategories(request.categories)
+      .then(() => sendResponse({ success: true }))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'resetCategories') {
+    resetCategories()
+      .then(() => sendResponse({ success: true, categories: DEFAULT_CATEGORIES }))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'reloadCategories') {
+    loadCategories()
+      .then(categories => sendResponse({ success: true, categories }))
       .catch(error => sendResponse({ error: error.message }));
     return true;
   }
