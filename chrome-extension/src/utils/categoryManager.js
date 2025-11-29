@@ -311,6 +311,8 @@ async function loadCategories() {
 async function saveCategories(categories) {
   await chrome.storage.sync.set({ categories });
   cachedCategories = categories;
+  // Invalidate the loading promise so next load fetches fresh data
+  categoriesLoadedPromise = Promise.resolve(categories);
 }
 
 /**
