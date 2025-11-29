@@ -3,7 +3,9 @@
 [![CI](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml/badge.svg)](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml)
 [![Coverage](.github/coverage-badge.svg)](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml)
 
-> Chrome extension for managing tabs: organize by domain, remove duplicates, and save to bookmarks.
+Chrome extension for managing tabs: organize by domain, remove duplicates, and save to bookmarks.
+
+Built for those of us that always have way too many tabs and windows open. Instead of having to manually create multiple Chrome tab groups, Tab Manager automates the groupings. You can then rename, color label, and more via the default Chrome group manager if desired. 
 
 **Quick Links:** [Features](#features) • [Installation](#quick-start) • [Usage](#usage) • [Screenshots](#screenshots) • [Releases](#releases) • [Contributing](#contributing) • [Project Board](https://github.com/users/malston/projects/2)
 
