@@ -47,6 +47,8 @@ Select and restore previously saved tab sessions:
 - **Restore from bookmarks** - Restore tab groups from saved bookmarks
 - **Smart coloring** - Each group gets a unique color
 - **Shows tab counts** - See how many tabs in each group
+- **Custom categories** - Define your own categories in the options page
+- **Dark mode support** - Respects system dark mode preferences
 - **Works everywhere** - Use in any Chrome profile, anytime
 - **No setup required** - No remote debugging, no command line
 
@@ -134,6 +136,20 @@ Example result:
 4. Done! All tabs saved as bookmarks in organized folders
 
 All bookmarks are saved in "Other Bookmarks" under a timestamped folder. Each tab group becomes its own bookmark folder.
+
+### Configure Custom Categories
+
+**Define your own tab categories**:
+
+1. Right-click the Tab Organizer icon → "Options"
+2. Add custom categories with domain patterns
+3. Click "Save"
+4. Use "Organize by Category" to apply your custom groupings
+
+Custom categories let you group tabs exactly how you want. For example:
+- "Work" category for company domains
+- "Research" for academic sites
+- "Entertainment" for streaming services
 
 ### Restore Tabs from Bookmarks
 
