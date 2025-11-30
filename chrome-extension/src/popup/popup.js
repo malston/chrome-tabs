@@ -346,14 +346,17 @@ function getSelectedSourceIds() {
 
 function populateTargetGroupSelect(groups, excludeIds) {
   targetGroupSelect.innerHTML = '';
-  groups
-    .filter(group => !excludeIds.includes(group.id))
-    .forEach(group => {
-      const option = document.createElement('option');
-      option.value = group.id;
-      option.textContent = `${group.baseName} (${group.tabCount})`;
-      targetGroupSelect.appendChild(option);
-    });
+  const filteredGroups = groups.filter(group => !excludeIds.includes(group.id));
+  filteredGroups.forEach((group, index) => {
+    const option = document.createElement('option');
+    option.value = group.id;
+    option.textContent = `${group.baseName} (${group.tabCount})`;
+    // Select first option by default since size > 1 listboxes don't auto-select
+    if (index === 0) {
+      option.selected = true;
+    }
+    targetGroupSelect.appendChild(option);
+  });
 }
 
 combineGroupsBtn.addEventListener('click', async () => {
