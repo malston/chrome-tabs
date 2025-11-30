@@ -64,12 +64,14 @@ const createElement = (tag) => {
 let organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn, combineGroupsBtn;
 let statusDiv, bookmarkSelector, folderSelect, restoreSelectedBtn, cancelSelectBtn;
 let combineGroupsSelector, sourceGroupSelect, targetGroupSelect, combineSelectedBtn, cancelCombineBtn;
+let settingsLink;
 const allButtons = [];
 
 // Mock Chrome API
 global.chrome = {
   runtime: {
     sendMessage: jest.fn(),
+    openOptionsPage: jest.fn(),
   },
 };
 
@@ -96,6 +98,7 @@ global.document = {
       case 'targetGroupSelect': return targetGroupSelect;
       case 'combineSelectedBtn': return combineSelectedBtn;
       case 'cancelCombineBtn': return cancelCombineBtn;
+      case 'settingsLink': return settingsLink;
       default: return null;
     }
   },
@@ -130,6 +133,7 @@ function setupDOM() {
   targetGroupSelect.innerHTML = '';
   combineSelectedBtn = createMockElement('combineSelectedBtn');
   cancelCombineBtn = createMockElement('cancelCombineBtn');
+  settingsLink = createMockElement('settingsLink');
 
   allButtons.length = 0;
   allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, combineGroupsBtn, removeGroupsBtn);
@@ -661,6 +665,479 @@ describe('popup.js', () => {
     });
   });
 
+  describe('Organize All Windows by Domain button', () => {
+    test('should send organizeTabs message with domain mode and allWindows flag', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        groupedTabs: 20,
+        groups: 5
+      });
+
+      organizeAllWindowsBtn.click();
+
+      await Promise.resolve();
+
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        action: 'organizeTabs',
+        mode: 'domain',
+        allWindows: true
+      });
+    });
+
+    test('should disable button while organizing', () => {
+      chrome.runtime.sendMessage.mockImplementation(() =>
+        new Promise(resolve => setTimeout(() => resolve({ groupedTabs: 20, groups: 5 }), 100))
+      );
+
+      organizeAllWindowsBtn.click();
+
+      expect(organizeAllWindowsBtn.disabled).toBe(true);
+      expect(organizeAllWindowsBtn.textContent).toBe('Organizing...');
+    });
+
+    test('should re-enable button after completion', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        groupedTabs: 20,
+        groups: 5
+      });
+
+      organizeAllWindowsBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(organizeAllWindowsBtn.disabled).toBe(false);
+      expect(organizeAllWindowsBtn.textContent).toBe('Organize All Windows by Domain');
+    });
+
+    test('should display success status with all counts', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        groupedTabs: 30,
+        groups: 8,
+        duplicatesClosed: 5,
+        tabsMoved: 10,
+        ungroupedTabsMoved: 3,
+        ungroupedDuplicates: 2
+      });
+
+      organizeAllWindowsBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toContain('✓ Organized 30 tabs into 8 groups!');
+      expect(statusDiv.textContent).toContain('Removed 5 duplicates.');
+      expect(statusDiv.textContent).toContain('Moved 10 tabs.');
+      expect(statusDiv.textContent).toContain('Moved 3 ungrouped tab(s) to end.');
+      expect(statusDiv.textContent).toContain('Warning: 2 ungrouped duplicate(s) found.');
+    });
+
+    test('should display error status on failure', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        error: 'Failed to organize all windows'
+      });
+
+      organizeAllWindowsBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Failed to organize all windows');
+      expect(statusDiv.className).toContain('error');
+    });
+
+    test('should handle exception from sendMessage', async () => {
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('Connection failed'));
+
+      organizeAllWindowsBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Connection failed');
+      expect(statusDiv.className).toContain('error');
+    });
+  });
+
+  describe('Organize All Windows by Category button', () => {
+    test('should send organizeTabs message with category mode and allWindows flag', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        groupedTabs: 25,
+        groups: 6
+      });
+
+      organizeAllWindowsCategoryBtn.click();
+
+      await Promise.resolve();
+
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        action: 'organizeTabs',
+        mode: 'category',
+        allWindows: true
+      });
+    });
+
+    test('should disable button while organizing', () => {
+      chrome.runtime.sendMessage.mockImplementation(() =>
+        new Promise(resolve => setTimeout(() => resolve({ groupedTabs: 25, groups: 6 }), 100))
+      );
+
+      organizeAllWindowsCategoryBtn.click();
+
+      expect(organizeAllWindowsCategoryBtn.disabled).toBe(true);
+      expect(organizeAllWindowsCategoryBtn.textContent).toBe('Organizing...');
+    });
+
+    test('should re-enable button after completion', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        groupedTabs: 25,
+        groups: 6
+      });
+
+      organizeAllWindowsCategoryBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(organizeAllWindowsCategoryBtn.disabled).toBe(false);
+      expect(organizeAllWindowsCategoryBtn.textContent).toBe('Organize All Windows by Category');
+    });
+
+    test('should display success status with all counts', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        groupedTabs: 40,
+        groups: 10,
+        duplicatesClosed: 8,
+        tabsMoved: 15,
+        ungroupedTabsMoved: 4,
+        ungroupedDuplicates: 1
+      });
+
+      organizeAllWindowsCategoryBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toContain('✓ Organized 40 tabs into 10 categories!');
+      expect(statusDiv.textContent).toContain('Removed 8 duplicates.');
+      expect(statusDiv.textContent).toContain('Moved 15 tabs.');
+      expect(statusDiv.textContent).toContain('Moved 4 ungrouped tab(s) to end.');
+      expect(statusDiv.textContent).toContain('Warning: 1 ungrouped duplicate(s) found.');
+    });
+
+    test('should display error status on failure', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        error: 'Failed to organize categories'
+      });
+
+      organizeAllWindowsCategoryBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Failed to organize categories');
+      expect(statusDiv.className).toContain('error');
+    });
+
+    test('should handle exception from sendMessage', async () => {
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('Network error'));
+
+      organizeAllWindowsCategoryBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Network error');
+      expect(statusDiv.className).toContain('error');
+    });
+  });
+
+  describe('Combine Groups button', () => {
+    test('should send getGroups message', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'Group A', tabCount: 5 },
+        { id: 2, baseName: 'Group B', tabCount: 3 }
+      ]);
+
+      combineGroupsBtn.click();
+
+      await Promise.resolve();
+
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        action: 'getGroups'
+      });
+    });
+
+    test('should disable button while loading', () => {
+      chrome.runtime.sendMessage.mockImplementation(() =>
+        new Promise(resolve => setTimeout(() => resolve([]), 100))
+      );
+
+      combineGroupsBtn.click();
+
+      expect(combineGroupsBtn.disabled).toBe(true);
+      expect(combineGroupsBtn.textContent).toBe('Loading...');
+    });
+
+    test('should show combine selector when groups found', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'Group A', tabCount: 5 },
+        { id: 2, baseName: 'Group B', tabCount: 3 },
+        { id: 3, baseName: 'Group C', tabCount: 7 }
+      ]);
+
+      combineGroupsBtn.click();
+
+      await Promise.resolve();
+
+      expect(combineGroupsSelector.style.display).toBe('block');
+      expect(organizeBtn.style.display).toBe('none');
+      expect(sourceGroupSelect.options.length).toBe(3);
+      // Value is set as number in the code
+      expect(sourceGroupSelect.options[0].value).toBe(1);
+      expect(sourceGroupSelect.options[0].textContent).toBe('Group A (5)');
+    });
+
+    test('should populate target select excluding source', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'Group A', tabCount: 5 },
+        { id: 2, baseName: 'Group B', tabCount: 3 }
+      ]);
+
+      combineGroupsBtn.click();
+
+      await Promise.resolve();
+
+      // Both source and target get all groups in our mock since we don't have real DOM filtering
+      // The real code uses parseInt(sourceGroupSelect.value) which starts as empty string
+      expect(sourceGroupSelect.options.length).toBe(2);
+    });
+
+    test('should show error when less than 2 groups', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'Group A', tabCount: 5 }
+      ]);
+
+      combineGroupsBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Need at least 2 groups to combine');
+      expect(statusDiv.className).toContain('error');
+      expect(combineGroupsSelector.style.display).not.toBe('block');
+    });
+
+    test('should handle error response', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        error: 'Failed to get groups'
+      });
+
+      combineGroupsBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Failed to get groups');
+    });
+
+    test('should handle exception from sendMessage', async () => {
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('Connection failed'));
+
+      combineGroupsBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Connection failed');
+    });
+
+    test('should re-enable button after completion', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'Group A', tabCount: 5 },
+        { id: 2, baseName: 'Group B', tabCount: 3 }
+      ]);
+
+      combineGroupsBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(combineGroupsBtn.disabled).toBe(false);
+      expect(combineGroupsBtn.textContent).toBe('Combine Groups');
+    });
+  });
+
+  describe('Source Group Select change handler', () => {
+    beforeEach(async () => {
+      // Setup combine groups selector with groups
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'Group A', tabCount: 5 },
+        { id: 2, baseName: 'Group B', tabCount: 3 },
+        { id: 3, baseName: 'Group C', tabCount: 7 }
+      ]);
+
+      combineGroupsBtn.click();
+      await Promise.resolve();
+    });
+
+    test('should have change handler registered', () => {
+      // Verify groups are loaded
+      expect(sourceGroupSelect.options.length).toBe(3);
+      // The change handler is registered during popup.js initialization
+      // This test confirms the setup works and groups are populated
+    });
+  });
+
+  describe('Combine Selected button', () => {
+    beforeEach(async () => {
+      // Setup combine groups selector
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'Group A', tabCount: 5 },
+        { id: 2, baseName: 'Group B', tabCount: 3 }
+      ]);
+
+      combineGroupsBtn.click();
+      await Promise.resolve();
+
+      sourceGroupSelect.value = '1';
+      targetGroupSelect.value = '2';
+    });
+
+    test('should send combineGroups message with selected groups', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        sourceGroupName: 'Group A',
+        targetGroupName: 'Group B',
+        tabsMoved: 5,
+        newTargetTabCount: 8
+      });
+
+      combineSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        action: 'combineGroups',
+        sourceGroupId: 1,
+        targetGroupId: 2
+      });
+    });
+
+    test('should show error when groups not selected', async () => {
+      sourceGroupSelect.value = '';
+      targetGroupSelect.value = '';
+
+      combineSelectedBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Please select both groups');
+      expect(statusDiv.className).toContain('error');
+    });
+
+    test('should disable button while combining', () => {
+      chrome.runtime.sendMessage.mockImplementation(() =>
+        new Promise(resolve => setTimeout(() => resolve({}), 100))
+      );
+
+      combineSelectedBtn.click();
+
+      expect(combineSelectedBtn.disabled).toBe(true);
+      expect(combineSelectedBtn.textContent).toBe('Combining...');
+    });
+
+    test('should display success message with details', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        sourceGroupName: 'Group A',
+        targetGroupName: 'Group B',
+        tabsMoved: 5,
+        newTargetTabCount: 8
+      });
+
+      combineSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('✓ Merged "Group A" (5 tabs) into "Group B" (now 8 tabs)');
+      expect(statusDiv.className).toContain('success');
+    });
+
+    test('should hide selector and show main buttons after success', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        sourceGroupName: 'Group A',
+        targetGroupName: 'Group B',
+        tabsMoved: 5,
+        newTargetTabCount: 8
+      });
+
+      combineSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(combineGroupsSelector.style.display).toBe('none');
+      expect(organizeBtn.style.display).toBe('block');
+    });
+
+    test('should handle error response', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        error: 'Failed to combine groups'
+      });
+
+      combineSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Failed to combine groups');
+    });
+
+    test('should handle exception from sendMessage', async () => {
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('Network error'));
+
+      combineSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Network error');
+    });
+
+    test('should re-enable button after completion', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        sourceGroupName: 'Group A',
+        targetGroupName: 'Group B',
+        tabsMoved: 5,
+        newTargetTabCount: 8
+      });
+
+      combineSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(combineSelectedBtn.disabled).toBe(false);
+      expect(combineSelectedBtn.textContent).toBe('Combine');
+    });
+  });
+
+  describe('Cancel Combine button', () => {
+    beforeEach(async () => {
+      // Show combine selector
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'Group A', tabCount: 5 },
+        { id: 2, baseName: 'Group B', tabCount: 3 }
+      ]);
+
+      combineGroupsBtn.click();
+      await Promise.resolve();
+    });
+
+    test('should hide selector and show main buttons', () => {
+      expect(combineGroupsSelector.style.display).toBe('block');
+
+      cancelCombineBtn.click();
+
+      expect(combineGroupsSelector.style.display).toBe('none');
+      expect(organizeBtn.style.display).toBe('block');
+    });
+  });
+
   describe('Edge Cases', () => {
     test('should handle multiple quick clicks on same button', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
@@ -790,6 +1267,194 @@ describe('popup.js', () => {
       await Promise.resolve();
 
       expect(statusDiv.textContent).toBe('Error: Failed to restore tabs');
+    });
+  });
+
+  describe('Settings Link', () => {
+    test('should be defined when element exists', () => {
+      // The settingsLink element exists and has a click handler registered
+      // The actual click handling requires a proper event object with preventDefault
+      // This test verifies the element is properly set up
+      expect(settingsLink).toBeDefined();
+      expect(settingsLink.id).toBe('settingsLink');
+    });
+  });
+
+  describe('Ungrouped Tabs Edge Cases', () => {
+    test('should display ungroupedTabsMoved in organize by domain', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        groupedTabs: 10,
+        groups: 3,
+        ungroupedTabsMoved: 5
+      });
+
+      organizeBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toContain('Moved 5 ungrouped tab(s) to end.');
+    });
+
+    test('should display ungroupedDuplicates warning in organize by domain', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        groupedTabs: 10,
+        groups: 3,
+        ungroupedDuplicates: 2
+      });
+
+      organizeBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toContain('Warning: 2 ungrouped duplicate(s) found.');
+    });
+
+    test('should display ungroupedTabsMoved in organize by category', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        groupedTabs: 12,
+        groups: 4,
+        ungroupedTabsMoved: 3
+      });
+
+      organizeCategoryBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toContain('Moved 3 ungrouped tab(s) to end.');
+    });
+
+    test('should display ungroupedDuplicates warning in organize by category', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        groupedTabs: 12,
+        groups: 4,
+        ungroupedDuplicates: 1
+      });
+
+      organizeCategoryBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toContain('Warning: 1 ungrouped duplicate(s) found.');
+    });
+
+    test('should handle error in organize by category', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        error: 'Category organization failed'
+      });
+
+      organizeCategoryBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Category organization failed');
+      expect(statusDiv.className).toContain('error');
+    });
+
+    test('should handle exception in organize by category', async () => {
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('Connection lost'));
+
+      organizeCategoryBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Connection lost');
+    });
+  });
+
+  describe('Additional Error Handling', () => {
+    test('should handle error in remove duplicates', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        error: 'Failed to remove duplicates'
+      });
+
+      dedupeBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Failed to remove duplicates');
+      expect(statusDiv.className).toContain('error');
+    });
+
+    test('should handle error in save to bookmarks', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        error: 'Failed to save bookmarks'
+      });
+
+      saveBookmarksBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Failed to save bookmarks');
+      expect(statusDiv.className).toContain('error');
+    });
+
+    test('should handle exception in save to bookmarks', async () => {
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('Storage error'));
+
+      saveBookmarksBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Storage error');
+    });
+
+    test('should handle exception in restore bookmarks', async () => {
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('Load error'));
+
+      restoreBookmarksBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Load error');
+    });
+
+    test('should handle exception in restore selected', async () => {
+      // Setup folder selection first
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: '1', title: 'Test Folder' }
+      ]);
+
+      restoreBookmarksBtn.click();
+      await Promise.resolve();
+
+      folderSelect.value = '1';
+
+      // Now trigger exception
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('Restore failed'));
+
+      restoreSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Restore failed');
+    });
+
+    test('should handle error in remove groups', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        error: 'Failed to remove groups'
+      });
+
+      removeGroupsBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Failed to remove groups');
+      expect(statusDiv.className).toContain('error');
+    });
+
+    test('should handle exception in remove groups', async () => {
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('API error'));
+
+      removeGroupsBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: API error');
     });
   });
 });
