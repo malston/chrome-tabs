@@ -193,6 +193,17 @@ Edit `removeDuplicateTabs()` function in `chrome-extension/src/background/remove
 - Reload extension (refresh icon)
 - Check service worker console for errors
 
+## Release Conventions
+
+When creating a GitHub release:
+
+1. **Always include CHANGELOG.md link** - Add to the Documentation section of release notes
+2. **Always include "New in vX.X.X" section** - Highlight new features, fixes, and improvements specific to this release
+3. **Update version in both files** - `chrome-extension/package.json` and `chrome-extension/manifest.json`
+4. **Update CHANGELOG.md** - Add new version entry with Added, Changed, Fixed sections as applicable
+
+See v1.2.0 and v1.3.0 releases for reference formatting.
+
 ## Project Evolution Notes
 
 This project evolved from a CDP-based approach to a Chrome Extension:
