@@ -160,6 +160,17 @@
       color: var(--text-primary);
     }
 
+    .bookmark-selector select option:checked {
+      background-color: var(--primary-color);
+      color: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .bookmark-selector select option:checked {
+        color: #202124;
+      }
+    }
+
     .selector-buttons {
       display: flex;
       gap: 8px;
