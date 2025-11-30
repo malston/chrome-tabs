@@ -61,8 +61,9 @@ const createElement = (tag) => {
 };
 
 // Setup DOM environment
-let organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn;
+let organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn, combineGroupsBtn;
 let statusDiv, bookmarkSelector, folderSelect, restoreSelectedBtn, cancelSelectBtn;
+let combineGroupsSelector, sourceGroupSelect, targetGroupSelect, combineSelectedBtn, cancelCombineBtn;
 const allButtons = [];
 
 // Mock Chrome API
@@ -84,11 +85,17 @@ global.document = {
       case 'saveBookmarksBtn': return saveBookmarksBtn;
       case 'restoreBookmarksBtn': return restoreBookmarksBtn;
       case 'removeGroupsBtn': return removeGroupsBtn;
+      case 'combineGroupsBtn': return combineGroupsBtn;
       case 'status': return statusDiv;
       case 'bookmarkSelector': return bookmarkSelector;
       case 'folderSelect': return folderSelect;
       case 'restoreSelectedBtn': return restoreSelectedBtn;
       case 'cancelSelectBtn': return cancelSelectBtn;
+      case 'combineGroupsSelector': return combineGroupsSelector;
+      case 'sourceGroupSelect': return sourceGroupSelect;
+      case 'targetGroupSelect': return targetGroupSelect;
+      case 'combineSelectedBtn': return combineSelectedBtn;
+      case 'cancelCombineBtn': return cancelCombineBtn;
       default: return null;
     }
   },
@@ -105,6 +112,7 @@ function setupDOM() {
   saveBookmarksBtn = createMockElement('saveBookmarksBtn');
   restoreBookmarksBtn = createMockElement('restoreBookmarksBtn');
   removeGroupsBtn = createMockElement('removeGroupsBtn');
+  combineGroupsBtn = createMockElement('combineGroupsBtn');
   statusDiv = createMockElement('status');
   bookmarkSelector = createMockElement('bookmarkSelector');
   folderSelect = createMockElement('folderSelect');
@@ -112,9 +120,19 @@ function setupDOM() {
   folderSelect.innerHTML = '';
   restoreSelectedBtn = createMockElement('restoreSelectedBtn');
   cancelSelectBtn = createMockElement('cancelSelectBtn');
+  combineGroupsSelector = createMockElement('combineGroupsSelector');
+  combineGroupsSelector.dataset = {};
+  sourceGroupSelect = createMockElement('sourceGroupSelect');
+  sourceGroupSelect.options = [];
+  sourceGroupSelect.innerHTML = '';
+  targetGroupSelect = createMockElement('targetGroupSelect');
+  targetGroupSelect.options = [];
+  targetGroupSelect.innerHTML = '';
+  combineSelectedBtn = createMockElement('combineSelectedBtn');
+  cancelCombineBtn = createMockElement('cancelCombineBtn');
 
   allButtons.length = 0;
-  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn);
+  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, combineGroupsBtn, removeGroupsBtn);
   allButtons.forEach = function(callback) {
     for (let i = 0; i < this.length; i++) {
       callback(this[i]);

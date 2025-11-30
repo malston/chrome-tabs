@@ -160,6 +160,17 @@
       color: var(--text-primary);
     }
 
+    .bookmark-selector select option:checked {
+      background-color: var(--primary-color);
+      color: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .bookmark-selector select option:checked {
+        color: #202124;
+      }
+    }
+
     .selector-buttons {
       display: flex;
       gap: 8px;
@@ -202,6 +213,10 @@
     Restore from Bookmarks
   </button>
 
+  <button id="combineGroupsBtn" class="secondary">
+    Combine Groups
+  </button>
+
   <button id="removeGroupsBtn" class="secondary">
     Remove All Groups
   </button>
@@ -214,6 +229,18 @@
     <div class="selector-buttons">
       <button id="restoreSelectedBtn" class="primary">Restore</button>
       <button id="cancelSelectBtn" class="secondary">Cancel</button>
+    </div>
+  </div>
+
+  <div id="combineGroupsSelector" class="bookmark-selector" style="display: none;">
+    <h2>Combine Tab Groups</h2>
+    <label for="sourceGroupSelect" style="font-size: 13px; display: block; margin-bottom: 4px;">Merge this group:</label>
+    <select id="sourceGroupSelect" size="4"></select>
+    <label for="targetGroupSelect" style="font-size: 13px; display: block; margin-bottom: 4px;">Into this group:</label>
+    <select id="targetGroupSelect" size="4"></select>
+    <div class="selector-buttons">
+      <button id="combineSelectedBtn" class="primary">Combine</button>
+      <button id="cancelCombineBtn" class="secondary">Cancel</button>
     </div>
   </div>
 
