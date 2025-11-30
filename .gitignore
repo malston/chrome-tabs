@@ -40,3 +40,4 @@ dist/
 # AI
 .serena/
 .worktrees/
+.claude/settings.local.json
