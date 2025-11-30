@@ -25,7 +25,7 @@
     "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
     "NODE_ENV": "development"
   },
-  "includeCoAuthoredBy": true,
+  "includeCoAuthoredBy": false,
   "cleanupPeriodDays": 30,
   "hooks": {
     "PreToolUse": [
