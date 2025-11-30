@@ -332,10 +332,14 @@ function showMainButtons() {
   document.querySelectorAll(mainButtonsSelector).forEach(btn => btn.style.display = 'block');
 }
 
-function populateTargetGroupSelect(groups, excludeId) {
+function getSelectedSourceIds() {
+  return Array.from(sourceGroupSelect.selectedOptions).map(opt => parseInt(opt.value));
+}
+
+function populateTargetGroupSelect(groups, excludeIds) {
   targetGroupSelect.innerHTML = '';
   groups
-    .filter(group => group.id !== excludeId)
+    .filter(group => !excludeIds.includes(group.id))
     .forEach(group => {
       const option = document.createElement('option');
       option.value = group.id;
@@ -374,8 +378,11 @@ combineGroupsBtn.addEventListener('click', async () => {
         sourceGroupSelect.appendChild(option);
       });
 
-      // Populate target group select (excluding first source)
-      populateTargetGroupSelect(response, parseInt(sourceGroupSelect.value));
+      // Select first item by default and populate target (excluding selected sources)
+      if (sourceGroupSelect.options.length > 0) {
+        sourceGroupSelect.options[0].selected = true;
+      }
+      populateTargetGroupSelect(response, getSelectedSourceIds());
     }
   } catch (error) {
     showStatus(`Error: ${error.message}`, 'error');
@@ -388,15 +395,15 @@ combineGroupsBtn.addEventListener('click', async () => {
 // Update target dropdown when source selection changes
 sourceGroupSelect.addEventListener('change', () => {
   const groups = JSON.parse(combineGroupsSelector.dataset.groups || '[]');
-  populateTargetGroupSelect(groups, parseInt(sourceGroupSelect.value));
+  populateTargetGroupSelect(groups, getSelectedSourceIds());
 });
 
 combineSelectedBtn.addEventListener('click', async () => {
-  const sourceGroupId = parseInt(sourceGroupSelect.value);
+  const sourceGroupIds = getSelectedSourceIds();
   const targetGroupId = parseInt(targetGroupSelect.value);
 
-  if (!sourceGroupId || !targetGroupId) {
-    showStatus('Please select both groups', 'error');
+  if (sourceGroupIds.length === 0 || !targetGroupId) {
+    showStatus('Please select source group(s) and a target group', 'error');
     return;
   }
 
@@ -406,7 +413,7 @@ combineSelectedBtn.addEventListener('click', async () => {
   try {
     const response = await chrome.runtime.sendMessage({
       action: 'combineGroups',
-      sourceGroupId,
+      sourceGroupIds,
       targetGroupId
     });
 
@@ -414,7 +421,7 @@ combineSelectedBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       showStatus(
-        `✓ Merged "${response.sourceGroupName}" (${response.tabsMoved} tabs) into "${response.targetGroupName}" (now ${response.newTargetTabCount} tabs)`,
+        `✓ Merged ${response.sourceGroupNames.length} group(s) (${response.tabsMoved} tabs) into "${response.targetGroupName}" (now ${response.newTargetTabCount} tabs)`,
         'success'
       );
 

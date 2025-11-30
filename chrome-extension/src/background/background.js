@@ -104,7 +104,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.action === 'combineGroups') {
-    combineGroups(request.sourceGroupId, request.targetGroupId)
+    combineGroups(request.sourceGroupIds, request.targetGroupId)
       .then(result => sendResponse(result))
       .catch(error => sendResponse({ error: error.message }));
     return true;
