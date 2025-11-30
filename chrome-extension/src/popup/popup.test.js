@@ -128,6 +128,7 @@ function setupDOM() {
   sourceGroupSelect = createMockElement('sourceGroupSelect');
   sourceGroupSelect.options = [];
   sourceGroupSelect.innerHTML = '';
+  sourceGroupSelect.selectedOptions = [];
   targetGroupSelect = createMockElement('targetGroupSelect');
   targetGroupSelect.options = [];
   targetGroupSelect.innerHTML = '';
@@ -993,13 +994,14 @@ describe('popup.js', () => {
       combineGroupsBtn.click();
       await Promise.resolve();
 
-      sourceGroupSelect.value = '1';
+      // Mock multi-select behavior
+      sourceGroupSelect.selectedOptions = [{ value: '1' }];
       targetGroupSelect.value = '2';
     });
 
     test('should send combineGroups message with selected groups', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
-        sourceGroupName: 'Group A',
+        sourceGroupNames: ['Group A'],
         targetGroupName: 'Group B',
         tabsMoved: 5,
         newTargetTabCount: 8
@@ -1012,20 +1014,20 @@ describe('popup.js', () => {
 
       expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
         action: 'combineGroups',
-        sourceGroupId: 1,
+        sourceGroupIds: [1],
         targetGroupId: 2
       });
     });
 
     test('should show error when groups not selected', async () => {
-      sourceGroupSelect.value = '';
+      sourceGroupSelect.selectedOptions = [];
       targetGroupSelect.value = '';
 
       combineSelectedBtn.click();
 
       await Promise.resolve();
 
-      expect(statusDiv.textContent).toBe('Please select both groups');
+      expect(statusDiv.textContent).toBe('Please select source group(s) and a target group');
       expect(statusDiv.className).toContain('error');
     });
 
@@ -1042,7 +1044,7 @@ describe('popup.js', () => {
 
     test('should display success message with details', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
-        sourceGroupName: 'Group A',
+        sourceGroupNames: ['Group A'],
         targetGroupName: 'Group B',
         tabsMoved: 5,
         newTargetTabCount: 8
@@ -1053,13 +1055,13 @@ describe('popup.js', () => {
       await Promise.resolve();
       await Promise.resolve();
 
-      expect(statusDiv.textContent).toBe('✓ Merged "Group A" (5 tabs) into "Group B" (now 8 tabs)');
+      expect(statusDiv.textContent).toBe('✓ Merged 1 group(s) (5 tabs) into "Group B" (now 8 tabs)');
       expect(statusDiv.className).toContain('success');
     });
 
     test('should hide selector and show main buttons after success', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
-        sourceGroupName: 'Group A',
+        sourceGroupNames: ['Group A'],
         targetGroupName: 'Group B',
         tabsMoved: 5,
         newTargetTabCount: 8
@@ -1100,7 +1102,7 @@ describe('popup.js', () => {
 
     test('should re-enable button after completion', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
-        sourceGroupName: 'Group A',
+        sourceGroupNames: ['Group A'],
         targetGroupName: 'Group B',
         tabsMoved: 5,
         newTargetTabCount: 8
