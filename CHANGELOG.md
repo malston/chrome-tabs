@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-11-29
+
+### Added
+
+- Protect Group feature (#40) - Mark tab groups as protected to prevent accidental closure during cleanup; protected groups are automatically saved to bookmarks for easy recovery
+- Multi-select for group combination (#39) - Select multiple groups to combine, contributed by @AmberAlston
+
+### Changed
+
+- CI now enforces 80% code coverage threshold
+- Test coverage improved to 91%
+
+### Fixed
+
+- Auto-select first target option in Combine Groups for better UX
+- Handle missing "Other Bookmarks" folder in CI environment
+
 ## [1.2.0] - 2025-11-29
 
 ### Added

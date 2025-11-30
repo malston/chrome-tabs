@@ -44,6 +44,7 @@ Select and restore previously saved tab sessions:
 - **One-click organization** - Automatically group tabs by domain or category
 - **One-click deduplication** - Remove duplicate tabs instantly
 - **Combine groups** - Merge two tab groups into one
+- **Protect groups** - Mark groups as protected to prevent accidental closure; protected groups are auto-saved to bookmarks
 - **Save to bookmarks** - Save all tabs into bookmark folders by group
 - **Restore from bookmarks** - Restore tab groups from saved bookmarks
 - **Smart coloring** - Each group gets a unique color
@@ -136,6 +137,17 @@ Example result:
 3. Select the first group (highlighted when selected)
 4. Select the second group to merge into
 5. Done! Both groups are merged into one
+
+### Protect Tab Groups
+
+**Mark groups as protected to prevent accidental closure**:
+
+1. Click the Tab Organizer icon
+2. Click "Protect Group"
+3. Select the group you want to protect
+4. Done! The group is now protected and saved to bookmarks
+
+Protected groups are automatically saved to bookmarks, making them easy to recover if accidentally closed. Use this feature for important tab collections you want to preserve.
 
 ### Save Tabs to Bookmarks
 
