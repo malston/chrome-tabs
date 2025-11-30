@@ -172,22 +172,49 @@ describe('Protect Group Feature', () => {
     // Step 5: Select the GitHub group and protect it
     console.log('Selecting GitHub group to protect...');
     await popupPage.select('#protectGroupSelect', String(githubGroup.id));
+
+    // Small delay to ensure selection is registered
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    console.log('Clicking Protect button...');
     await popupPage.click('#protectSelectedBtn');
 
-    // Wait for protection to complete
-    await popupPage.waitForFunction(
-      () => {
+    // Wait for protection to complete (longer timeout for CI)
+    try {
+      await popupPage.waitForFunction(
+        () => {
+          const status = document.getElementById('status');
+          return status && status.style.display !== 'none' && status.textContent.length > 0;
+        },
+        { timeout: 20000 }
+      );
+    } catch (e) {
+      // Log current state for debugging
+      const debugInfo = await popupPage.evaluate(() => {
         const status = document.getElementById('status');
-        return status && status.textContent.includes('Protected');
-      },
-      { timeout: 10000 }
-    );
+        const btn = document.getElementById('protectSelectedBtn');
+        return {
+          statusText: status ? status.textContent : 'no status element',
+          statusDisplay: status ? status.style.display : 'no status',
+          btnDisabled: btn ? btn.disabled : 'no btn',
+          btnText: btn ? btn.textContent : 'no btn'
+        };
+      });
+      console.log('Debug info on timeout:', debugInfo);
+      throw e;
+    }
 
     const statusMessage = await popupPage.evaluate(() => {
       return document.getElementById('status').textContent;
     });
 
     console.log('Status message:', statusMessage);
+
+    // Check for error
+    if (statusMessage.includes('Error')) {
+      console.log('ERROR: Protection failed with:', statusMessage);
+    }
+
     expect(statusMessage).toContain('Protected');
     expect(statusMessage).toContain('github.com');
     expect(statusMessage).toContain('3 tabs');
