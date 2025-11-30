@@ -82,8 +82,8 @@ describe('getOtherBookmarksId', () => {
     });
   });
 
-  describe('Edge Cases', () => {
-    test('should throw error if "Other Bookmarks" not found', async () => {
+  describe('Fallback Behavior', () => {
+    test('should fall back to "Bookmarks Bar" if "Other Bookmarks" not found', async () => {
       const mockTree = [{
         id: '0',
         title: '',
@@ -95,10 +95,45 @@ describe('getOtherBookmarksId', () => {
 
       chrome.bookmarks.getTree.mockResolvedValue(mockTree);
 
-      await expect(getOtherBookmarksId()).rejects.toThrow('Other Bookmarks folder not found');
+      const id = await getOtherBookmarksId();
+      expect(id).toBe('1');
     });
 
-    test('should handle empty bookmark tree', async () => {
+    test('should fall back to "Bookmarks bar" (lowercase) if "Other Bookmarks" not found', async () => {
+      const mockTree = [{
+        id: '0',
+        title: '',
+        children: [
+          { id: '1', title: 'Bookmarks bar' },
+          { id: '3', title: 'Mobile Bookmarks' }
+        ]
+      }];
+
+      chrome.bookmarks.getTree.mockResolvedValue(mockTree);
+
+      const id = await getOtherBookmarksId();
+      expect(id).toBe('1');
+    });
+
+    test('should fall back to first available folder if neither found', async () => {
+      const mockTree = [{
+        id: '0',
+        title: '',
+        children: [
+          { id: '5', title: 'Custom Folder' },
+          { id: '3', title: 'Mobile Bookmarks' }
+        ]
+      }];
+
+      chrome.bookmarks.getTree.mockResolvedValue(mockTree);
+
+      const id = await getOtherBookmarksId();
+      expect(id).toBe('5');
+    });
+  });
+
+  describe('Edge Cases', () => {
+    test('should throw error for empty bookmark tree', async () => {
       const mockTree = [{
         id: '0',
         title: '',
@@ -107,10 +142,10 @@ describe('getOtherBookmarksId', () => {
 
       chrome.bookmarks.getTree.mockResolvedValue(mockTree);
 
-      await expect(getOtherBookmarksId()).rejects.toThrow('Other Bookmarks folder not found');
+      await expect(getOtherBookmarksId()).rejects.toThrow('No bookmark folders available');
     });
 
-    test('should handle missing children array', async () => {
+    test('should throw error for missing children array', async () => {
       const mockTree = [{
         id: '0',
         title: ''
@@ -118,7 +153,7 @@ describe('getOtherBookmarksId', () => {
 
       chrome.bookmarks.getTree.mockResolvedValue(mockTree);
 
-      await expect(getOtherBookmarksId()).rejects.toThrow('Other Bookmarks folder not found');
+      await expect(getOtherBookmarksId()).rejects.toThrow('No bookmark folders available');
     });
   });
 

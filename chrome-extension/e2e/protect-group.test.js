@@ -69,11 +69,17 @@ describe('Protect Group Feature', () => {
     try {
       await sw.evaluate(async () => {
         const tree = await chrome.bookmarks.getTree();
-        const otherBookmarks = tree[0].children.find(c => c.title === 'Other Bookmarks');
-        if (otherBookmarks && otherBookmarks.children) {
-          for (const child of otherBookmarks.children) {
-            if (child.title.startsWith('🔒')) {
-              await chrome.bookmarks.removeTree(child.id);
+        // Check both "Other Bookmarks" and "Bookmarks Bar" for CI compatibility
+        const possibleParents = tree[0].children.filter(c =>
+          c.title === 'Other Bookmarks' || c.title === 'Bookmarks Bar' || c.title === 'Bookmarks bar'
+        );
+
+        for (const parent of possibleParents) {
+          if (parent.children) {
+            for (const child of parent.children) {
+              if (child.title.startsWith('🔒')) {
+                await chrome.bookmarks.removeTree(child.id);
+              }
             }
           }
         }
@@ -176,17 +182,24 @@ describe('Protect Group Feature', () => {
     // Small delay to ensure selection is registered
     await new Promise(resolve => setTimeout(resolve, 200));
 
+    // Get current status before protect (to detect change)
+    const statusBefore = await popupPage.evaluate(() => {
+      return document.getElementById('status').textContent;
+    });
+    console.log('Status before protect:', statusBefore);
+
     console.log('Clicking Protect button...');
     await popupPage.click('#protectSelectedBtn');
 
-    // Wait for protection to complete (longer timeout for CI)
+    // Wait for status to change from before (longer timeout for CI)
     try {
       await popupPage.waitForFunction(
-        () => {
+        (prevStatus) => {
           const status = document.getElementById('status');
-          return status && status.style.display !== 'none' && status.textContent.length > 0;
+          return status && status.textContent !== prevStatus && status.textContent.length > 0;
         },
-        { timeout: 20000 }
+        { timeout: 20000 },
+        statusBefore
       );
     } catch (e) {
       // Log current state for debugging
@@ -223,11 +236,21 @@ describe('Protect Group Feature', () => {
     console.log('Verifying bookmark folder...');
     const bookmarkFolders = await serviceWorker.evaluate(async () => {
       const tree = await chrome.bookmarks.getTree();
-      const otherBookmarks = tree[0].children.find(c => c.title === 'Other Bookmarks');
-      if (!otherBookmarks || !otherBookmarks.children) return [];
-      return otherBookmarks.children
-        .filter(c => c.title.startsWith('🔒'))
-        .map(c => ({ id: c.id, title: c.title }));
+      // Check both "Other Bookmarks" and "Bookmarks Bar" for CI compatibility
+      const possibleParents = tree[0].children.filter(c =>
+        c.title === 'Other Bookmarks' || c.title === 'Bookmarks Bar' || c.title === 'Bookmarks bar'
+      );
+
+      const protectedFolders = [];
+      for (const parent of possibleParents) {
+        if (parent.children) {
+          const found = parent.children
+            .filter(c => c.title.startsWith('🔒'))
+            .map(c => ({ id: c.id, title: c.title }));
+          protectedFolders.push(...found);
+        }
+      }
+      return protectedFolders;
     });
 
     console.log('Protected bookmark folders:', bookmarkFolders);
