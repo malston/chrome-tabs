@@ -42,3 +42,4 @@ dist/
 .worktrees/
 .claude/settings.local.json
 .claude/commands/
+.mcp.json
