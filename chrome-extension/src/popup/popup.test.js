@@ -64,6 +64,8 @@ const createElement = (tag) => {
 let organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn, combineGroupsBtn;
 let statusDiv, bookmarkSelector, folderSelect, restoreSelectedBtn, cancelSelectBtn;
 let combineGroupsSelector, sourceGroupSelect, targetGroupSelect, combineSelectedBtn, cancelCombineBtn;
+let protectGroupBtn, protectGroupSelector, protectGroupSelect, protectSelectedBtn, cancelProtectBtn;
+let protectedGroupsList, protectedGroupsContainer, closeProtectedListBtn;
 let settingsLink;
 const allButtons = [];
 
@@ -98,6 +100,14 @@ global.document = {
       case 'targetGroupSelect': return targetGroupSelect;
       case 'combineSelectedBtn': return combineSelectedBtn;
       case 'cancelCombineBtn': return cancelCombineBtn;
+      case 'protectGroupBtn': return protectGroupBtn;
+      case 'protectGroupSelector': return protectGroupSelector;
+      case 'protectGroupSelect': return protectGroupSelect;
+      case 'protectSelectedBtn': return protectSelectedBtn;
+      case 'cancelProtectBtn': return cancelProtectBtn;
+      case 'protectedGroupsList': return protectedGroupsList;
+      case 'protectedGroupsContainer': return protectedGroupsContainer;
+      case 'closeProtectedListBtn': return closeProtectedListBtn;
       case 'settingsLink': return settingsLink;
       default: return null;
     }
@@ -134,10 +144,20 @@ function setupDOM() {
   targetGroupSelect.innerHTML = '';
   combineSelectedBtn = createMockElement('combineSelectedBtn');
   cancelCombineBtn = createMockElement('cancelCombineBtn');
+  protectGroupBtn = createMockElement('protectGroupBtn');
+  protectGroupSelector = createMockElement('protectGroupSelector');
+  protectGroupSelect = createMockElement('protectGroupSelect');
+  protectGroupSelect.options = [];
+  protectGroupSelect.innerHTML = '';
+  protectSelectedBtn = createMockElement('protectSelectedBtn');
+  cancelProtectBtn = createMockElement('cancelProtectBtn');
+  protectedGroupsList = createMockElement('protectedGroupsList');
+  protectedGroupsContainer = createMockElement('protectedGroupsContainer');
+  closeProtectedListBtn = createMockElement('closeProtectedListBtn');
   settingsLink = createMockElement('settingsLink');
 
   allButtons.length = 0;
-  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, combineGroupsBtn, removeGroupsBtn);
+  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, combineGroupsBtn, protectGroupBtn, removeGroupsBtn);
   allButtons.forEach = function(callback) {
     for (let i = 0; i < this.length; i++) {
       callback(this[i]);
@@ -1457,6 +1477,265 @@ describe('popup.js', () => {
       await Promise.resolve();
 
       expect(statusDiv.textContent).toBe('Error: API error');
+    });
+  });
+
+  describe('Protect Group button', () => {
+    test('should send getGroups message', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'GitHub', tabCount: 5 },
+        { id: 2, baseName: 'Docs', tabCount: 3 }
+      ]);
+
+      protectGroupBtn.click();
+
+      await Promise.resolve();
+
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        action: 'getGroups'
+      });
+    });
+
+    test('should disable button while loading', () => {
+      chrome.runtime.sendMessage.mockImplementation(() =>
+        new Promise(resolve => setTimeout(() => resolve([]), 100))
+      );
+
+      protectGroupBtn.click();
+
+      expect(protectGroupBtn.disabled).toBe(true);
+      expect(protectGroupBtn.textContent).toBe('Loading...');
+    });
+
+    test('should show protect selector when groups found', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'GitHub', tabCount: 5 },
+        { id: 2, baseName: 'Docs', tabCount: 3 }
+      ]);
+
+      protectGroupBtn.click();
+
+      await Promise.resolve();
+
+      expect(protectGroupSelector.style.display).toBe('block');
+      expect(organizeBtn.style.display).toBe('none');
+      expect(protectGroupSelect.options.length).toBe(2);
+      expect(protectGroupSelect.options[0].value).toBe(1);
+      expect(protectGroupSelect.options[0].textContent).toBe('GitHub (5)');
+    });
+
+    test('should show error when no groups to protect', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue([]);
+
+      protectGroupBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('No groups to protect');
+      expect(statusDiv.className).toContain('error');
+      expect(protectGroupSelector.style.display).not.toBe('block');
+    });
+
+    test('should handle error response', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        error: 'Failed to get groups'
+      });
+
+      protectGroupBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Failed to get groups');
+    });
+
+    test('should handle exception from sendMessage', async () => {
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('Connection failed'));
+
+      protectGroupBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Connection failed');
+    });
+
+    test('should re-enable button after completion', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'GitHub', tabCount: 5 }
+      ]);
+
+      protectGroupBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(protectGroupBtn.disabled).toBe(false);
+      expect(protectGroupBtn.textContent).toBe('Protect Group');
+    });
+  });
+
+  describe('Protect Selected button', () => {
+    beforeEach(async () => {
+      // Setup protect group selector
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'GitHub', tabCount: 5 },
+        { id: 2, baseName: 'Docs', tabCount: 3 }
+      ]);
+
+      protectGroupBtn.click();
+      await Promise.resolve();
+
+      protectGroupSelect.value = '1';
+    });
+
+    test('should send protectGroup message with selected group', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        success: true,
+        groupTitle: 'GitHub',
+        tabCount: 5,
+        bookmarkFolderId: 'folder123'
+      });
+
+      protectSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        action: 'protectGroup',
+        groupId: 1
+      });
+    });
+
+    test('should show error when no group selected', async () => {
+      protectGroupSelect.value = '';
+
+      protectSelectedBtn.click();
+
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Please select a group');
+      expect(statusDiv.className).toContain('error');
+    });
+
+    test('should disable button while protecting', () => {
+      chrome.runtime.sendMessage.mockImplementation(() =>
+        new Promise(resolve => setTimeout(() => resolve({}), 100))
+      );
+
+      protectSelectedBtn.click();
+
+      expect(protectSelectedBtn.disabled).toBe(true);
+      expect(protectSelectedBtn.textContent).toBe('Protecting...');
+    });
+
+    test('should display success message with details', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        success: true,
+        groupTitle: 'GitHub',
+        tabCount: 5,
+        bookmarkFolderId: 'folder123'
+      });
+
+      protectSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('✓ Protected "GitHub" (5 tabs) - saved to bookmarks!');
+      expect(statusDiv.className).toContain('success');
+    });
+
+    test('should hide selector and show main buttons after success', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        success: true,
+        groupTitle: 'GitHub',
+        tabCount: 5,
+        bookmarkFolderId: 'folder123'
+      });
+
+      protectSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(protectGroupSelector.style.display).toBe('none');
+      expect(organizeBtn.style.display).toBe('block');
+    });
+
+    test('should handle error response', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        error: 'Failed to protect group'
+      });
+
+      protectSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Failed to protect group');
+    });
+
+    test('should handle exception from sendMessage', async () => {
+      chrome.runtime.sendMessage.mockRejectedValue(new Error('Network error'));
+
+      protectSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('Error: Network error');
+    });
+
+    test('should re-enable button after completion', async () => {
+      chrome.runtime.sendMessage.mockResolvedValue({
+        success: true,
+        groupTitle: 'GitHub',
+        tabCount: 5,
+        bookmarkFolderId: 'folder123'
+      });
+
+      protectSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(protectSelectedBtn.disabled).toBe(false);
+      expect(protectSelectedBtn.textContent).toBe('Protect');
+    });
+  });
+
+  describe('Cancel Protect button', () => {
+    beforeEach(async () => {
+      // Show protect selector
+      chrome.runtime.sendMessage.mockResolvedValue([
+        { id: 1, baseName: 'GitHub', tabCount: 5 }
+      ]);
+
+      protectGroupBtn.click();
+      await Promise.resolve();
+    });
+
+    test('should hide selector and show main buttons', () => {
+      expect(protectGroupSelector.style.display).toBe('block');
+
+      cancelProtectBtn.click();
+
+      expect(protectGroupSelector.style.display).toBe('none');
+      expect(organizeBtn.style.display).toBe('block');
+    });
+  });
+
+  describe('Close Protected List button', () => {
+    test('should hide protected list and show main buttons', () => {
+      // Simulate showing protected list
+      protectedGroupsList.style.display = 'block';
+      organizeBtn.style.display = 'none';
+
+      closeProtectedListBtn.click();
+
+      expect(protectedGroupsList.style.display).toBe('none');
+      expect(organizeBtn.style.display).toBe('block');
     });
   });
 });
