@@ -9,11 +9,17 @@ const dedupeBtn = document.getElementById('dedupeBtn');
 const saveBookmarksBtn = document.getElementById('saveBookmarksBtn');
 const restoreBookmarksBtn = document.getElementById('restoreBookmarksBtn');
 const removeGroupsBtn = document.getElementById('removeGroupsBtn');
+const combineGroupsBtn = document.getElementById('combineGroupsBtn');
 const statusDiv = document.getElementById('status');
 const bookmarkSelector = document.getElementById('bookmarkSelector');
 const folderSelect = document.getElementById('folderSelect');
 const restoreSelectedBtn = document.getElementById('restoreSelectedBtn');
 const cancelSelectBtn = document.getElementById('cancelSelectBtn');
+const combineGroupsSelector = document.getElementById('combineGroupsSelector');
+const sourceGroupSelect = document.getElementById('sourceGroupSelect');
+const targetGroupSelect = document.getElementById('targetGroupSelect');
+const combineSelectedBtn = document.getElementById('combineSelectedBtn');
+const cancelCombineBtn = document.getElementById('cancelCombineBtn');
 
 function showStatus(message, type = 'success') {
   statusDiv.textContent = message;
@@ -225,7 +231,7 @@ restoreBookmarksBtn.addEventListener('click', async () => {
       showStatus('No saved bookmark folders found', 'error');
     } else {
       // Hide main buttons, show selector
-      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'none');
+      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'none');
       bookmarkSelector.style.display = 'block';
 
       // Populate folder select
@@ -278,7 +284,7 @@ restoreSelectedBtn.addEventListener('click', async () => {
 
       // Hide selector, show main buttons
       bookmarkSelector.style.display = 'none';
-      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
+      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
     }
   } catch (error) {
     showStatus(`Error: ${error.message}`, 'error');
@@ -290,7 +296,7 @@ restoreSelectedBtn.addEventListener('click', async () => {
 
 cancelSelectBtn.addEventListener('click', () => {
   bookmarkSelector.style.display = 'none';
-  document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
+  document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
 });
 
 removeGroupsBtn.addEventListener('click', async () => {
@@ -313,6 +319,120 @@ removeGroupsBtn.addEventListener('click', async () => {
     removeGroupsBtn.disabled = false;
     removeGroupsBtn.textContent = 'Remove All Groups';
   }
+});
+
+// Combine Groups functionality
+const mainButtonsSelector = '#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #removeGroupsBtn';
+
+function hideMainButtons() {
+  document.querySelectorAll(mainButtonsSelector).forEach(btn => btn.style.display = 'none');
+}
+
+function showMainButtons() {
+  document.querySelectorAll(mainButtonsSelector).forEach(btn => btn.style.display = 'block');
+}
+
+function populateTargetGroupSelect(groups, excludeId) {
+  targetGroupSelect.innerHTML = '';
+  groups
+    .filter(group => group.id !== excludeId)
+    .forEach(group => {
+      const option = document.createElement('option');
+      option.value = group.id;
+      option.textContent = `${group.baseName} (${group.tabCount})`;
+      targetGroupSelect.appendChild(option);
+    });
+}
+
+combineGroupsBtn.addEventListener('click', async () => {
+  combineGroupsBtn.disabled = true;
+  combineGroupsBtn.textContent = 'Loading...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'getGroups'
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else if (response.length < 2) {
+      showStatus('Need at least 2 groups to combine', 'error');
+    } else {
+      // Hide main buttons, show combine selector
+      hideMainButtons();
+      combineGroupsSelector.style.display = 'block';
+
+      // Store groups for later use
+      combineGroupsSelector.dataset.groups = JSON.stringify(response);
+
+      // Populate source group select
+      sourceGroupSelect.innerHTML = '';
+      response.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = `${group.baseName} (${group.tabCount})`;
+        sourceGroupSelect.appendChild(option);
+      });
+
+      // Populate target group select (excluding first source)
+      populateTargetGroupSelect(response, parseInt(sourceGroupSelect.value));
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    combineGroupsBtn.disabled = false;
+    combineGroupsBtn.textContent = 'Combine Groups';
+  }
+});
+
+// Update target dropdown when source selection changes
+sourceGroupSelect.addEventListener('change', () => {
+  const groups = JSON.parse(combineGroupsSelector.dataset.groups || '[]');
+  populateTargetGroupSelect(groups, parseInt(sourceGroupSelect.value));
+});
+
+combineSelectedBtn.addEventListener('click', async () => {
+  const sourceGroupId = parseInt(sourceGroupSelect.value);
+  const targetGroupId = parseInt(targetGroupSelect.value);
+
+  if (!sourceGroupId || !targetGroupId) {
+    showStatus('Please select both groups', 'error');
+    return;
+  }
+
+  combineSelectedBtn.disabled = true;
+  combineSelectedBtn.textContent = 'Combining...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'combineGroups',
+      sourceGroupId,
+      targetGroupId
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else {
+      showStatus(
+        `✓ Merged "${response.sourceGroupName}" (${response.tabsMoved} tabs) into "${response.targetGroupName}" (now ${response.newTargetTabCount} tabs)`,
+        'success'
+      );
+
+      // Hide selector, show main buttons
+      combineGroupsSelector.style.display = 'none';
+      showMainButtons();
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    combineSelectedBtn.disabled = false;
+    combineSelectedBtn.textContent = 'Combine';
+  }
+});
+
+cancelCombineBtn.addEventListener('click', () => {
+  combineGroupsSelector.style.display = 'none';
+  showMainButtons();
 });
 
 // Settings link - open options page

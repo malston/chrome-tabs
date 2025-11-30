@@ -6,6 +6,8 @@ import { removeDuplicateTabs } from './removeDuplicateTabs.js';
 import { removeAllGroups } from './removeAllGroups.js';
 import { saveTabsToBookmarks } from './saveTabsToBookmarks.js';
 import { restoreFromBookmarks } from './restoreFromBookmarks.js';
+import { combineGroups } from './combineGroups.js';
+import { getExistingGroups } from './getExistingGroups.js';
 import { getTabOrganizerBookmarkFolders } from '../utils/getTabOrganizerBookmarkFolders.js';
 import {
   loadCategories,
@@ -90,6 +92,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'reloadCategories') {
     loadCategories()
       .then(categories => sendResponse({ success: true, categories }))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'getGroups') {
+    getExistingGroups()
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'combineGroups') {
+    combineGroups(request.sourceGroupId, request.targetGroupId)
+      .then(result => sendResponse(result))
       .catch(error => sendResponse({ error: error.message }));
     return true;
   }
