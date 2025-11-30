@@ -38,6 +38,7 @@ describe('getExistingGroups', () => {
 
       const result = await getExistingGroups();
 
+      // Uses WINDOW_ID_CURRENT (-2) when no windowId provided
       expect(chrome.tabGroups.query).toHaveBeenCalledWith({ windowId: -2 });
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({

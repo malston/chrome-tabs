@@ -8,9 +8,10 @@ import { extractGroupBaseName } from '../utils/extractGroupBaseName.js';
  * @param {number} [windowId] - Window ID, defaults to current window
  * @returns {Promise<Array>} Array of { id, title, baseName, tabCount, color }
  */
-export async function getExistingGroups(windowId = chrome.windows.WINDOW_ID_CURRENT) {
-  // Get all groups in the window
-  const groups = await chrome.tabGroups.query({ windowId });
+export async function getExistingGroups(windowId) {
+  // Get all groups in the window (default to current window)
+  const targetWindowId = windowId ?? chrome.windows.WINDOW_ID_CURRENT;
+  const groups = await chrome.tabGroups.query({ windowId: targetWindowId });
 
   // Get tab counts for each group
   const groupsWithCounts = await Promise.all(
