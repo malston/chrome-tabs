@@ -217,6 +217,10 @@
     Combine Groups
   </button>
 
+  <button id="protectGroupBtn" class="secondary">
+    Protect Group
+  </button>
+
   <button id="removeGroupsBtn" class="secondary">
     Remove All Groups
   </button>
@@ -241,6 +245,24 @@
     <div class="selector-buttons">
       <button id="combineSelectedBtn" class="primary">Combine</button>
       <button id="cancelCombineBtn" class="secondary">Cancel</button>
+    </div>
+  </div>
+
+  <div id="protectGroupSelector" class="bookmark-selector" style="display: none;">
+    <h2>Protect Tab Group</h2>
+    <label for="protectGroupSelect" style="font-size: 13px; display: block; margin-bottom: 4px;">Select group to protect:</label>
+    <select id="protectGroupSelect" size="4"></select>
+    <div class="selector-buttons">
+      <button id="protectSelectedBtn" class="primary">Protect</button>
+      <button id="cancelProtectBtn" class="secondary">Cancel</button>
+    </div>
+  </div>
+
+  <div id="protectedGroupsList" class="bookmark-selector" style="display: none;">
+    <h2>Protected Groups</h2>
+    <div id="protectedGroupsContainer" style="max-height: 150px; overflow-y: auto; margin-bottom: 12px;"></div>
+    <div class="selector-buttons">
+      <button id="closeProtectedListBtn" class="secondary">Close</button>
     </div>
   </div>
 

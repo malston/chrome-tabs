@@ -20,6 +20,14 @@ const sourceGroupSelect = document.getElementById('sourceGroupSelect');
 const targetGroupSelect = document.getElementById('targetGroupSelect');
 const combineSelectedBtn = document.getElementById('combineSelectedBtn');
 const cancelCombineBtn = document.getElementById('cancelCombineBtn');
+const protectGroupBtn = document.getElementById('protectGroupBtn');
+const protectGroupSelector = document.getElementById('protectGroupSelector');
+const protectGroupSelect = document.getElementById('protectGroupSelect');
+const protectSelectedBtn = document.getElementById('protectSelectedBtn');
+const cancelProtectBtn = document.getElementById('cancelProtectBtn');
+const protectedGroupsList = document.getElementById('protectedGroupsList');
+const protectedGroupsContainer = document.getElementById('protectedGroupsContainer');
+const closeProtectedListBtn = document.getElementById('closeProtectedListBtn');
 
 function showStatus(message, type = 'success') {
   statusDiv.textContent = message;
@@ -231,7 +239,7 @@ restoreBookmarksBtn.addEventListener('click', async () => {
       showStatus('No saved bookmark folders found', 'error');
     } else {
       // Hide main buttons, show selector
-      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'none');
+      hideMainButtons();
       bookmarkSelector.style.display = 'block';
 
       // Populate folder select
@@ -284,7 +292,7 @@ restoreSelectedBtn.addEventListener('click', async () => {
 
       // Hide selector, show main buttons
       bookmarkSelector.style.display = 'none';
-      document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
+      showMainButtons();
     }
   } catch (error) {
     showStatus(`Error: ${error.message}`, 'error');
@@ -296,7 +304,7 @@ restoreSelectedBtn.addEventListener('click', async () => {
 
 cancelSelectBtn.addEventListener('click', () => {
   bookmarkSelector.style.display = 'none';
-  document.querySelectorAll('#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #removeGroupsBtn').forEach(btn => btn.style.display = 'block');
+  showMainButtons();
 });
 
 removeGroupsBtn.addEventListener('click', async () => {
@@ -322,7 +330,7 @@ removeGroupsBtn.addEventListener('click', async () => {
 });
 
 // Combine Groups functionality
-const mainButtonsSelector = '#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #removeGroupsBtn';
+const mainButtonsSelector = '#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #protectGroupBtn, #removeGroupsBtn';
 
 function hideMainButtons() {
   document.querySelectorAll(mainButtonsSelector).forEach(btn => btn.style.display = 'none');
@@ -432,6 +440,89 @@ combineSelectedBtn.addEventListener('click', async () => {
 
 cancelCombineBtn.addEventListener('click', () => {
   combineGroupsSelector.style.display = 'none';
+  showMainButtons();
+});
+
+// Protect Group functionality
+protectGroupBtn.addEventListener('click', async () => {
+  protectGroupBtn.disabled = true;
+  protectGroupBtn.textContent = 'Loading...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'getGroups'
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else if (response.length === 0) {
+      showStatus('No groups to protect', 'error');
+    } else {
+      // Hide main buttons, show protect selector
+      hideMainButtons();
+      protectGroupSelector.style.display = 'block';
+
+      // Populate group select
+      protectGroupSelect.innerHTML = '';
+      response.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = `${group.baseName} (${group.tabCount})`;
+        protectGroupSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    protectGroupBtn.disabled = false;
+    protectGroupBtn.textContent = 'Protect Group';
+  }
+});
+
+protectSelectedBtn.addEventListener('click', async () => {
+  const groupId = parseInt(protectGroupSelect.value);
+
+  if (!groupId) {
+    showStatus('Please select a group', 'error');
+    return;
+  }
+
+  protectSelectedBtn.disabled = true;
+  protectSelectedBtn.textContent = 'Protecting...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'protectGroup',
+      groupId
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else {
+      showStatus(
+        `✓ Protected "${response.groupTitle}" (${response.tabCount} tabs) - saved to bookmarks!`,
+        'success'
+      );
+
+      // Hide selector, show main buttons
+      protectGroupSelector.style.display = 'none';
+      showMainButtons();
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    protectSelectedBtn.disabled = false;
+    protectSelectedBtn.textContent = 'Protect';
+  }
+});
+
+cancelProtectBtn.addEventListener('click', () => {
+  protectGroupSelector.style.display = 'none';
+  showMainButtons();
+});
+
+closeProtectedListBtn.addEventListener('click', () => {
+  protectedGroupsList.style.display = 'none';
   showMainButtons();
 });
 
