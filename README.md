@@ -43,6 +43,7 @@ Select and restore previously saved tab sessions:
 
 - **One-click organization** - Automatically group tabs by domain or category
 - **One-click deduplication** - Remove duplicate tabs instantly
+- **Combine groups** - Merge two tab groups into one
 - **Save to bookmarks** - Save all tabs into bookmark folders by group
 - **Restore from bookmarks** - Restore tab groups from saved bookmarks
 - **Smart coloring** - Each group gets a unique color
@@ -125,6 +126,16 @@ Example result:
 1. Click the Tab Organizer icon
 2. Click "Remove Duplicates"
 3. Done! All duplicate URLs removed
+
+### Combine Tab Groups
+
+**Merge two groups into one**:
+
+1. Click the Tab Organizer icon
+2. Click "Combine Groups"
+3. Select the first group (highlighted when selected)
+4. Select the second group to merge into
+5. Done! Both groups are merged into one
 
 ### Save Tabs to Bookmarks
 
