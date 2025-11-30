@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Instructions
 
-Please read and follow the coding rules defined in `chrome-extension/.cursor/rules`.
+This is a **JavaScript-only** Chrome extension project (no TypeScript, no bundler).
 
 ## Project Overview
 
@@ -30,11 +30,19 @@ chrome-extension/
 │   │   ├── removeAllGroups.js
 │   │   ├── saveTabsToBookmarks.js
 │   │   ├── restoreFromBookmarks.js
+│   │   ├── combineGroups.js
+│   │   ├── getExistingGroups.js
+│   │   ├── protectGroup.js
+│   │   ├── getProtectedGroups.js
 │   │   └── *.test.js         # Colocated unit tests
 │   ├── popup/                # Popup UI
 │   │   ├── popup.html
 │   │   ├── popup.js
 │   │   └── popup.test.js
+│   ├── options/              # Options page
+│   │   ├── options.html
+│   │   ├── options.js
+│   │   └── options.test.js
 │   └── utils/                # Shared utility functions
 │       ├── extractDomain.js
 │       ├── shouldSkipUrl.js
@@ -42,6 +50,7 @@ chrome-extension/
 │       ├── getOtherBookmarksId.js
 │       ├── getTabOrganizerBookmarkFolders.js
 │       ├── colorManager.js
+│       ├── categoryManager.js
 │       └── *.test.js
 ├── assets/                   # Static resources
 ├── e2e/                      # End-to-end tests
@@ -66,6 +75,10 @@ chrome-extension/
   - `removeAllGroups()` - Ungroups all tabs
   - `saveTabsToBookmarks()` - Saves tab groups to bookmarks
   - `restoreFromBookmarks()` - Restores tabs from saved bookmarks
+  - `combineGroups()` - Merges multiple tab groups into one
+  - `getExistingGroups()` - Retrieves current tab groups in window
+  - `protectGroup()` - Marks a group as protected from reorganization
+  - `getProtectedGroups()` - Gets list of protected group IDs
 
 - **Utility Functions** (`src/utils/`)
   - `extractDomain()` - Extracts domain from URLs with special handling for:
@@ -77,6 +90,10 @@ chrome-extension/
   - `getOtherBookmarksId()` - Gets the "Other Bookmarks" folder ID
   - `getTabOrganizerBookmarkFolders()` - Lists saved Tab Organizer bookmark folders
   - `colorManager()` - Manages tab group colors
+  - `categoryManager()` - Manages category definitions for "Organize by Category"
+
+- **Options Page** (`src/options/`)
+  - `options.html/js` - Extension settings UI for customizing categories
 
 - **popup.html/js** (`src/popup/`) - Extension UI
   - Buttons: Organize by Domain, Organize by Category, Remove Duplicates, Save to Bookmarks, Restore from Bookmarks, Remove All Groups
