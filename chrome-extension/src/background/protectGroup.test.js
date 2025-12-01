@@ -26,9 +26,9 @@ jest.mock('../utils/getOtherBookmarksId.js', () => ({
   getOtherBookmarksId: jest.fn().mockResolvedValue('2')
 }));
 
-const { protectGroup, getProtectedGroupsFromStorage } = require('./protectGroup.js');
+const { protectGroups, getProtectedGroupsFromStorage } = require('./protectGroup.js');
 
-describe('protectGroup', () => {
+describe('protectGroups', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     chrome.storage.local.get.mockResolvedValue({ protectedGroups: {} });
@@ -44,7 +44,7 @@ describe('protectGroup', () => {
       ]);
       chrome.bookmarks.create.mockResolvedValue({ id: 'folder123' });
 
-      await protectGroup(1);
+      await protectGroups([1]);
 
       // Verify folder was created with correct naming
       expect(chrome.bookmarks.create).toHaveBeenCalledWith(
@@ -64,7 +64,7 @@ describe('protectGroup', () => {
       ]);
       chrome.bookmarks.create.mockResolvedValue({ id: 'folder123' });
 
-      await protectGroup(1);
+      await protectGroups([1]);
 
       // 1 folder + 3 bookmarks = 4 calls
       expect(chrome.bookmarks.create).toHaveBeenCalledTimes(4);
@@ -94,7 +94,7 @@ describe('protectGroup', () => {
       ]);
       chrome.bookmarks.create.mockResolvedValue({ id: 'folder456' });
 
-      await protectGroup(5);
+      await protectGroups([5]);
 
       expect(chrome.storage.local.set).toHaveBeenCalledWith({
         protectedGroups: expect.objectContaining({
@@ -116,25 +116,100 @@ describe('protectGroup', () => {
       ]);
       chrome.bookmarks.create.mockResolvedValue({ id: 'folder789' });
 
-      const result = await protectGroup(1);
+      const result = await protectGroups([1]);
 
       expect(result).toEqual({
         success: true,
-        bookmarkFolderId: 'folder789',
-        tabCount: 2,
-        groupTitle: 'Project'
+        protectedCount: 1,
+        totalTabs: 2,
+        groupTitles: ['Project']
       });
     });
   });
 
+  describe('Multi-select Functionality', () => {
+    test('should protect multiple groups at once', async () => {
+      chrome.tabGroups.get
+        .mockResolvedValueOnce({ id: 1, title: 'Group A' })
+        .mockResolvedValueOnce({ id: 2, title: 'Group B' });
+      chrome.tabs.query
+        .mockResolvedValueOnce([
+          { id: 101, title: 'Tab A1', url: 'https://example.com/a1' }
+        ])
+        .mockResolvedValueOnce([
+          { id: 201, title: 'Tab B1', url: 'https://example.com/b1' },
+          { id: 202, title: 'Tab B2', url: 'https://example.com/b2' }
+        ]);
+      chrome.bookmarks.create.mockResolvedValue({ id: 'folder123' });
+
+      const result = await protectGroups([1, 2]);
+
+      expect(result).toEqual({
+        success: true,
+        protectedCount: 2,
+        totalTabs: 3,
+        groupTitles: ['Group A', 'Group B']
+      });
+    });
+
+    test('should create separate bookmark folders for each group', async () => {
+      chrome.tabGroups.get
+        .mockResolvedValueOnce({ id: 1, title: 'First' })
+        .mockResolvedValueOnce({ id: 2, title: 'Second' });
+      chrome.tabs.query
+        .mockResolvedValueOnce([{ id: 101, title: 'Tab 1', url: 'https://example.com/1' }])
+        .mockResolvedValueOnce([{ id: 201, title: 'Tab 2', url: 'https://example.com/2' }]);
+      chrome.bookmarks.create.mockResolvedValue({ id: 'folder123' });
+
+      await protectGroups([1, 2]);
+
+      // 2 folders + 2 bookmarks = 4 calls
+      expect(chrome.bookmarks.create).toHaveBeenCalledTimes(4);
+      expect(chrome.bookmarks.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: expect.stringMatching(/^🔒 First - \d{4}-\d{2}-\d{2}$/)
+        })
+      );
+      expect(chrome.bookmarks.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: expect.stringMatching(/^🔒 Second - \d{4}-\d{2}-\d{2}$/)
+        })
+      );
+    });
+  });
+
   describe('Edge Cases', () => {
-    test('should handle empty group', async () => {
+    test('should skip empty groups and return success for others', async () => {
+      chrome.tabGroups.get
+        .mockResolvedValueOnce({ id: 1, title: 'Empty' })
+        .mockResolvedValueOnce({ id: 2, title: 'HasTabs' });
+      chrome.tabs.query
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{ id: 201, title: 'Tab', url: 'https://example.com' }]);
+      chrome.bookmarks.create.mockResolvedValue({ id: 'folder123' });
+
+      const result = await protectGroups([1, 2]);
+
+      expect(result).toEqual({
+        success: true,
+        protectedCount: 1,
+        totalTabs: 1,
+        groupTitles: ['HasTabs']
+      });
+    });
+
+    test('should handle all empty groups', async () => {
       chrome.tabGroups.get.mockResolvedValue({ id: 1, title: 'Empty' });
       chrome.tabs.query.mockResolvedValue([]);
 
-      const result = await protectGroup(1);
+      const result = await protectGroups([1]);
 
-      expect(result).toEqual({ error: 'Group has no tabs to protect' });
+      expect(result).toEqual({
+        success: true,
+        protectedCount: 0,
+        totalTabs: 0,
+        groupTitles: []
+      });
       expect(chrome.bookmarks.create).not.toHaveBeenCalled();
     });
 
@@ -145,7 +220,7 @@ describe('protectGroup', () => {
       ]);
       chrome.bookmarks.create.mockResolvedValue({ id: 'folder123' });
 
-      await protectGroup(1);
+      await protectGroups([1]);
 
       expect(chrome.bookmarks.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -161,7 +236,7 @@ describe('protectGroup', () => {
       ]);
       chrome.bookmarks.create.mockResolvedValue({ id: 'folder123' });
 
-      await protectGroup(1);
+      await protectGroups([1]);
 
       expect(chrome.bookmarks.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -182,7 +257,7 @@ describe('protectGroup', () => {
       ]);
       chrome.bookmarks.create.mockResolvedValue({ id: 'folder123' });
 
-      await protectGroup(20);
+      await protectGroups([20]);
 
       expect(chrome.storage.local.set).toHaveBeenCalledWith({
         protectedGroups: expect.objectContaining({
@@ -197,7 +272,7 @@ describe('protectGroup', () => {
     test('should throw when tabGroups.get fails', async () => {
       chrome.tabGroups.get.mockRejectedValue(new Error('Group not found'));
 
-      await expect(protectGroup(999)).rejects.toThrow('Group not found');
+      await expect(protectGroups([999])).rejects.toThrow('Group not found');
     });
 
     test('should throw when bookmark creation fails', async () => {
@@ -207,7 +282,7 @@ describe('protectGroup', () => {
       ]);
       chrome.bookmarks.create.mockRejectedValue(new Error('Bookmark error'));
 
-      await expect(protectGroup(1)).rejects.toThrow('Bookmark error');
+      await expect(protectGroups([1])).rejects.toThrow('Bookmark error');
     });
   });
 });

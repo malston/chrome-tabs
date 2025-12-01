@@ -485,15 +485,16 @@ protectGroupBtn.addEventListener('click', async () => {
     showStatus(`Error: ${error.message}`, 'error');
   } finally {
     protectGroupBtn.disabled = false;
-    protectGroupBtn.textContent = 'Protect Group';
+    protectGroupBtn.textContent = 'Protect Groups';
   }
 });
 
 protectSelectedBtn.addEventListener('click', async () => {
-  const groupId = parseInt(protectGroupSelect.value);
+  const selectedOptions = Array.from(protectGroupSelect.selectedOptions);
+  const groupIds = selectedOptions.map(opt => parseInt(opt.value));
 
-  if (!groupId) {
-    showStatus('Please select a group', 'error');
+  if (groupIds.length === 0) {
+    showStatus('Please select at least one group', 'error');
     return;
   }
 
@@ -502,15 +503,15 @@ protectSelectedBtn.addEventListener('click', async () => {
 
   try {
     const response = await chrome.runtime.sendMessage({
-      action: 'protectGroup',
-      groupId
+      action: 'protectGroups',
+      groupIds
     });
 
     if (response.error) {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       showStatus(
-        `✓ Protected "${response.groupTitle}" (${response.tabCount} tabs) - saved to bookmarks!`,
+        `✓ Protected ${response.protectedCount} group(s) (${response.totalTabs} tabs) - saved to bookmarks!`,
         'success'
       );
 

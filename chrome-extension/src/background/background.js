@@ -8,7 +8,7 @@ import { saveTabsToBookmarks } from './saveTabsToBookmarks.js';
 import { restoreFromBookmarks } from './restoreFromBookmarks.js';
 import { combineGroups } from './combineGroups.js';
 import { getExistingGroups } from './getExistingGroups.js';
-import { protectGroup } from './protectGroup.js';
+import { protectGroups } from './protectGroup.js';
 import { getProtectedGroups } from './getProtectedGroups.js';
 import { getTabOrganizerBookmarkFolders } from '../utils/getTabOrganizerBookmarkFolders.js';
 import {
@@ -112,8 +112,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 
-  if (request.action === 'protectGroup') {
-    protectGroup(request.groupId)
+  if (request.action === 'protectGroups') {
+    protectGroups(request.groupIds)
       .then(result => sendResponse(result))
       .catch(error => sendResponse({ error: error.message }));
     return true;

@@ -1,4 +1,4 @@
-// ABOUTME: Protects a tab group by saving it to bookmarks for easy recovery.
+// ABOUTME: Protects tab groups by saving them to bookmarks for easy recovery.
 // ABOUTME: Stores protection metadata in chrome.storage.local.
 
 import { getOtherBookmarksId } from '../utils/getOtherBookmarksId.js';
@@ -13,55 +13,69 @@ async function getProtectedGroupsFromStorage() {
 }
 
 /**
- * Protects a tab group by saving to bookmarks
- * @param {number} groupId - The tab group ID to protect
- * @returns {Promise<{success: boolean, bookmarkFolderId: string, tabCount: number, groupTitle: string}>}
+ * Protects multiple tab groups by saving to bookmarks
+ * @param {number[]} groupIds - The tab group IDs to protect
+ * @returns {Promise<{success: boolean, protectedCount: number, totalTabs: number, groupTitles: string[]}>}
  */
-async function protectGroup(groupId) {
-  // 1. Get group info
-  const group = await chrome.tabGroups.get(groupId);
-  const tabs = await chrome.tabs.query({ groupId });
-
-  if (tabs.length === 0) {
-    return { error: 'Group has no tabs to protect' };
-  }
-
-  // 2. Create bookmark folder with protection naming
-  const timestamp = new Date().toISOString().split('T')[0];
-  const groupTitle = group.title || 'Untitled';
-  const folderName = `🔒 ${groupTitle} - ${timestamp}`;
-
+async function protectGroups(groupIds) {
   const otherBookmarksId = await getOtherBookmarksId();
-  const folder = await chrome.bookmarks.create({
-    parentId: otherBookmarksId,
-    title: folderName
-  });
+  const timestamp = new Date().toISOString().split('T')[0];
+  const protectedGroupsStorage = await getProtectedGroupsFromStorage();
 
-  // 3. Save each tab as bookmark
-  for (const tab of tabs) {
-    await chrome.bookmarks.create({
-      parentId: folder.id,
-      title: tab.title,
-      url: tab.url
+  const results = [];
+
+  for (const groupId of groupIds) {
+    // 1. Get group info
+    const group = await chrome.tabGroups.get(groupId);
+    const tabs = await chrome.tabs.query({ groupId });
+
+    if (tabs.length === 0) {
+      continue; // Skip empty groups
+    }
+
+    // 2. Create bookmark folder with protection naming
+    const groupTitle = group.title || 'Untitled';
+    const folderName = `🔒 ${groupTitle} - ${timestamp}`;
+
+    const folder = await chrome.bookmarks.create({
+      parentId: otherBookmarksId,
+      title: folderName
+    });
+
+    // 3. Save each tab as bookmark
+    for (const tab of tabs) {
+      await chrome.bookmarks.create({
+        parentId: folder.id,
+        title: tab.title,
+        url: tab.url
+      });
+    }
+
+    // 4. Store protection metadata
+    protectedGroupsStorage[groupId] = {
+      bookmarkFolderId: folder.id,
+      groupTitle: groupTitle,
+      tabCount: tabs.length,
+      protectedAt: new Date().toISOString()
+    };
+
+    results.push({
+      groupTitle,
+      tabCount: tabs.length
     });
   }
 
-  // 4. Store protection metadata
-  const protectedGroups = await getProtectedGroupsFromStorage();
-  protectedGroups[groupId] = {
-    bookmarkFolderId: folder.id,
-    groupTitle: groupTitle,
-    tabCount: tabs.length,
-    protectedAt: new Date().toISOString()
-  };
-  await chrome.storage.local.set({ protectedGroups });
+  await chrome.storage.local.set({ protectedGroups: protectedGroupsStorage });
+
+  const totalTabs = results.reduce((sum, r) => sum + r.tabCount, 0);
+  const groupTitles = results.map(r => r.groupTitle);
 
   return {
     success: true,
-    bookmarkFolderId: folder.id,
-    tabCount: tabs.length,
-    groupTitle: groupTitle
+    protectedCount: results.length,
+    totalTabs,
+    groupTitles
   };
 }
 
-export { protectGroup, getProtectedGroupsFromStorage };
+export { protectGroups, getProtectedGroupsFromStorage };
