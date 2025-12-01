@@ -143,9 +143,9 @@ Example result:
 **Mark groups as protected to prevent accidental closure**:
 
 1. Click the Tab Organizer icon
-2. Click "Protect Group"
-3. Select the group you want to protect
-4. Done! The group is now protected and saved to bookmarks
+2. Click "Protect Groups"
+3. Select one or more groups (Cmd/Ctrl+click for multiple)
+4. Done! The groups are now protected and saved to bookmarks
 
 Protected groups are automatically saved to bookmarks, making them easy to recover if accidentally closed. Use this feature for important tab collections you want to preserve.
 

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-11-30
+
+### Added
+
+- Multi-select for Protect Groups (#46) - Select multiple tab groups to protect at once using Cmd/Ctrl+click, contributed by @AmberAlston
+- New layered tabs icon design (#47) - Fresh icon with three overlapping tabs in Chrome's tab group colors (yellow, green, blue), contributed by @AmberAlston
+- Icon generation script - SVG source file and script to regenerate PNG icons at all sizes
+
 ## [1.3.0] - 2025-11-29
 
 ### Added
