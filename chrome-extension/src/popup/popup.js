@@ -52,6 +52,9 @@ organizeBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} groups!`;
+      if (response.duplicateGroupsMerged > 0) {
+        message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
       if (response.ungroupedTabsMoved > 0) {
         message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
       }
@@ -82,6 +85,9 @@ organizeCategoryBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`;
+      if (response.duplicateGroupsMerged > 0) {
+        message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
       if (response.ungroupedTabsMoved > 0) {
         message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
       }
@@ -113,6 +119,9 @@ organizeAllWindowsBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} groups!`;
+      if (response.duplicateGroupsMerged > 0) {
+        message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
       if (response.duplicatesClosed > 0) {
         message += ` Removed ${response.duplicatesClosed} duplicates.`;
       }
@@ -150,6 +159,9 @@ organizeAllWindowsCategoryBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`;
+      if (response.duplicateGroupsMerged > 0) {
+        message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
       if (response.duplicatesClosed > 0) {
         message += ` Removed ${response.duplicatesClosed} duplicates.`;
       }

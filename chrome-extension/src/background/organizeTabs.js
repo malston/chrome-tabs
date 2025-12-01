@@ -6,9 +6,19 @@ import { shouldSkipUrl } from '../utils/shouldSkipUrl.js';
 import { extractGroupBaseName } from '../utils/extractGroupBaseName.js';
 import { getNextColor, resetColorIndex } from '../utils/colorManager.js';
 import { categorizeUrl } from '../utils/categoryManager.js';
+import { mergeDuplicateGroups } from './mergeDuplicateGroups.js';
 
 async function organizeTabs(mode = 'domain', allWindows = false) {
   console.log(`Organizing tabs by ${mode}${allWindows ? ' across all windows' : ''}...`);
+
+  // Check if auto-merge is enabled
+  let mergeResult = null;
+  const settings = await chrome.storage.local.get('autoMergeDuplicates');
+  if (settings.autoMergeDuplicates) {
+    console.log('Auto-merging duplicate groups before organizing...');
+    mergeResult = await mergeDuplicateGroups();
+    console.log(`Auto-merge result: ${mergeResult.message}`);
+  }
 
   // Get current window for reference
   const currentWindow = await chrome.windows.getCurrent();
@@ -275,7 +285,9 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
     duplicatesClosed: duplicatesClosed,
     tabsMoved: tabsMoved,
     ungroupedDuplicates: ungroupedDuplicates,
-    ungroupedTabsMoved: ungroupedTabsMoved
+    ungroupedTabsMoved: ungroupedTabsMoved,
+    duplicateGroupsMerged: mergeResult?.mergedGroups || 0,
+    tabsMovedFromMerge: mergeResult?.tabsMoved || 0
   };
 }
 
