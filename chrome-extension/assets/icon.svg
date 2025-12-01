@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Layered Tabs - larger, less whitespace -->
+  <!-- Back tab (yellow) -->
+  <rect x="4" y="8" width="100" height="72" rx="10" fill="#fbbc04"/>
+
+  <!-- Middle tab (green) -->
+  <rect x="14" y="28" width="100" height="72" rx="10" fill="#34a853"/>
+
+  <!-- Front tab (blue) -->
+  <rect x="24" y="48" width="100" height="72" rx="10" fill="#1a73e8"/>
+
+  <!-- White lines on front tab to suggest content -->
+  <line x1="38" y1="74" x2="90" y2="74" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <line x1="38" y1="94" x2="72" y2="94" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+</svg>
