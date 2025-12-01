@@ -37,14 +37,33 @@ Select and restore previously saved tab sessions:
 
 <img src="screenshots/bookmark-restore.jpg" alt="Select Bookmark Folder" width="300">
 
+### Combine Tab Groups
+
+Merge multiple groups into one with multi-select:
+
+<img src="screenshots/combine-groups.png" alt="Combine Groups" width="300">
+
+### Protect Tab Groups
+
+Protect multiple groups at once to prevent accidental closure:
+
+<img src="screenshots/protect-groups.png" alt="Protect Groups" width="300">
+
+### Options Page
+
+Customize categories for tab organization:
+
+<img src="screenshots/options-page.png" alt="Options Page" width="500">
+
 ## Features
 
 ### 🎯 Chrome Extension
 
 - **One-click organization** - Automatically group tabs by domain or category
+- **Cross-window organization** - Consolidate tabs from all windows into the current window
 - **One-click deduplication** - Remove duplicate tabs instantly
-- **Combine groups** - Merge two tab groups into one
-- **Protect groups** - Mark groups as protected to prevent accidental closure; protected groups are auto-saved to bookmarks
+- **Combine groups** - Merge multiple tab groups into one with multi-select
+- **Protect groups** - Mark groups as protected with multi-select; protected groups are auto-saved to bookmarks
 - **Save to bookmarks** - Save all tabs into bookmark folders by group
 - **Restore from bookmarks** - Restore tab groups from saved bookmarks
 - **Smart coloring** - Each group gets a unique color
@@ -120,6 +139,19 @@ Example result:
 - `Social Media (12)` - Twitter, LinkedIn, Reddit tabs
 - `Shopping (8)` - Amazon, eBay tabs
 
+### Organize All Windows
+
+**Consolidate tabs from all Chrome windows into the current window**:
+
+1. Click the Tab Organizer icon in your toolbar
+2. Click "Organize All Windows by Domain" or "Organize All Windows by Category"
+3. Done! Tabs from all windows are moved to the current window and grouped
+
+This is useful when you have tabs scattered across multiple Chrome windows. The extension will:
+- Move all tabs from other windows to the current window
+- Remove duplicate URLs across windows
+- Group the consolidated tabs by domain or category
+
 ### Remove Duplicate Tabs
 
 **Use the Chrome Extension**:
@@ -130,13 +162,13 @@ Example result:
 
 ### Combine Tab Groups
 
-**Merge two groups into one**:
+**Merge multiple groups into one**:
 
 1. Click the Tab Organizer icon
 2. Click "Combine Groups"
-3. Select the first group (highlighted when selected)
-4. Select the second group to merge into
-5. Done! Both groups are merged into one
+3. Select one or more source groups to merge (Cmd/Ctrl+click for multiple)
+4. Select the target group to merge into
+5. Done! All selected groups are merged into the target group
 
 ### Protect Tab Groups
 
