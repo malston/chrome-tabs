@@ -149,6 +149,7 @@ function setupDOM() {
   protectGroupSelect = createMockElement('protectGroupSelect');
   protectGroupSelect.options = [];
   protectGroupSelect.innerHTML = '';
+  protectGroupSelect.selectedOptions = [];
   protectSelectedBtn = createMockElement('protectSelectedBtn');
   cancelProtectBtn = createMockElement('cancelProtectBtn');
   protectedGroupsList = createMockElement('protectedGroupsList');
@@ -1570,7 +1571,7 @@ describe('popup.js', () => {
       await Promise.resolve();
 
       expect(protectGroupBtn.disabled).toBe(false);
-      expect(protectGroupBtn.textContent).toBe('Protect Group');
+      expect(protectGroupBtn.textContent).toBe('Protect Groups');
     });
   });
 
@@ -1585,15 +1586,16 @@ describe('popup.js', () => {
       protectGroupBtn.click();
       await Promise.resolve();
 
-      protectGroupSelect.value = '1';
+      // Setup multi-select with one selected option
+      protectGroupSelect.selectedOptions = [{ value: '1' }];
     });
 
-    test('should send protectGroup message with selected group', async () => {
+    test('should send protectGroups message with selected groups', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
         success: true,
-        groupTitle: 'GitHub',
-        tabCount: 5,
-        bookmarkFolderId: 'folder123'
+        protectedCount: 1,
+        totalTabs: 5,
+        groupTitles: ['GitHub']
       });
 
       protectSelectedBtn.click();
@@ -1602,19 +1604,39 @@ describe('popup.js', () => {
       await Promise.resolve();
 
       expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
-        action: 'protectGroup',
-        groupId: 1
+        action: 'protectGroups',
+        groupIds: [1]
+      });
+    });
+
+    test('should send multiple groupIds when multiple selected', async () => {
+      protectGroupSelect.selectedOptions = [{ value: '1' }, { value: '2' }];
+      chrome.runtime.sendMessage.mockResolvedValue({
+        success: true,
+        protectedCount: 2,
+        totalTabs: 8,
+        groupTitles: ['GitHub', 'Docs']
+      });
+
+      protectSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        action: 'protectGroups',
+        groupIds: [1, 2]
       });
     });
 
     test('should show error when no group selected', async () => {
-      protectGroupSelect.value = '';
+      protectGroupSelect.selectedOptions = [];
 
       protectSelectedBtn.click();
 
       await Promise.resolve();
 
-      expect(statusDiv.textContent).toBe('Please select a group');
+      expect(statusDiv.textContent).toBe('Please select at least one group');
       expect(statusDiv.className).toContain('error');
     });
 
@@ -1632,9 +1654,9 @@ describe('popup.js', () => {
     test('should display success message with details', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
         success: true,
-        groupTitle: 'GitHub',
-        tabCount: 5,
-        bookmarkFolderId: 'folder123'
+        protectedCount: 1,
+        totalTabs: 5,
+        groupTitles: ['GitHub']
       });
 
       protectSelectedBtn.click();
@@ -1642,16 +1664,34 @@ describe('popup.js', () => {
       await Promise.resolve();
       await Promise.resolve();
 
-      expect(statusDiv.textContent).toBe('✓ Protected "GitHub" (5 tabs) - saved to bookmarks!');
+      expect(statusDiv.textContent).toBe('✓ Protected 1 group(s) (5 tabs) - saved to bookmarks!');
+      expect(statusDiv.className).toContain('success');
+    });
+
+    test('should display success message for multiple groups', async () => {
+      protectGroupSelect.selectedOptions = [{ value: '1' }, { value: '2' }];
+      chrome.runtime.sendMessage.mockResolvedValue({
+        success: true,
+        protectedCount: 2,
+        totalTabs: 8,
+        groupTitles: ['GitHub', 'Docs']
+      });
+
+      protectSelectedBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toBe('✓ Protected 2 group(s) (8 tabs) - saved to bookmarks!');
       expect(statusDiv.className).toContain('success');
     });
 
     test('should hide selector and show main buttons after success', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
         success: true,
-        groupTitle: 'GitHub',
-        tabCount: 5,
-        bookmarkFolderId: 'folder123'
+        protectedCount: 1,
+        totalTabs: 5,
+        groupTitles: ['GitHub']
       });
 
       protectSelectedBtn.click();
@@ -1665,7 +1705,7 @@ describe('popup.js', () => {
 
     test('should handle error response', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
-        error: 'Failed to protect group'
+        error: 'Failed to protect groups'
       });
 
       protectSelectedBtn.click();
@@ -1673,7 +1713,7 @@ describe('popup.js', () => {
       await Promise.resolve();
       await Promise.resolve();
 
-      expect(statusDiv.textContent).toBe('Error: Failed to protect group');
+      expect(statusDiv.textContent).toBe('Error: Failed to protect groups');
     });
 
     test('should handle exception from sendMessage', async () => {
@@ -1690,9 +1730,9 @@ describe('popup.js', () => {
     test('should re-enable button after completion', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
         success: true,
-        groupTitle: 'GitHub',
-        tabCount: 5,
-        bookmarkFolderId: 'folder123'
+        protectedCount: 1,
+        totalTabs: 5,
+        groupTitles: ['GitHub']
       });
 
       protectSelectedBtn.click();
