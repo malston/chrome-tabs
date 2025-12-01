@@ -10,6 +10,7 @@ import { combineGroups } from './combineGroups.js';
 import { getExistingGroups } from './getExistingGroups.js';
 import { protectGroups } from './protectGroup.js';
 import { getProtectedGroups } from './getProtectedGroups.js';
+import { mergeDuplicateGroups } from './mergeDuplicateGroups.js';
 import { getTabOrganizerBookmarkFolders } from '../utils/getTabOrganizerBookmarkFolders.js';
 import {
   loadCategories,
@@ -121,6 +122,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   if (request.action === 'getProtectedGroups') {
     getProtectedGroups()
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'mergeDuplicateGroups') {
+    mergeDuplicateGroups()
       .then(result => sendResponse(result))
       .catch(error => sendResponse({ error: error.message }));
     return true;
