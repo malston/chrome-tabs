@@ -1,4 +1,4 @@
-# Chrome Tab Manager 🗂️
+# <img src="chrome-extension/assets/icon128.png" width="32" height="32" alt="icon"> Chrome Tab Manager
 
 [![CI](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml/badge.svg)](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml)
 [![Coverage](.github/coverage-badge.svg)](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml)
