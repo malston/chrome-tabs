@@ -528,4 +528,103 @@ describe('options.js', () => {
       );
     });
   });
+
+  describe('Advanced Features Settings', () => {
+    test('should load and display advanced features toggle state when enabled', async () => {
+      chrome.storage.local.get.mockResolvedValue({ advancedFeaturesEnabled: true });
+
+      jest.isolateModules(() => {
+        require('./options.js');
+      });
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(chrome.storage.local.get).toHaveBeenCalledWith(['advancedFeaturesEnabled', 'autoMergeDuplicates']);
+      expect(mockElements.advancedFeaturesEnabled.checked).toBe(true);
+    });
+
+    test('should show sub-toggle when advanced features enabled', async () => {
+      chrome.storage.local.get.mockResolvedValue({ advancedFeaturesEnabled: true });
+
+      jest.isolateModules(() => {
+        require('./options.js');
+      });
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(mockElements.autoMergeSettingContainer.style.display).toBe('block');
+    });
+
+    test('should hide sub-toggle when advanced features disabled', async () => {
+      chrome.storage.local.get.mockResolvedValue({ advancedFeaturesEnabled: false });
+
+      jest.isolateModules(() => {
+        require('./options.js');
+      });
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(mockElements.autoMergeSettingContainer.style.display).toBe('none');
+    });
+
+    test('should save settings when advanced features toggle changed', async () => {
+      let changeHandler;
+      mockElements.advancedFeaturesEnabled.addEventListener.mockImplementation((event, handler) => {
+        if (event === 'change') changeHandler = handler;
+      });
+
+      jest.isolateModules(() => {
+        require('./options.js');
+      });
+
+      await Promise.resolve();
+
+      mockElements.advancedFeaturesEnabled.checked = true;
+      await changeHandler();
+
+      expect(chrome.storage.local.set).toHaveBeenCalledWith({ advancedFeaturesEnabled: true });
+    });
+
+    test('should save settings when auto-merge toggle changed', async () => {
+      let changeHandler;
+      mockElements.autoMergeDuplicates.addEventListener.mockImplementation((event, handler) => {
+        if (event === 'change') changeHandler = handler;
+      });
+
+      jest.isolateModules(() => {
+        require('./options.js');
+      });
+
+      await Promise.resolve();
+
+      mockElements.autoMergeDuplicates.checked = true;
+      await changeHandler();
+
+      expect(chrome.storage.local.set).toHaveBeenCalledWith({ autoMergeDuplicates: true });
+    });
+
+    test('should disable auto-merge when advanced features disabled', async () => {
+      let changeHandler;
+      mockElements.advancedFeaturesEnabled.addEventListener.mockImplementation((event, handler) => {
+        if (event === 'change') changeHandler = handler;
+      });
+
+      jest.isolateModules(() => {
+        require('./options.js');
+      });
+
+      await Promise.resolve();
+
+      // Enable, then disable advanced features
+      mockElements.advancedFeaturesEnabled.checked = false;
+      mockElements.autoMergeDuplicates.checked = true;
+      await changeHandler();
+
+      // Should set autoMergeDuplicates to false when advanced features disabled
+      expect(chrome.storage.local.set).toHaveBeenCalledWith({ autoMergeDuplicates: false });
+    });
+  });
 });
