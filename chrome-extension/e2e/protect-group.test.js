@@ -229,7 +229,7 @@ describe('Protect Group Feature', () => {
     }
 
     expect(statusMessage).toContain('Protected');
-    expect(statusMessage).toContain('github.com');
+    expect(statusMessage).toContain('1 group');
     expect(statusMessage).toContain('3 tabs');
 
     // Step 6: Verify bookmark folder was created
