@@ -9,6 +9,12 @@
 global.chrome = {
   runtime: {
     sendMessage: jest.fn()
+  },
+  storage: {
+    local: {
+      get: jest.fn().mockResolvedValue({}),
+      set: jest.fn().mockResolvedValue()
+    }
   }
 };
 
@@ -26,7 +32,10 @@ const mockElements = {
   categoryName: { value: '', focus: jest.fn() },
   categoryPatterns: { value: '' },
   cancelModalBtn: { addEventListener: jest.fn() },
-  saveModalBtn: { addEventListener: jest.fn() }
+  saveModalBtn: { addEventListener: jest.fn() },
+  advancedFeaturesEnabled: { checked: false, addEventListener: jest.fn() },
+  autoMergeDuplicates: { checked: false, addEventListener: jest.fn() },
+  autoMergeSettingContainer: { style: { display: 'none' } }
 };
 
 // Mock getElementById
@@ -44,7 +53,10 @@ document.getElementById = jest.fn((id) => {
     'categoryName': mockElements.categoryName,
     'categoryPatterns': mockElements.categoryPatterns,
     'cancelModalBtn': mockElements.cancelModalBtn,
-    'saveModalBtn': mockElements.saveModalBtn
+    'saveModalBtn': mockElements.saveModalBtn,
+    'advancedFeaturesEnabled': mockElements.advancedFeaturesEnabled,
+    'autoMergeDuplicates': mockElements.autoMergeDuplicates,
+    'autoMergeSettingContainer': mockElements.autoMergeSettingContainer
   };
   return idMap[id] || null;
 });

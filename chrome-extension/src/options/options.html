@@ -263,6 +263,37 @@
     .hidden {
       display: none;
     }
+
+    .settings-section {
+      background: white;
+      border: 1px solid #e8eaed;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .settings-section h2 {
+      font-size: 16px;
+      margin: 0 0 16px 0;
+    }
+
+    .setting-item {
+      margin-bottom: 12px;
+    }
+
+    .setting-item small {
+      display: block;
+      margin-top: 4px;
+      margin-left: 24px;
+      color: #5f6368;
+      font-size: 12px;
+    }
+
+    .sub-setting {
+      margin-left: 24px;
+      padding-left: 12px;
+      border-left: 2px solid #e8eaed;
+    }
   </style>
 </head>
 <body>
@@ -278,6 +309,24 @@
 
   <div id="categoryList" class="category-list">
     <!-- Categories will be rendered here -->
+  </div>
+
+  <div class="settings-section">
+    <h2>Advanced Features</h2>
+    <div class="setting-item">
+      <label class="toggle-label">
+        <input type="checkbox" id="advancedFeaturesEnabled">
+        Enable Advanced Features
+      </label>
+      <small>Shows additional tools for power users in the popup</small>
+    </div>
+    <div class="setting-item sub-setting" id="autoMergeSettingContainer" style="display: none;">
+      <label class="toggle-label">
+        <input type="checkbox" id="autoMergeDuplicates">
+        Auto-merge duplicate groups during organize
+      </label>
+      <small>Automatically consolidates groups with the same name before organizing</small>
+    </div>
   </div>
 
   <div class="footer">
