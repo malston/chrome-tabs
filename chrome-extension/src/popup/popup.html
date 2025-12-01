@@ -180,6 +180,22 @@
       flex: 1;
       margin-bottom: 0;
     }
+
+    .advanced-section {
+      margin-top: 16px;
+      padding-top: 12px;
+    }
+
+    .section-divider {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
   </style>
 </head>
 <body>
@@ -224,6 +240,13 @@
   <button id="removeGroupsBtn" class="secondary">
     Remove All Groups
   </button>
+
+  <div id="advancedSection" class="advanced-section" style="display: none;">
+    <div class="section-divider">Advanced</div>
+    <button id="mergeDuplicatesBtn" class="secondary">
+      Merge Duplicate Groups
+    </button>
+  </div>
 
   <div id="status" class="status"></div>
 

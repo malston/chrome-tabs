@@ -67,6 +67,7 @@ let combineGroupsSelector, sourceGroupSelect, targetGroupSelect, combineSelected
 let protectGroupBtn, protectGroupSelector, protectGroupSelect, protectSelectedBtn, cancelProtectBtn;
 let protectedGroupsList, protectedGroupsContainer, closeProtectedListBtn;
 let settingsLink;
+let advancedSection, mergeDuplicatesBtn;
 const allButtons = [];
 
 // Mock Chrome API
@@ -74,6 +75,11 @@ global.chrome = {
   runtime: {
     sendMessage: jest.fn(),
     openOptionsPage: jest.fn(),
+  },
+  storage: {
+    local: {
+      get: jest.fn().mockResolvedValue({}),
+    },
   },
 };
 
@@ -109,6 +115,8 @@ global.document = {
       case 'protectedGroupsContainer': return protectedGroupsContainer;
       case 'closeProtectedListBtn': return closeProtectedListBtn;
       case 'settingsLink': return settingsLink;
+      case 'advancedSection': return advancedSection;
+      case 'mergeDuplicatesBtn': return mergeDuplicatesBtn;
       default: return null;
     }
   },
@@ -156,9 +164,11 @@ function setupDOM() {
   protectedGroupsContainer = createMockElement('protectedGroupsContainer');
   closeProtectedListBtn = createMockElement('closeProtectedListBtn');
   settingsLink = createMockElement('settingsLink');
+  advancedSection = createMockElement('advancedSection');
+  mergeDuplicatesBtn = createMockElement('mergeDuplicatesBtn');
 
   allButtons.length = 0;
-  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, combineGroupsBtn, protectGroupBtn, removeGroupsBtn);
+  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, combineGroupsBtn, protectGroupBtn, removeGroupsBtn, mergeDuplicatesBtn);
   allButtons.forEach = function(callback) {
     for (let i = 0; i < this.length; i++) {
       callback(this[i]);

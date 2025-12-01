@@ -330,7 +330,7 @@ removeGroupsBtn.addEventListener('click', async () => {
 });
 
 // Combine Groups functionality
-const mainButtonsSelector = '#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #protectGroupBtn, #removeGroupsBtn';
+const mainButtonsSelector = '#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #protectGroupBtn, #removeGroupsBtn, #mergeDuplicatesBtn';
 
 function hideMainButtons() {
   document.querySelectorAll(mainButtonsSelector).forEach(btn => btn.style.display = 'none');
@@ -545,3 +545,46 @@ if (settingsLink) {
     chrome.runtime.openOptionsPage();
   });
 }
+
+// Advanced Features Section
+const advancedSection = document.getElementById('advancedSection');
+const mergeDuplicatesBtn = document.getElementById('mergeDuplicatesBtn');
+
+// Check if advanced features are enabled and show/hide section
+async function initAdvancedSection() {
+  const result = await chrome.storage.local.get('advancedFeaturesEnabled');
+  if (result.advancedFeaturesEnabled) {
+    advancedSection.style.display = 'block';
+  }
+}
+
+mergeDuplicatesBtn.addEventListener('click', async () => {
+  mergeDuplicatesBtn.disabled = true;
+  mergeDuplicatesBtn.textContent = 'Merging...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'mergeDuplicateGroups'
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else if (response.mergedGroups === 0) {
+      showStatus('No duplicate groups to merge', 'success');
+    } else {
+      let message = `✓ Merged ${response.mergedGroups} groups (${response.tabsMoved} tabs moved)`;
+      if (response.skippedProtected > 0) {
+        message += ` (${response.skippedProtected} protected sets skipped)`;
+      }
+      showStatus(message, 'success');
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    mergeDuplicatesBtn.disabled = false;
+    mergeDuplicatesBtn.textContent = 'Merge Duplicate Groups';
+  }
+});
+
+// Initialize advanced section
+initAdvancedSection();
