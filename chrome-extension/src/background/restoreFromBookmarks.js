@@ -76,16 +76,33 @@ async function restoreFromBookmarks(bookmarkFolderId) {
       if (newTabIds.length > 0) {
         const existingGroup = groupsByTitle.get(groupName);
         if (existingGroup) {
-          await chrome.tabs.group({ tabIds: newTabIds, groupId: existingGroup.id });
-          groupsMerged++;
+          // Add tabs to existing group
+          try {
+            await chrome.tabs.group({ tabIds: newTabIds, groupId: existingGroup.id });
+            groupsMerged++;
+            console.log(`Added ${newTabIds.length} tabs to existing group: ${groupName}`);
+          } catch (e) {
+            console.error(`Error adding tabs to group ${groupName}:`, e);
+          }
         } else {
-          const groupId = await chrome.tabs.group({ tabIds: newTabIds });
-          await chrome.tabGroups.update(groupId, {
-            title: groupName,
-            color: getNextColor(),
-            collapsed: false
-          });
-          groupsCreated++;
+          // Create new group
+          try {
+            const groupId = await chrome.tabs.group({ tabIds: newTabIds });
+            await chrome.tabGroups.update(groupId, {
+              title: groupName,
+              color: getNextColor(),
+              collapsed: false
+            });
+            groupsCreated++;
+
+            // Add to our tracking map
+            const newGroup = await chrome.tabGroups.get(groupId);
+            groupsByTitle.set(groupName, newGroup);
+
+            console.log(`Created new group: ${groupName} with ${newTabIds.length} tabs`);
+          } catch (e) {
+            console.error(`Error creating group ${groupName}:`, e);
+          }
         }
       }
     }
