@@ -310,6 +310,38 @@ describe('getTabOrganizerBookmarkFolders', () => {
       expect(result).toHaveLength(3);
     });
 
+    test('should include protected group folders starting with 🔒', async () => {
+      const mockChildren = [
+        { id: '1', title: '🔒 github.com - 2024-01-15' },
+        { id: '2', title: 'Tab Organizer - 2024-01-16' },
+        { id: '3', title: '🔒 work-tabs - 2024-01-17' },
+        { id: '4', title: 'Some Other Folder' },
+      ];
+
+      chrome.bookmarks.getChildren.mockResolvedValue(mockChildren);
+
+      const result = await getTabOrganizerBookmarkFolders();
+
+      expect(result).toHaveLength(3);
+      // Should include both Tab Organizer and protected group folders
+      expect(result.map(f => f.id)).toContain('1');
+      expect(result.map(f => f.id)).toContain('2');
+      expect(result.map(f => f.id)).toContain('3');
+    });
+
+    test('should handle only protected group folders', async () => {
+      const mockChildren = [
+        { id: '1', title: '🔒 github.com - 2024-01-15' },
+        { id: '2', title: '🔒 stackoverflow.com - 2024-01-16' },
+      ];
+
+      chrome.bookmarks.getChildren.mockResolvedValue(mockChildren);
+
+      const result = await getTabOrganizerBookmarkFolders();
+
+      expect(result).toHaveLength(2);
+    });
+
     test('should handle very long folder names', async () => {
       const longName = 'Tab Organizer - ' + 'a'.repeat(500);
       const mockChildren = [
