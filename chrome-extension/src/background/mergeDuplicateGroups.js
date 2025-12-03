@@ -23,7 +23,6 @@ function isValidGroupName(name) {
 async function mergeDuplicateGroups() {
   // Get all groups in current window
   const allGroups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
-  console.log('All groups found:', allGroups.map(g => ({ id: g.id, title: g.title, collapsed: g.collapsed })));
 
   // Get protected groups
   const protectedGroups = await getProtectedGroupsFromStorage();
@@ -34,7 +33,6 @@ async function mergeDuplicateGroups() {
 
   for (const group of allGroups) {
     const baseName = extractGroupBaseName(group.title);
-    console.log(`Group "${group.title}" (collapsed: ${group.collapsed}) -> baseName: "${baseName}"`);
 
     if (!isValidGroupName(baseName)) {
       continue;
@@ -58,14 +56,12 @@ async function mergeDuplicateGroups() {
     const groupsWithTabs = await Promise.all(
       groups.map(async (group) => {
         const tabs = await chrome.tabs.query({ groupId: group.id });
-        console.log(`  Group "${group.title}" has ${tabs.length} tabs (collapsed: ${group.collapsed})`);
         return { group, tabs, tabCount: tabs.length };
       })
     );
 
     // Filter out empty groups
     const nonEmptyGroups = groupsWithTabs.filter(g => g.tabCount > 0);
-    console.log(`  Non-empty groups for "${baseName}": ${nonEmptyGroups.length}`);
     if (nonEmptyGroups.length < 2) continue;
 
     // Check protection status

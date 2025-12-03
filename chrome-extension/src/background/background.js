@@ -20,11 +20,8 @@ import {
   DEFAULT_CATEGORIES
 } from '../utils/categoryManager.js';
 
-console.log('Tab Organizer extension loaded');
-
 // Initialize categories on startup
 loadCategories()
-  .then(() => console.log('Categories loaded'))
   .catch(error => console.error('Failed to load categories:', error));
 
 // Listen for messages from popup

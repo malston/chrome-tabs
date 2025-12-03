@@ -299,19 +299,6 @@ describe('removeAllGroups', () => {
   });
 
   describe('Console Logging', () => {
-    test('should log when removing groups', async () => {
-      const mockTabs = [
-        { id: 1, groupId: 1, title: 'Tab 1', url: 'https://example.com' },
-      ];
-
-      chrome.tabs.query.mockResolvedValue(mockTabs);
-      chrome.tabs.ungroup.mockResolvedValue(undefined);
-
-      await removeAllGroups();
-
-      expect(console.log).toHaveBeenCalledWith('Removing all tab groups...');
-    });
-
     test('should log errors when ungrouping fails', async () => {
       const mockTabs = [
         { id: 1, groupId: 1, title: 'Tab 1', url: 'https://example.com' },

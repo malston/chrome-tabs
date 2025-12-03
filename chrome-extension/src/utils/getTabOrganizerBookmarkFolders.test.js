@@ -434,26 +434,6 @@ describe('getTabOrganizerBookmarkFolders', () => {
     });
   });
 
-  describe('Console Logging', () => {
-    test('should log when getting bookmark folders', async () => {
-      chrome.bookmarks.getChildren.mockResolvedValue([]);
-
-      await getTabOrganizerBookmarkFolders();
-
-      expect(console.log).toHaveBeenCalledWith('Getting Tab Organizer bookmark folders...');
-    });
-
-    test('should log even when no folders found', async () => {
-      chrome.bookmarks.getChildren.mockResolvedValue([
-        { id: '1', title: 'Other Folder' },
-      ]);
-
-      await getTabOrganizerBookmarkFolders();
-
-      expect(console.log).toHaveBeenCalledWith('Getting Tab Organizer bookmark folders...');
-    });
-  });
-
   describe('Return Value Validation', () => {
     test('should return array of objects with id and title', async () => {
       const mockChildren = [

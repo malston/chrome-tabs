@@ -12,8 +12,6 @@ import { getOtherBookmarksId } from './getOtherBookmarksId.js';
  * @throws {Error} If unable to retrieve bookmarks or find Other Bookmarks folder
  */
 async function getTabOrganizerBookmarkFolders() {
-  console.log('Getting Tab Organizer bookmark folders...');
-
   // Get "Other Bookmarks" folder ID dynamically
   const otherBookmarksId = await getOtherBookmarksId();
   const children = await chrome.bookmarks.getChildren(otherBookmarksId);

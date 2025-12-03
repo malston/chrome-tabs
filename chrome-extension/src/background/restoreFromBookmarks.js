@@ -12,8 +12,6 @@ import { getNextColor } from '../utils/colorManager.js';
  * @returns {Promise<Object>} Statistics object with: totalRestored, duplicatesSkipped, groupsCreated, groupsMerged
  */
 async function restoreFromBookmarks(bookmarkFolderId) {
-  console.log('Restoring tabs from bookmarks...');
-
   // Get the bookmark folder
   const [folder] = await chrome.bookmarks.get(bookmarkFolderId);
   if (!folder) {
@@ -92,7 +90,6 @@ async function restoreFromBookmarks(bookmarkFolderId) {
             groupId: existingGroup.id
           });
           groupsMerged++;
-          console.log(`Added ${newTabIds.length} tabs to existing group: ${groupName}`);
         } catch (e) {
           console.error(`Error adding tabs to group ${groupName}:`, e);
         }
@@ -110,16 +107,12 @@ async function restoreFromBookmarks(bookmarkFolderId) {
           // Add to our tracking map
           const newGroup = await chrome.tabGroups.get(groupId);
           groupsByTitle.set(groupName, newGroup);
-
-          console.log(`Created new group: ${groupName} with ${newTabIds.length} tabs`);
         } catch (e) {
           console.error(`Error creating group ${groupName}:`, e);
         }
       }
     }
   }
-
-  console.log(`Restored ${totalRestored} tabs, skipped ${duplicatesSkipped} duplicates`);
 
   return {
     totalRestored: totalRestored,
