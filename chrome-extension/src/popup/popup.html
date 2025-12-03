@@ -129,6 +129,38 @@
       text-align: center;
     }
 
+    .section-header {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin: 16px 0 8px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-header:first-of-type {
+      margin-top: 0;
+    }
+
+    .settings-link {
+      display: block;
+      text-align: center;
+      padding: 10px;
+      margin-top: 8px;
+      background-color: var(--bg-tertiary);
+      border-radius: 4px;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .settings-link:hover {
+      background-color: var(--secondary-hover);
+    }
+
     .bookmark-selector {
       margin-top: 16px;
       padding: 16px;
@@ -185,20 +217,14 @@
 <body>
   <h1>Tab Organizer</h1>
 
+  <div class="section-header">Current Window</div>
+
   <button id="organizeBtn" class="primary">
     Organize by Domain
   </button>
 
   <button id="organizeCategoryBtn" class="primary">
     Organize by Category
-  </button>
-
-  <button id="organizeAllWindowsBtn" class="primary">
-    Organize All Windows by Domain
-  </button>
-
-  <button id="organizeAllWindowsCategoryBtn" class="primary">
-    Organize All Windows by Category
   </button>
 
   <button id="dedupeBtn" class="primary">
@@ -223,6 +249,16 @@
 
   <button id="removeGroupsBtn" class="secondary">
     Remove All Groups
+  </button>
+
+  <div class="section-header">All Windows</div>
+
+  <button id="organizeAllWindowsBtn" class="primary">
+    Organize All Windows by Domain
+  </button>
+
+  <button id="organizeAllWindowsCategoryBtn" class="primary">
+    Organize All Windows by Category
   </button>
 
   <div id="status" class="status"></div>
@@ -266,10 +302,10 @@
     </div>
   </div>
 
+  <a href="#" id="settingsLink" class="settings-link">⚙️ Category Settings</a>
+
   <div class="footer">
     Organize and deduplicate tabs
-    <br>
-    <a href="#" id="settingsLink" style="color: #1a73e8; text-decoration: none;">Category Settings</a>
   </div>
 
   <script src="popup.js"></script>
