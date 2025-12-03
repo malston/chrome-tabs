@@ -13,7 +13,12 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
   let mergeResult = null;
   const settings = await chrome.storage.local.get('autoMergeDuplicates');
   if (settings.autoMergeDuplicates) {
-    mergeResult = await mergeDuplicateGroups();
+    try {
+      mergeResult = await mergeDuplicateGroups();
+    } catch (error) {
+      console.error('Auto-merge failed, continuing with organize:', error);
+      // Continue with organize even if merge fails
+    }
   }
 
   // Get current window for reference

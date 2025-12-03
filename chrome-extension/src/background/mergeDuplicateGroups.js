@@ -24,6 +24,11 @@ async function mergeDuplicateGroups() {
   // Get all groups in current window
   const allGroups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
 
+  // Validate query result
+  if (!Array.isArray(allGroups)) {
+    throw new Error('Failed to query tab groups: invalid response');
+  }
+
   // Get protected groups
   const protectedGroups = await getProtectedGroupsFromStorage();
   const protectedGroupIds = new Set(Object.keys(protectedGroups).map(id => parseInt(id)));
