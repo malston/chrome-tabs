@@ -46,8 +46,8 @@
     }
 
     body {
-      width: 300px;
-      padding: 16px;
+      width: 280px;
+      padding: 12px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
       background-color: var(--bg-primary);
@@ -55,18 +55,24 @@
     }
 
     h1 {
-      font-size: 18px;
-      margin: 0 0 16px 0;
+      font-size: 16px;
+      margin: 0;
       color: var(--text-primary);
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
     }
 
     button {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 8px;
+      padding: 8px;
+      margin-bottom: 4px;
       border: none;
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       cursor: pointer;
       transition: background-color 0.2s;
@@ -97,11 +103,11 @@
     }
 
     .status {
-      margin-top: 16px;
-      padding: 12px;
+      margin-top: 8px;
+      padding: 8px;
       background-color: var(--status-bg);
       border-radius: 4px;
-      font-size: 13px;
+      font-size: 12px;
       display: none;
       color: var(--text-primary);
     }
@@ -121,22 +127,22 @@
     }
 
     .footer {
-      margin-top: 16px;
-      padding-top: 16px;
+      margin-top: 8px;
+      padding-top: 8px;
       border-top: 1px solid var(--border-color);
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-secondary);
       text-align: center;
     }
 
     .section-header {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-secondary);
-      margin: 16px 0 8px 0;
-      padding-bottom: 4px;
+      margin: 10px 0 6px 0;
+      padding-bottom: 2px;
       border-bottom: 1px solid var(--border-color);
     }
 
@@ -145,43 +151,37 @@
     }
 
     .settings-link {
-      display: block;
-      text-align: center;
-      padding: 10px;
-      margin-top: 8px;
-      background-color: var(--bg-tertiary);
-      border-radius: 4px;
+      display: inline;
       color: var(--primary-color);
       text-decoration: none;
-      font-size: 13px;
-      font-weight: 500;
+      font-size: 11px;
     }
 
     .settings-link:hover {
-      background-color: var(--secondary-hover);
+      text-decoration: underline;
     }
 
     .bookmark-selector {
-      margin-top: 16px;
-      padding: 16px;
+      margin-top: 10px;
+      padding: 10px;
       background-color: var(--bg-secondary);
       border-radius: 4px;
       border: 1px solid var(--border-color);
     }
 
     .bookmark-selector h2 {
-      font-size: 14px;
-      margin: 0 0 12px 0;
+      font-size: 13px;
+      margin: 0 0 8px 0;
       color: var(--text-primary);
     }
 
     .bookmark-selector select {
       width: 100%;
-      padding: 8px;
+      padding: 6px;
       border: 1px solid var(--border-color);
       border-radius: 4px;
-      font-size: 13px;
-      margin-bottom: 12px;
+      font-size: 12px;
+      margin-bottom: 8px;
       background-color: var(--select-bg);
       color: var(--text-primary);
     }
@@ -216,27 +216,28 @@
 </head>
 <body>
   <h1>Tab Organizer</h1>
+  <div class="subtitle">Organize and deduplicate tabs</div>
 
   <div class="section-header">Current Window</div>
 
-  <button id="organizeBtn" class="primary">
-    Organize by Domain
+  <button id="organizeCategoryBtn" class="primary">
+    Organize Tabs by Category
   </button>
 
-  <button id="organizeCategoryBtn" class="primary">
-    Organize by Category
+  <button id="organizeBtn" class="primary">
+    Organize Tabs by Domain
   </button>
 
   <button id="dedupeBtn" class="primary">
-    Remove Duplicates
+    Remove Duplicate Tabs
   </button>
 
   <button id="saveBookmarksBtn" class="primary">
-    Save to Bookmarks
+    Save Tabs to Bookmarks
   </button>
 
   <button id="restoreBookmarksBtn" class="primary">
-    Restore from Bookmarks
+    Restore Tabs from Bookmarks
   </button>
 
   <button id="combineGroupsBtn" class="secondary">
@@ -251,14 +252,14 @@
     Remove All Groups
   </button>
 
-  <div class="section-header">All Windows</div>
-
-  <button id="organizeAllWindowsBtn" class="primary">
-    Organize All Windows by Domain
-  </button>
+  <div class="section-header">All Active Windows</div>
 
   <button id="organizeAllWindowsCategoryBtn" class="primary">
-    Organize All Windows by Category
+    Organize Tabs by Category
+  </button>
+
+  <button id="organizeAllWindowsBtn" class="primary">
+    Organize Tabs by Domain
   </button>
 
   <div id="status" class="status"></div>
@@ -274,9 +275,9 @@
 
   <div id="combineGroupsSelector" class="bookmark-selector" style="display: none;">
     <h2>Combine Tab Groups</h2>
-    <label for="sourceGroupSelect" style="font-size: 13px; display: block; margin-bottom: 4px;">Merge these groups (Cmd/Ctrl+click for multiple):</label>
+    <label for="sourceGroupSelect" style="font-size: 11px; display: block; margin-bottom: 4px;">Merge these groups (Cmd/Ctrl+click for multiple):</label>
     <select id="sourceGroupSelect" size="4" multiple></select>
-    <label for="targetGroupSelect" style="font-size: 13px; display: block; margin-bottom: 4px;">Into this group:</label>
+    <label for="targetGroupSelect" style="font-size: 11px; display: block; margin-bottom: 4px;">Into this group:</label>
     <select id="targetGroupSelect" size="4"></select>
     <div class="selector-buttons">
       <button id="combineSelectedBtn" class="primary">Combine</button>
@@ -286,7 +287,7 @@
 
   <div id="protectGroupSelector" class="bookmark-selector" style="display: none;">
     <h2>Protect Tab Groups</h2>
-    <label for="protectGroupSelect" style="font-size: 13px; display: block; margin-bottom: 4px;">Select groups to protect (Cmd/Ctrl+click for multiple):</label>
+    <label for="protectGroupSelect" style="font-size: 11px; display: block; margin-bottom: 4px;">Select groups to protect (Cmd/Ctrl+click for multiple):</label>
     <select id="protectGroupSelect" size="4" multiple></select>
     <div class="selector-buttons">
       <button id="protectSelectedBtn" class="primary">Protect</button>
@@ -302,10 +303,8 @@
     </div>
   </div>
 
-  <a href="#" id="settingsLink" class="settings-link">⚙️ Category Settings</a>
-
   <div class="footer">
-    Organize and deduplicate tabs
+    <a href="#" id="settingsLink" class="settings-link">Category Settings</a>
   </div>
 
   <script src="popup.js"></script>
