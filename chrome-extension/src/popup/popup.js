@@ -342,14 +342,12 @@ removeGroupsBtn.addEventListener('click', async () => {
 });
 
 // Combine Groups functionality
-const mainButtonsSelector = '#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #protectGroupBtn, #removeGroupsBtn, #mergeDuplicatesBtn';
-
 function hideMainButtons() {
-  document.querySelectorAll(mainButtonsSelector).forEach(btn => btn.style.display = 'none');
+  document.querySelectorAll('.main-action-btn').forEach(btn => btn.style.display = 'none');
 }
 
 function showMainButtons() {
-  document.querySelectorAll(mainButtonsSelector).forEach(btn => btn.style.display = 'block');
+  document.querySelectorAll('.main-action-btn').forEach(btn => btn.style.display = 'block');
 }
 
 function getSelectedSourceIds() {
