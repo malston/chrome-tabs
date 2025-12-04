@@ -110,26 +110,12 @@ See [chrome-extension/README.md](chrome-extension/README.md) for detailed instru
 
 ## Usage
 
-### Organize Tabs by Domain
-
-**Use the Chrome Extension**:
-
-1. Click the Tab Organizer icon in your toolbar
-2. Click "Organize by Domain"
-3. Done! All tabs grouped automatically
-
-Example result:
-
-- `github.com (25)` - All GitHub tabs
-- `acme.com (24)` - All acme.com tabs
-- `local-network (7)` - All lab IPs
-
 ### Organize Tabs by Category
 
 **Use the Chrome Extension**:
 
 1. Click the Tab Organizer icon in your toolbar
-2. Click "Organize by Category"
+2. Click "Organize Tabs by Category"
 3. Done! All tabs grouped by category
 
 Example result:
@@ -139,12 +125,26 @@ Example result:
 - `Social Media (12)` - Twitter, LinkedIn, Reddit tabs
 - `Shopping (8)` - Amazon, eBay tabs
 
+### Organize Tabs by Domain
+
+**Use the Chrome Extension**:
+
+1. Click the Tab Organizer icon in your toolbar
+2. Click "Organize Tabs by Domain"
+3. Done! All tabs grouped automatically
+
+Example result:
+
+- `github.com (25)` - All GitHub tabs
+- `acme.com (24)` - All acme.com tabs
+- `local-network (7)` - All lab IPs
+
 ### Organize All Windows
 
 **Consolidate tabs from all Chrome windows into the current window**:
 
 1. Click the Tab Organizer icon in your toolbar
-2. Click "Organize All Windows by Domain" or "Organize All Windows by Category"
+2. Under "All Active Windows", click "Organize Tabs by Domain" or "Organize Tabs by Category"
 3. Done! Tabs from all windows are moved to the current window and grouped
 
 This is useful when you have tabs scattered across multiple Chrome windows. The extension will:
@@ -157,7 +157,7 @@ This is useful when you have tabs scattered across multiple Chrome windows. The 
 **Use the Chrome Extension**:
 
 1. Click the Tab Organizer icon
-2. Click "Remove Duplicates"
+2. Click "Remove Duplicate Tabs"
 3. Done! All duplicate URLs removed
 
 ### Combine Tab Groups
@@ -187,7 +187,7 @@ Protected groups are automatically saved to bookmarks, making them easy to recov
 
 1. Organize your tabs first (by Domain or Category)
 2. Click the Tab Organizer icon
-3. Click "Save to Bookmarks"
+3. Click "Save Tabs to Bookmarks"
 4. Done! All tabs saved as bookmarks in organized folders
 
 All bookmarks are saved in "Other Bookmarks" under a timestamped folder. Each tab group becomes its own bookmark folder.
@@ -211,7 +211,7 @@ Custom categories let you group tabs exactly how you want. For example:
 **Use the Chrome Extension**:
 
 1. Click the Tab Organizer icon
-2. Click "Restore from Bookmarks"
+2. Click "Restore Tabs from Bookmarks"
 3. Select a previously saved bookmark folder
 4. Click "Restore"
 5. Done! Tabs and groups are recreated
@@ -276,16 +276,16 @@ chrome-tabs/
 
 ### Spring Cleaning
 
-1. Click extension → "Remove Duplicates"
-2. Click extension → "Organize by Domain" or "Organize by Category"
+1. Click extension → "Remove Duplicate Tabs"
+2. Click extension → "Organize Tabs by Domain" or "Organize Tabs by Category"
 3. Manually close groups you don't need
 4. Done!
 
 ### Before Closing Chrome
 
-1. Click extension → "Organize by Domain"
+1. Click extension → "Organize Tabs by Domain"
 2. Review your tab groups
-3. Click extension → "Save to Bookmarks" for important groups
+3. Click extension → "Save Tabs to Bookmarks" for important groups
 4. Close Chrome with confidence
 
 ## Releases
