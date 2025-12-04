@@ -14,8 +14,8 @@
       --border-color: #e8eaed;
       --primary-color: #1a73e8;
       --primary-hover: #1557b0;
-      --secondary-bg: #f1f3f4;
-      --secondary-hover: #e8eaed;
+      --secondary-bg: #34a853;
+      --secondary-hover: #2d9249;
       --status-bg: #e8f0fe;
       --success-bg: #e6f4ea;
       --success-text: #137333;
@@ -34,8 +34,8 @@
         --border-color: #5f6368;
         --primary-color: #8ab4f8;
         --primary-hover: #aecbfa;
-        --secondary-bg: #3c4043;
-        --secondary-hover: #5f6368;
+        --secondary-bg: #81c995;
+        --secondary-hover: #a8dab5;
         --status-bg: #394457;
         --success-bg: #1e3a2f;
         --success-text: #81c995;
@@ -95,11 +95,17 @@
 
     .secondary {
       background-color: var(--secondary-bg);
-      color: var(--text-primary);
+      color: #ffffff;
     }
 
     .secondary:hover {
       background-color: var(--secondary-hover);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .secondary {
+        color: #202124;
+      }
     }
 
     .status {
@@ -148,6 +154,16 @@
 
     .section-header:first-of-type {
       margin-top: 0;
+    }
+
+    .subsection-header {
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--text-secondary);
+      margin: 8px 0 4px 0;
+      opacity: 0.8;
     }
 
     .settings-link {
@@ -239,6 +255,8 @@
   <button id="restoreBookmarksBtn" class="primary">
     Restore Tabs from Bookmarks
   </button>
+
+  <div class="subsection-header">Manage Groups</div>
 
   <button id="combineGroupsBtn" class="secondary">
     Combine Groups
