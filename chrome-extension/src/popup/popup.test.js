@@ -728,7 +728,7 @@ describe('popup.js', () => {
       await Promise.resolve();
 
       expect(organizeAllWindowsBtn.disabled).toBe(false);
-      expect(organizeAllWindowsBtn.textContent).toBe('Organize All Windows by Domain');
+      expect(organizeAllWindowsBtn.textContent).toBe('Organize by Domain');
     });
 
     test('should display success status with all counts', async () => {
@@ -819,7 +819,7 @@ describe('popup.js', () => {
       await Promise.resolve();
 
       expect(organizeAllWindowsCategoryBtn.disabled).toBe(false);
-      expect(organizeAllWindowsCategoryBtn.textContent).toBe('Organize All Windows by Category');
+      expect(organizeAllWindowsCategoryBtn.textContent).toBe('Organize by Category');
     });
 
     test('should display success status with all counts', async () => {
