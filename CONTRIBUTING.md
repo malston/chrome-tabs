@@ -245,6 +245,28 @@ npm test
    - Ensure all tests pass (CI will check automatically)
    - Respond to review feedback
 
+### Automated Code Review Workflow
+
+This repository uses [Claude Code](https://claude.com/claude-code) for automated code reviews on pull requests.
+
+**Important Note for External Contributors:**
+
+Due to GitHub's security model, automated workflows cannot access secrets or authentication tokens for pull requests from forked repositories. This means:
+
+- ✅ **PRs from branches in `malston/chrome-tabs`** will receive automated Claude code reviews
+- ❌ **PRs from forked repositories** will not trigger the automated review workflow
+
+**If you're contributing from a fork:**
+
+Your PR will still be reviewed manually by maintainers. The automated Claude review is a convenience feature but not required for contributions to be accepted.
+
+If you'd like automated review on your PR, a maintainer can:
+1. Fetch your branch from your fork
+2. Push it to the main repository
+3. Create a new PR from the main repository branch
+
+This limitation exists to protect repository secrets and is a standard security practice for GitHub Actions workflows.
+
 ### Skipping Pre-commit Hooks
 
 If you need to commit without running hooks (not recommended):
