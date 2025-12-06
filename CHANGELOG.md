@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- UI: Improved popup UX with section headers and compact design (#56) - Better organization with Organize, Manage Groups, and Settings sections; shorter, clearer button labels, contributed by @AmberAlston
 - UI: Resized options page for better usability
 
 ### Fixed
