@@ -19,17 +19,17 @@ The extension provides a clean, simple interface with one-click actions:
 
 <img src="screenshots/popup.png" alt="Extension Popup" width="300">
 
-### Organized Tabs by Domain
-
-Tabs automatically grouped by domain with color coding:
-
-<img src="screenshots/organize-domain.jpg" alt="Organize by Domain" width="300">
-
 ### Organized Tabs by Category
 
 Tabs intelligently categorized by their purpose:
 
 <img src="screenshots/organize-category.jpg" alt="Organize by Category" width="300">
+
+### Organized Tabs by Domain
+
+Tabs automatically grouped by domain with color coding:
+
+<img src="screenshots/organize-domain.jpg" alt="Organize by Domain" width="300">
 
 ### Bookmark Restore Interface
 
