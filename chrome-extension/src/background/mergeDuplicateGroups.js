@@ -18,16 +18,17 @@ function isValidGroupName(name) {
 
 /**
  * Merges duplicate tab groups by moving tabs from smaller groups into larger ones.
- * @returns {Promise<{mergedGroups: number, tabsMoved: number, skippedProtected: number, message: string}>}
+ * @returns {Promise<{mergedGroups: number, tabsMoved: number, skippedProtected: number, errors: number, message: string}>}
  */
 async function mergeDuplicateGroups() {
-  // Get all groups in current window
-  const allGroups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+  try {
+    // Get all groups in current window
+    const allGroups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
 
-  // Validate query result
-  if (!Array.isArray(allGroups)) {
-    throw new Error('Failed to query tab groups: invalid response');
-  }
+    // Validate query result
+    if (!Array.isArray(allGroups)) {
+      throw new Error('Failed to query tab groups: invalid response');
+    }
 
   // Get protected groups
   const protectedGroups = await getProtectedGroupsFromStorage();
@@ -49,74 +50,103 @@ async function mergeDuplicateGroups() {
     groupsByBaseName.get(baseName).push(group);
   }
 
-  let mergedGroups = 0;
-  let tabsMoved = 0;
-  let skippedProtected = 0;
+    let mergedGroups = 0;
+    let tabsMoved = 0;
+    let skippedProtected = 0;
+    let errors = 0;
 
-  // Process each set of duplicates
-  for (const [baseName, groups] of groupsByBaseName) {
-    if (groups.length < 2) continue; // No duplicates
+    // Process each set of duplicates
+    for (const [baseName, groups] of groupsByBaseName) {
+      try {
+        if (groups.length < 2) continue; // No duplicates
 
-    // Get tab counts for each group
-    const groupsWithTabs = await Promise.all(
-      groups.map(async (group) => {
-        const tabs = await chrome.tabs.query({ groupId: group.id });
-        return { group, tabs, tabCount: tabs.length };
-      })
-    );
+        // Get tab counts for each group
+        const groupsWithTabs = await Promise.all(
+          groups.map(async (group) => {
+            try {
+              const tabs = await chrome.tabs.query({ groupId: group.id });
+              return { group, tabs, tabCount: tabs.length };
+            } catch (error) {
+              console.error(`Failed to query tabs for group ${group.id}:`, error);
+              return { group, tabs: [], tabCount: 0 };
+            }
+          })
+        );
 
-    // Filter out empty groups
-    const nonEmptyGroups = groupsWithTabs.filter(g => g.tabCount > 0);
-    if (nonEmptyGroups.length < 2) continue;
+        // Filter out empty groups
+        const nonEmptyGroups = groupsWithTabs.filter(g => g.tabCount > 0);
+        if (nonEmptyGroups.length < 2) continue;
 
-    // Check protection status
-    const protectedInSet = nonEmptyGroups.filter(g => protectedGroupIds.has(g.group.id));
+        // Check protection status
+        const protectedInSet = nonEmptyGroups.filter(g => protectedGroupIds.has(g.group.id));
 
-    if (protectedInSet.length > 1) {
-      // Multiple protected duplicates - skip this set
-      skippedProtected++;
-      continue;
+        if (protectedInSet.length > 1) {
+          // Multiple protected duplicates - skip this set
+          skippedProtected++;
+          continue;
+        }
+
+        // Determine target group:
+        // - If one is protected, it becomes the target
+        // - Otherwise, largest becomes target
+        let targetGroupData;
+        let sourceGroupsData;
+
+        if (protectedInSet.length === 1) {
+          targetGroupData = protectedInSet[0];
+          sourceGroupsData = nonEmptyGroups.filter(g => g.group.id !== targetGroupData.group.id);
+        } else {
+          // Sort by tab count descending, largest first
+          nonEmptyGroups.sort((a, b) => b.tabCount - a.tabCount);
+          targetGroupData = nonEmptyGroups[0];
+          sourceGroupsData = nonEmptyGroups.slice(1);
+        }
+
+        // Merge all source groups into target
+        const allSourceTabIds = sourceGroupsData.flatMap(g => g.tabs.map(t => t.id));
+
+        if (allSourceTabIds.length === 0) continue;
+
+        try {
+          await chrome.tabs.group({ tabIds: allSourceTabIds, groupId: targetGroupData.group.id });
+
+          // Update target group title with new count
+          const newTabCount = targetGroupData.tabCount + allSourceTabIds.length;
+          await chrome.tabGroups.update(targetGroupData.group.id, {
+            title: `${baseName} (${newTabCount})`
+          });
+
+          mergedGroups += sourceGroupsData.length;
+          tabsMoved += allSourceTabIds.length;
+        } catch (error) {
+          console.error(`Failed to merge groups for "${baseName}":`, error);
+          errors++;
+        }
+      } catch (error) {
+        console.error(`Failed to process duplicate groups for "${baseName}":`, error);
+        errors++;
+      }
     }
 
-    // Determine target group:
-    // - If one is protected, it becomes the target
-    // - Otherwise, largest becomes target
-    let targetGroupData;
-    let sourceGroupsData;
-
-    if (protectedInSet.length === 1) {
-      targetGroupData = protectedInSet[0];
-      sourceGroupsData = nonEmptyGroups.filter(g => g.group.id !== targetGroupData.group.id);
-    } else {
-      // Sort by tab count descending, largest first
-      nonEmptyGroups.sort((a, b) => b.tabCount - a.tabCount);
-      targetGroupData = nonEmptyGroups[0];
-      sourceGroupsData = nonEmptyGroups.slice(1);
-    }
-
-    // Merge all source groups into target
-    const allSourceTabIds = sourceGroupsData.flatMap(g => g.tabs.map(t => t.id));
-
-    if (allSourceTabIds.length === 0) continue;
-
-    await chrome.tabs.group({ tabIds: allSourceTabIds, groupId: targetGroupData.group.id });
-
-    // Update target group title with new count
-    const newTabCount = targetGroupData.tabCount + allSourceTabIds.length;
-    await chrome.tabGroups.update(targetGroupData.group.id, {
-      title: `${baseName} (${newTabCount})`
-    });
-
-    mergedGroups += sourceGroupsData.length;
-    tabsMoved += allSourceTabIds.length;
+    return {
+      mergedGroups,
+      tabsMoved,
+      skippedProtected,
+      errors,
+      message: mergedGroups === 0
+        ? (errors > 0 ? `Failed to merge groups (${errors} errors)` : 'No duplicate groups to merge')
+        : `Merged ${mergedGroups} groups (${tabsMoved} tabs moved)${errors > 0 ? ` with ${errors} errors` : ''}`
+    };
+  } catch (error) {
+    console.error('Failed to merge duplicate groups:', error);
+    return {
+      mergedGroups: 0,
+      tabsMoved: 0,
+      skippedProtected: 0,
+      errors: 1,
+      message: `Failed to merge groups: ${error.message}`
+    };
   }
-
-  return {
-    mergedGroups,
-    tabsMoved,
-    skippedProtected,
-    message: mergedGroups === 0 ? 'No duplicate groups to merge' : `Merged ${mergedGroups} groups (${tabsMoved} tabs moved)`
-  };
 }
 
 export { mergeDuplicateGroups, isValidGroupName };
