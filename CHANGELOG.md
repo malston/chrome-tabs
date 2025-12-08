@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-12-06
+
+### Added
+
+- CI: Claude Code Review workflow - Automated code review for pull requests
+- CI: Claude PR Assistant workflow - Automated PR assistance
+
+### Changed
+
+- UI: Improved popup UX with section headers and compact design (#56) - Better organization with Organize, Manage Groups, and Settings sections; shorter, clearer button labels, contributed by @AmberAlston
+- UI: Resized options page for better usability
+
+### Fixed
+
+- Protected group folders now included in Restore from Bookmarks (#52) - Protected groups are properly restored from bookmarks, contributed by @AmberAlston
+- Error handling and tracking consistency to protected folder restore - Improved reliability when restoring protected groups
+- CI workflow now only runs for same-repo PRs (not forks) - Prevents workflow failures on external contributions
+
+### Documentation
+
+- Updated README with new features and screenshots (#49)
+- Added merge duplicate groups design documentation
+
 ## [1.4.0] - 2025-11-30
 
 ### Added

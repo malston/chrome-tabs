@@ -37,36 +37,32 @@ async function restoreFromBookmarks(bookmarkFolderId) {
   let groupsCreated = 0;
   let groupsMerged = 0;
 
-  // Process each bookmark folder (which represents a tab group)
-  for (const child of children) {
-    // Only process folders
-    if (!child.url) {
-      const groupName = child.title;
-      const bookmarks = await chrome.bookmarks.getChildren(child.id);
+  // Check if this is a protected group folder (bookmarks directly in folder, no subfolders)
+  // Protected folders start with 🔒 and contain bookmarks directly
+  const hasSubfolders = children.some(child => !child.url);
+  const hasDirectBookmarks = children.some(child => child.url);
+  const isProtectedGroupFolder = folder.title.startsWith('🔒') && hasDirectBookmarks && !hasSubfolders;
 
-      // Filter out non-URL bookmarks and duplicates
-      const urlsToRestore = [];
-      for (const bookmark of bookmarks) {
-        if (bookmark.url && !shouldSkipUrl(bookmark.url)) {
-          if (existingUrls.has(bookmark.url)) {
-            duplicatesSkipped++;
-          } else {
-            urlsToRestore.push(bookmark.url);
-            existingUrls.add(bookmark.url); // Track to avoid duplicates within this restore
-          }
+  if (isProtectedGroupFolder) {
+    // Handle protected group folder: bookmarks are directly in the folder
+    // Extract group name from folder title (e.g., "🔒 github.com - 2024-01-15" -> "github.com")
+    const groupName = folder.title.replace(/^🔒\s*/, '').replace(/\s*-\s*\d{4}-\d{2}-\d{2}.*$/, '');
+
+    const urlsToRestore = [];
+    for (const bookmark of children) {
+      if (bookmark.url && !shouldSkipUrl(bookmark.url)) {
+        if (existingUrls.has(bookmark.url)) {
+          duplicatesSkipped++;
+        } else {
+          urlsToRestore.push(bookmark.url);
+          existingUrls.add(bookmark.url);
         }
       }
+    }
 
-      if (urlsToRestore.length === 0) {
-        continue; // Skip empty folders
-      }
-
-      // Create tabs for these URLs (parallel for better performance)
+    if (urlsToRestore.length > 0) {
       const tabPromises = urlsToRestore.map(url =>
-        chrome.tabs.create({
-          url: url,
-          active: false
-        }).catch(e => {
+        chrome.tabs.create({ url, active: false }).catch(e => {
           console.error(`Error creating tab for ${url}:`, e);
           return null;
         })
@@ -75,40 +71,116 @@ async function restoreFromBookmarks(bookmarkFolderId) {
       const newTabIds = tabs.filter(t => t !== null).map(t => t.id);
       totalRestored += newTabIds.length;
 
-      if (newTabIds.length === 0) {
-        continue; // No tabs created
-      }
+      if (newTabIds.length > 0) {
+        const existingGroup = groupsByTitle.get(groupName);
+        if (existingGroup) {
+          // Add tabs to existing group
+          try {
+            await chrome.tabs.group({ tabIds: newTabIds, groupId: existingGroup.id });
+            groupsMerged++;
+            console.log(`Added ${newTabIds.length} tabs to existing group: ${groupName}`);
+          } catch (e) {
+            console.error(`Error adding tabs to group ${groupName}:`, e);
+          }
+        } else {
+          // Create new group
+          try {
+            const groupId = await chrome.tabs.group({ tabIds: newTabIds });
+            await chrome.tabGroups.update(groupId, {
+              title: groupName,
+              color: getNextColor(),
+              collapsed: false
+            });
+            groupsCreated++;
 
-      // Check if group with this name already exists
-      const existingGroup = groupsByTitle.get(groupName);
+            // Add to our tracking map
+            const newGroup = await chrome.tabGroups.get(groupId);
+            groupsByTitle.set(groupName, newGroup);
 
-      if (existingGroup) {
-        // Add tabs to existing group
-        try {
-          await chrome.tabs.group({
-            tabIds: newTabIds,
-            groupId: existingGroup.id
-          });
-          groupsMerged++;
-        } catch (e) {
-          console.error(`Error adding tabs to group ${groupName}:`, e);
+            console.log(`Created new group: ${groupName} with ${newTabIds.length} tabs`);
+          } catch (e) {
+            console.error(`Error creating group ${groupName}:`, e);
+          }
         }
-      } else {
-        // Create new group
-        try {
-          const groupId = await chrome.tabs.group({ tabIds: newTabIds });
-          await chrome.tabGroups.update(groupId, {
-            title: groupName,
-            color: getNextColor(),
-            collapsed: false
-          });
-          groupsCreated++;
+      }
+    }
+  } else {
+    // Handle regular Tab Organizer folder: subfolders represent tab groups
+    for (const child of children) {
+      // Only process folders
+      if (!child.url) {
+        const groupName = child.title;
+        const bookmarks = await chrome.bookmarks.getChildren(child.id);
 
-          // Add to our tracking map
-          const newGroup = await chrome.tabGroups.get(groupId);
-          groupsByTitle.set(groupName, newGroup);
-        } catch (e) {
-          console.error(`Error creating group ${groupName}:`, e);
+        // Filter out non-URL bookmarks and duplicates
+        const urlsToRestore = [];
+        for (const bookmark of bookmarks) {
+          if (bookmark.url && !shouldSkipUrl(bookmark.url)) {
+            if (existingUrls.has(bookmark.url)) {
+              duplicatesSkipped++;
+            } else {
+              urlsToRestore.push(bookmark.url);
+              existingUrls.add(bookmark.url); // Track to avoid duplicates within this restore
+            }
+          }
+        }
+
+        if (urlsToRestore.length === 0) {
+          continue; // Skip empty folders
+        }
+
+        // Create tabs for these URLs (parallel for better performance)
+        const tabPromises = urlsToRestore.map(url =>
+          chrome.tabs.create({
+            url: url,
+            active: false
+          }).catch(e => {
+            console.error(`Error creating tab for ${url}:`, e);
+            return null;
+          })
+        );
+        const tabs = await Promise.all(tabPromises);
+        const newTabIds = tabs.filter(t => t !== null).map(t => t.id);
+        totalRestored += newTabIds.length;
+
+        if (newTabIds.length === 0) {
+          continue; // No tabs created
+        }
+
+        // Check if group with this name already exists
+        const existingGroup = groupsByTitle.get(groupName);
+
+        if (existingGroup) {
+          // Add tabs to existing group
+          try {
+            await chrome.tabs.group({
+              tabIds: newTabIds,
+              groupId: existingGroup.id
+            });
+            groupsMerged++;
+            console.log(`Added ${newTabIds.length} tabs to existing group: ${groupName}`);
+          } catch (e) {
+            console.error(`Error adding tabs to group ${groupName}:`, e);
+          }
+        } else {
+          // Create new group
+          try {
+            const groupId = await chrome.tabs.group({ tabIds: newTabIds });
+            await chrome.tabGroups.update(groupId, {
+              title: groupName,
+              color: getNextColor(),
+              collapsed: false
+            });
+            groupsCreated++;
+
+            // Add to our tracking map
+            const newGroup = await chrome.tabGroups.get(groupId);
+            groupsByTitle.set(groupName, newGroup);
+
+            console.log(`Created new group: ${groupName} with ${newTabIds.length} tabs`);
+          } catch (e) {
+            console.error(`Error creating group ${groupName}:`, e);
+          }
         }
       }
     }

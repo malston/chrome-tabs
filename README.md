@@ -3,7 +3,7 @@
 [![CI](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml/badge.svg)](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml)
 [![Coverage](.github/coverage-badge.svg)](https://github.com/malston/chrome-tabs/actions/workflows/ci.yml)
 
-Chrome extension for managing tabs: organize by domain, remove duplicates, and save to bookmarks.
+Chrome extension for managing tabs: organize by category or domain, remove duplicates, and save to bookmarks.
 
 Built for those of us that always have way too many tabs and windows open. Instead of having to manually create multiple Chrome tab groups, Tab Manager automates the groupings. You can then rename, color label, and more via the default Chrome group manager if desired.
 
@@ -19,17 +19,17 @@ The extension provides a clean, simple interface with one-click actions:
 
 <img src="screenshots/popup.png" alt="Extension Popup" width="300">
 
-### Organized Tabs by Domain
-
-Tabs automatically grouped by domain with color coding:
-
-<img src="screenshots/organize-domain.jpg" alt="Organize by Domain" width="300">
-
 ### Organized Tabs by Category
 
 Tabs intelligently categorized by their purpose:
 
 <img src="screenshots/organize-category.jpg" alt="Organize by Category" width="300">
+
+### Organized Tabs by Domain
+
+Tabs automatically grouped by domain with color coding:
+
+<img src="screenshots/organize-domain.jpg" alt="Organize by Domain" width="300">
 
 ### Bookmark Restore Interface
 
@@ -110,20 +110,6 @@ See [chrome-extension/README.md](chrome-extension/README.md) for detailed instru
 
 ## Usage
 
-### Organize Tabs by Domain
-
-**Use the Chrome Extension**:
-
-1. Click the Tab Organizer icon in your toolbar
-2. Click "Organize by Domain"
-3. Done! All tabs grouped automatically
-
-Example result:
-
-- `github.com (25)` - All GitHub tabs
-- `acme.com (24)` - All acme.com tabs
-- `local-network (7)` - All lab IPs
-
 ### Organize Tabs by Category
 
 **Use the Chrome Extension**:
@@ -139,12 +125,26 @@ Example result:
 - `Social Media (12)` - Twitter, LinkedIn, Reddit tabs
 - `Shopping (8)` - Amazon, eBay tabs
 
+### Organize Tabs by Domain
+
+**Use the Chrome Extension**:
+
+1. Click the Tab Organizer icon in your toolbar
+2. Click "Organize by Domain"
+3. Done! All tabs grouped automatically
+
+Example result:
+
+- `github.com (25)` - All GitHub tabs
+- `acme.com (24)` - All acme.com tabs
+- `local-network (7)` - All lab IPs
+
 ### Organize All Windows
 
 **Consolidate tabs from all Chrome windows into the current window**:
 
 1. Click the Tab Organizer icon in your toolbar
-2. Click "Organize All Windows by Domain" or "Organize All Windows by Category"
+2. Under "All Active Windows", click "Organize by Domain" or "Organize by Category"
 3. Done! Tabs from all windows are moved to the current window and grouped
 
 This is useful when you have tabs scattered across multiple Chrome windows. The extension will:

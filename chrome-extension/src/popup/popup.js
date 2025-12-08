@@ -140,7 +140,7 @@ organizeAllWindowsBtn.addEventListener('click', async () => {
     showStatus(`Error: ${error.message}`, 'error');
   } finally {
     organizeAllWindowsBtn.disabled = false;
-    organizeAllWindowsBtn.textContent = 'Organize All Windows by Domain';
+    organizeAllWindowsBtn.textContent = 'Organize by Domain';
   }
 });
 
@@ -180,7 +180,7 @@ organizeAllWindowsCategoryBtn.addEventListener('click', async () => {
     showStatus(`Error: ${error.message}`, 'error');
   } finally {
     organizeAllWindowsCategoryBtn.disabled = false;
-    organizeAllWindowsCategoryBtn.textContent = 'Organize All Windows by Category';
+    organizeAllWindowsCategoryBtn.textContent = 'Organize by Category';
   }
 });
 

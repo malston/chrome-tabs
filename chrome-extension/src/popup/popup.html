@@ -5,6 +5,22 @@
   <title>Tab Organizer</title>
   <style>
     :root {
+      /* Spacing */
+      --spacing-xs: 4px;
+      --spacing-sm: 6px;
+      --spacing-md: 8px;
+      --spacing-lg: 10px;
+      --spacing-xl: 12px;
+      --spacing-2xl: 16px;
+
+      /* Font sizes */
+      --font-size-xs: 9px;
+      --font-size-sm: 10px;
+      --font-size-md: 11px;
+      --font-size-base: 12px;
+      --font-size-lg: 13px;
+      --font-size-xl: 16px;
+
       /* Light mode colors (default) */
       --bg-primary: #ffffff;
       --bg-secondary: #f8f9fa;
@@ -14,8 +30,8 @@
       --border-color: #e8eaed;
       --primary-color: #1a73e8;
       --primary-hover: #1557b0;
-      --secondary-bg: #f1f3f4;
-      --secondary-hover: #e8eaed;
+      --secondary-bg: #34a853;
+      --secondary-hover: #2d9249;
       --status-bg: #e8f0fe;
       --success-bg: #e6f4ea;
       --success-text: #137333;
@@ -34,8 +50,8 @@
         --border-color: #5f6368;
         --primary-color: #8ab4f8;
         --primary-hover: #aecbfa;
-        --secondary-bg: #3c4043;
-        --secondary-hover: #5f6368;
+        --secondary-bg: #81c995;
+        --secondary-hover: #a8dab5;
         --status-bg: #394457;
         --success-bg: #1e3a2f;
         --success-text: #81c995;
@@ -46,8 +62,8 @@
     }
 
     body {
-      width: 300px;
-      padding: 16px;
+      width: 280px;
+      padding: var(--spacing-xl);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
       background-color: var(--bg-primary);
@@ -55,18 +71,18 @@
     }
 
     h1 {
-      font-size: 18px;
-      margin: 0 0 16px 0;
+      font-size: var(--font-size-xl);
+      margin: 0 0 var(--spacing-md) 0;
       color: var(--text-primary);
     }
 
     button {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 8px;
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-xs);
       border: none;
-      border-radius: 4px;
-      font-size: 14px;
+      border-radius: var(--spacing-xs);
+      font-size: var(--font-size-lg);
       font-weight: 500;
       cursor: pointer;
       transition: background-color 0.2s;
@@ -89,19 +105,25 @@
 
     .secondary {
       background-color: var(--secondary-bg);
-      color: var(--text-primary);
+      color: #ffffff;
     }
 
     .secondary:hover {
       background-color: var(--secondary-hover);
     }
 
+    @media (prefers-color-scheme: dark) {
+      .secondary {
+        color: #202124;
+      }
+    }
+
     .status {
-      margin-top: 16px;
-      padding: 12px;
+      margin-top: var(--spacing-md);
+      padding: var(--spacing-md);
       background-color: var(--status-bg);
-      border-radius: 4px;
-      font-size: 13px;
+      border-radius: var(--spacing-xs);
+      font-size: var(--font-size-base);
       display: none;
       color: var(--text-primary);
     }
@@ -121,41 +143,77 @@
     }
 
     .footer {
-      margin-top: 16px;
-      padding-top: 16px;
+      margin-top: var(--spacing-md);
+      padding-top: var(--spacing-md);
       border-top: 1px solid var(--border-color);
-      font-size: 12px;
+      font-size: var(--font-size-md);
       color: var(--text-secondary);
       text-align: center;
     }
 
+    .section-header {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin: var(--spacing-2xl) 0 var(--spacing-sm) 0;
+      padding-bottom: 2px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-header:first-of-type {
+      margin-top: 0;
+    }
+
+    .subsection-header {
+      font-size: var(--font-size-xs);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--text-secondary);
+      margin: var(--spacing-md) 0 var(--spacing-xs) 0;
+      opacity: 0.8;
+    }
+
+    .settings-link {
+      display: inline;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-size: var(--font-size-md);
+    }
+
+    .settings-link:hover {
+      text-decoration: underline;
+    }
+
     .bookmark-selector {
-      margin-top: 16px;
-      padding: 16px;
+      margin-top: var(--spacing-lg);
+      padding: var(--spacing-lg);
       background-color: var(--bg-secondary);
-      border-radius: 4px;
+      border-radius: var(--spacing-xs);
       border: 1px solid var(--border-color);
     }
 
     .bookmark-selector h2 {
-      font-size: 14px;
-      margin: 0 0 12px 0;
+      font-size: var(--font-size-lg);
+      margin: 0 0 var(--spacing-md) 0;
       color: var(--text-primary);
     }
 
     .bookmark-selector select {
       width: 100%;
-      padding: 8px;
+      padding: var(--spacing-sm);
       border: 1px solid var(--border-color);
-      border-radius: 4px;
-      font-size: 13px;
-      margin-bottom: 12px;
+      border-radius: var(--spacing-xs);
+      font-size: var(--font-size-base);
+      margin-bottom: var(--spacing-md);
       background-color: var(--select-bg);
       color: var(--text-primary);
     }
 
     .bookmark-selector select option {
-      padding: 8px;
+      padding: var(--spacing-md);
       background-color: var(--select-bg);
       color: var(--text-primary);
     }
@@ -173,12 +231,24 @@
 
     .selector-buttons {
       display: flex;
-      gap: 8px;
+      gap: var(--spacing-md);
     }
 
     .selector-buttons button {
       flex: 1;
       margin-bottom: 0;
+    }
+
+    .selector-label {
+      font-size: var(--font-size-md);
+      display: block;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .protected-groups-container {
+      max-height: 150px;
+      overflow-y: auto;
+      margin-bottom: var(--spacing-xl);
     }
 
     .advanced-section {
@@ -201,20 +271,16 @@
 <body>
   <h1>Tab Organizer</h1>
 
-  <button id="organizeBtn" class="primary main-action-btn">
-    Organize by Domain
-  </button>
+  <div class="section-header" role="heading" aria-level="2">Current Window</div>
+
+  <div class="subsection-header" role="heading" aria-level="3">Manage Tabs</div>
 
   <button id="organizeCategoryBtn" class="primary main-action-btn">
     Organize by Category
   </button>
 
-  <button id="organizeAllWindowsBtn" class="primary main-action-btn">
-    Organize All Windows by Domain
-  </button>
-
-  <button id="organizeAllWindowsCategoryBtn" class="primary main-action-btn">
-    Organize All Windows by Category
+  <button id="organizeBtn" class="primary main-action-btn">
+    Organize by Domain
   </button>
 
   <button id="dedupeBtn" class="primary main-action-btn">
@@ -229,6 +295,8 @@
     Restore from Bookmarks
   </button>
 
+  <div class="subsection-header" role="heading" aria-level="3">Manage Groups</div>
+
   <button id="combineGroupsBtn" class="secondary main-action-btn">
     Combine Groups
   </button>
@@ -239,6 +307,18 @@
 
   <button id="removeGroupsBtn" class="secondary main-action-btn">
     Remove All Groups
+  </button>
+
+  <div class="section-header" role="heading" aria-level="2">All Active Windows</div>
+
+  <div class="subsection-header" role="heading" aria-level="3">Manage Tabs</div>
+
+  <button id="organizeAllWindowsCategoryBtn" class="primary main-action-btn">
+    Organize by Category
+  </button>
+
+  <button id="organizeAllWindowsBtn" class="primary main-action-btn">
+    Organize by Domain
   </button>
 
   <div id="advancedSection" class="advanced-section" style="display: none;">
@@ -261,9 +341,9 @@
 
   <div id="combineGroupsSelector" class="bookmark-selector" style="display: none;">
     <h2>Combine Tab Groups</h2>
-    <label for="sourceGroupSelect" style="font-size: 13px; display: block; margin-bottom: 4px;">Merge these groups (Cmd/Ctrl+click for multiple):</label>
+    <label for="sourceGroupSelect" class="selector-label">Merge these groups (Cmd/Ctrl+click for multiple):</label>
     <select id="sourceGroupSelect" size="4" multiple></select>
-    <label for="targetGroupSelect" style="font-size: 13px; display: block; margin-bottom: 4px;">Into this group:</label>
+    <label for="targetGroupSelect" class="selector-label">Into this group:</label>
     <select id="targetGroupSelect" size="4"></select>
     <div class="selector-buttons">
       <button id="combineSelectedBtn" class="primary">Combine</button>
@@ -273,7 +353,7 @@
 
   <div id="protectGroupSelector" class="bookmark-selector" style="display: none;">
     <h2>Protect Tab Groups</h2>
-    <label for="protectGroupSelect" style="font-size: 13px; display: block; margin-bottom: 4px;">Select groups to protect (Cmd/Ctrl+click for multiple):</label>
+    <label for="protectGroupSelect" class="selector-label">Select groups to protect (Cmd/Ctrl+click for multiple):</label>
     <select id="protectGroupSelect" size="4" multiple></select>
     <div class="selector-buttons">
       <button id="protectSelectedBtn" class="primary">Protect</button>
@@ -283,16 +363,14 @@
 
   <div id="protectedGroupsList" class="bookmark-selector" style="display: none;">
     <h2>Protected Groups</h2>
-    <div id="protectedGroupsContainer" style="max-height: 150px; overflow-y: auto; margin-bottom: 12px;"></div>
+    <div id="protectedGroupsContainer" class="protected-groups-container"></div>
     <div class="selector-buttons">
       <button id="closeProtectedListBtn" class="secondary">Close</button>
     </div>
   </div>
 
   <div class="footer">
-    Organize and deduplicate tabs
-    <br>
-    <a href="#" id="settingsLink" style="color: #1a73e8; text-decoration: none;">Category Settings</a>
+    <a href="#" id="settingsLink" class="settings-link">Category Settings</a>
   </div>
 
   <script src="popup.js"></script>

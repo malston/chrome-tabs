@@ -27,6 +27,7 @@ global.chrome = {
   tabGroups: {
     query: jest.fn(),
     update: jest.fn(),
+    get: jest.fn(),
     TAB_GROUP_ID_NONE: -1
   },
   windows: {
@@ -343,6 +344,144 @@ describe('restoreFromBookmarks', () => {
       expect(result).toHaveProperty('duplicatesSkipped');
       expect(result).toHaveProperty('groupsCreated');
       expect(result).toHaveProperty('groupsMerged');
+    });
+  });
+
+  describe('Protected Group Folders', () => {
+    test('should restore tabs from protected group folder (flat structure)', async () => {
+      // Protected groups have bookmarks directly in the folder, no subfolders
+      const mockFolder = { id: 'folder1', title: '🔒 github.com - 2024-01-15' };
+      const mockBookmarks = [
+        { id: 'bm1', url: 'https://github.com/repo1', title: 'Repo 1' },
+        { id: 'bm2', url: 'https://github.com/repo2', title: 'Repo 2' }
+      ];
+
+      chrome.bookmarks.get.mockResolvedValue([mockFolder]);
+      chrome.bookmarks.getChildren.mockResolvedValue(mockBookmarks);
+      chrome.tabs.query.mockResolvedValue([]);
+      chrome.tabGroups.query.mockResolvedValue([]);
+      chrome.tabs.create
+        .mockResolvedValueOnce({ id: 1 })
+        .mockResolvedValueOnce({ id: 2 });
+      chrome.tabs.group.mockResolvedValue(1);
+      chrome.tabGroups.update.mockResolvedValue({});
+      chrome.tabGroups.get.mockResolvedValue({ id: 1, title: 'github.com' });
+
+      const result = await restoreFromBookmarks('folder1');
+
+      expect(result.totalRestored).toBe(2);
+      expect(result.groupsCreated).toBe(1);
+      expect(chrome.tabs.create).toHaveBeenCalledTimes(2);
+    });
+
+    test('should extract group name from protected folder title', async () => {
+      const mockFolder = { id: 'folder1', title: '🔒 my-work-tabs - 2024-01-15' };
+      const mockBookmarks = [
+        { id: 'bm1', url: 'https://example.com', title: 'Example' }
+      ];
+
+      chrome.bookmarks.get.mockResolvedValue([mockFolder]);
+      chrome.bookmarks.getChildren.mockResolvedValue(mockBookmarks);
+      chrome.tabs.query.mockResolvedValue([]);
+      chrome.tabGroups.query.mockResolvedValue([]);
+      chrome.tabs.create.mockResolvedValue({ id: 1 });
+      chrome.tabs.group.mockResolvedValue(1);
+      chrome.tabGroups.update.mockResolvedValue({});
+      chrome.tabGroups.get.mockResolvedValue({ id: 1, title: 'my-work-tabs' });
+
+      await restoreFromBookmarks('folder1');
+
+      // Verify group was created with extracted name
+      expect(chrome.tabGroups.update).toHaveBeenCalledWith(1, expect.objectContaining({
+        title: 'my-work-tabs'
+      }));
+    });
+
+    test('should skip duplicate URLs in protected group folder', async () => {
+      const mockFolder = { id: 'folder1', title: '🔒 github.com - 2024-01-15' };
+      const mockBookmarks = [
+        { id: 'bm1', url: 'https://github.com/repo1', title: 'Repo 1' },
+        { id: 'bm2', url: 'https://github.com/repo2', title: 'Repo 2' }
+      ];
+
+      chrome.bookmarks.get.mockResolvedValue([mockFolder]);
+      chrome.bookmarks.getChildren.mockResolvedValue(mockBookmarks);
+      // Existing tab with duplicate URL
+      chrome.tabs.query.mockResolvedValue([
+        { id: 100, url: 'https://github.com/repo1' }
+      ]);
+      chrome.tabGroups.query.mockResolvedValue([]);
+      chrome.tabs.create.mockResolvedValue({ id: 1 });
+      chrome.tabs.group.mockResolvedValue(1);
+      chrome.tabGroups.update.mockResolvedValue({});
+      chrome.tabGroups.get.mockResolvedValue({ id: 1, title: 'github.com' });
+
+      const result = await restoreFromBookmarks('folder1');
+
+      expect(result.totalRestored).toBe(1);
+      expect(result.duplicatesSkipped).toBe(1);
+    });
+
+    test('should merge into existing group for protected folder', async () => {
+      const mockFolder = { id: 'folder1', title: '🔒 github.com - 2024-01-15' };
+      const mockBookmarks = [
+        { id: 'bm1', url: 'https://github.com/repo1', title: 'Repo 1' }
+      ];
+
+      chrome.bookmarks.get.mockResolvedValue([mockFolder]);
+      chrome.bookmarks.getChildren.mockResolvedValue(mockBookmarks);
+      chrome.tabs.query.mockResolvedValue([]);
+      chrome.tabGroups.query.mockResolvedValue([
+        { id: 5, title: 'github.com' }
+      ]);
+      chrome.tabs.create.mockResolvedValue({ id: 1 });
+      chrome.tabs.group.mockResolvedValue(undefined);
+
+      const result = await restoreFromBookmarks('folder1');
+
+      expect(result.totalRestored).toBe(1);
+      expect(result.groupsMerged).toBe(1);
+      expect(result.groupsCreated).toBe(0);
+      expect(chrome.tabs.group).toHaveBeenCalledWith({
+        tabIds: [1],
+        groupId: 5
+      });
+    });
+
+    test('should handle empty protected group folder', async () => {
+      const mockFolder = { id: 'folder1', title: '🔒 empty - 2024-01-15' };
+
+      chrome.bookmarks.get.mockResolvedValue([mockFolder]);
+      chrome.bookmarks.getChildren.mockResolvedValue([]);
+      chrome.tabs.query.mockResolvedValue([]);
+      chrome.tabGroups.query.mockResolvedValue([]);
+
+      const result = await restoreFromBookmarks('folder1');
+
+      expect(result.totalRestored).toBe(0);
+      expect(result.groupsCreated).toBe(0);
+    });
+
+    test('should skip chrome URLs in protected group folder', async () => {
+      const mockFolder = { id: 'folder1', title: '🔒 mixed - 2024-01-15' };
+      const mockBookmarks = [
+        { id: 'bm1', url: 'chrome://extensions/', title: 'Extensions' },
+        { id: 'bm2', url: 'https://example.com', title: 'Example' }
+      ];
+
+      chrome.bookmarks.get.mockResolvedValue([mockFolder]);
+      chrome.bookmarks.getChildren.mockResolvedValue(mockBookmarks);
+      chrome.tabs.query.mockResolvedValue([]);
+      chrome.tabGroups.query.mockResolvedValue([]);
+      chrome.tabs.create.mockResolvedValue({ id: 1 });
+      chrome.tabs.group.mockResolvedValue(1);
+      chrome.tabGroups.update.mockResolvedValue({});
+      chrome.tabGroups.get.mockResolvedValue({ id: 1, title: 'mixed' });
+
+      const result = await restoreFromBookmarks('folder1');
+
+      expect(result.totalRestored).toBe(1);
+      expect(chrome.tabs.create).toHaveBeenCalledTimes(1);
     });
   });
 });
