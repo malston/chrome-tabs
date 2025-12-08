@@ -30,25 +30,25 @@ async function mergeDuplicateGroups() {
       throw new Error('Failed to query tab groups: invalid response');
     }
 
-  // Get protected groups
-  const protectedGroups = await getProtectedGroupsFromStorage();
-  const protectedGroupIds = new Set(Object.keys(protectedGroups).map(id => parseInt(id, 10)));
+    // Get protected groups
+    const protectedGroups = await getProtectedGroupsFromStorage();
+    const protectedGroupIds = new Set(Object.keys(protectedGroups).map(id => parseInt(id, 10)));
 
-  // Group by base name
-  const groupsByBaseName = new Map();
+    // Group by base name
+    const groupsByBaseName = new Map();
 
-  for (const group of allGroups) {
-    const baseName = extractGroupBaseName(group.title);
+    for (const group of allGroups) {
+      const baseName = extractGroupBaseName(group.title);
 
-    if (!isValidGroupName(baseName)) {
-      continue;
+      if (!isValidGroupName(baseName)) {
+        continue;
+      }
+
+      if (!groupsByBaseName.has(baseName)) {
+        groupsByBaseName.set(baseName, []);
+      }
+      groupsByBaseName.get(baseName).push(group);
     }
-
-    if (!groupsByBaseName.has(baseName)) {
-      groupsByBaseName.set(baseName, []);
-    }
-    groupsByBaseName.get(baseName).push(group);
-  }
 
     let mergedGroups = 0;
     let tabsMoved = 0;
