@@ -96,10 +96,10 @@ async function mergeDuplicateGroups() {
           targetGroupData = protectedInSet[0];
           sourceGroupsData = nonEmptyGroups.filter(g => g.group.id !== targetGroupData.group.id);
         } else {
-          // Sort by tab count descending, largest first
-          nonEmptyGroups.sort((a, b) => b.tabCount - a.tabCount);
-          targetGroupData = nonEmptyGroups[0];
-          sourceGroupsData = nonEmptyGroups.slice(1);
+          // Sort by tab count descending, largest first (use defensive copy)
+          const sortedGroups = [...nonEmptyGroups].sort((a, b) => b.tabCount - a.tabCount);
+          targetGroupData = sortedGroups[0];
+          sourceGroupsData = sortedGroups.slice(1);
         }
 
         // Merge all source groups into target
