@@ -277,7 +277,8 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
     ungroupedDuplicates: ungroupedDuplicates,
     ungroupedTabsMoved: ungroupedTabsMoved,
     duplicateGroupsMerged: mergeResult?.mergedGroups || 0,
-    tabsMovedFromMerge: mergeResult?.tabsMoved || 0
+    tabsMovedFromMerge: mergeResult?.tabsMoved || 0,
+    mergeErrors: mergeResult?.errors || 0
   };
 }
 

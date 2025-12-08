@@ -32,7 +32,7 @@ async function mergeDuplicateGroups() {
 
   // Get protected groups
   const protectedGroups = await getProtectedGroupsFromStorage();
-  const protectedGroupIds = new Set(Object.keys(protectedGroups).map(id => parseInt(id)));
+  const protectedGroupIds = new Set(Object.keys(protectedGroups).map(id => parseInt(id, 10)));
 
   // Group by base name
   const groupsByBaseName = new Map();

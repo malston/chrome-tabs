@@ -1877,6 +1877,7 @@ describe('popup.js', () => {
         mergedGroups: 0,
         tabsMoved: 0,
         skippedProtected: 0,
+        errors: 0,
         message: 'No duplicate groups to merge'
       });
 

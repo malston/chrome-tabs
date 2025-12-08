@@ -55,6 +55,9 @@ organizeBtn.addEventListener('click', async () => {
       if (response.duplicateGroupsMerged > 0) {
         message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
       }
+      if (response.mergeErrors > 0) {
+        message += ` ⚠️ ${response.mergeErrors} merge error(s) occurred.`;
+      }
       if (response.ungroupedTabsMoved > 0) {
         message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
       }
@@ -87,6 +90,9 @@ organizeCategoryBtn.addEventListener('click', async () => {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`;
       if (response.duplicateGroupsMerged > 0) {
         message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
+      if (response.mergeErrors > 0) {
+        message += ` ⚠️ ${response.mergeErrors} merge error(s) occurred.`;
       }
       if (response.ungroupedTabsMoved > 0) {
         message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
@@ -121,6 +127,9 @@ organizeAllWindowsBtn.addEventListener('click', async () => {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} groups!`;
       if (response.duplicateGroupsMerged > 0) {
         message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
+      if (response.mergeErrors > 0) {
+        message += ` ⚠️ ${response.mergeErrors} merge error(s) occurred.`;
       }
       if (response.duplicatesClosed > 0) {
         message += ` Removed ${response.duplicatesClosed} duplicates.`;
@@ -161,6 +170,9 @@ organizeAllWindowsCategoryBtn.addEventListener('click', async () => {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`;
       if (response.duplicateGroupsMerged > 0) {
         message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
+      if (response.mergeErrors > 0) {
+        message += ` ⚠️ ${response.mergeErrors} merge error(s) occurred.`;
       }
       if (response.duplicatesClosed > 0) {
         message += ` Removed ${response.duplicatesClosed} duplicates.`;
@@ -579,14 +591,17 @@ mergeDuplicatesBtn.addEventListener('click', async () => {
 
     if (response.error) {
       showStatus(`Error: ${response.error}`, 'error');
-    } else if (response.mergedGroups === 0) {
+    } else if (response.mergedGroups === 0 && response.errors === 0) {
       showStatus('No duplicate groups to merge', 'success');
     } else {
       let message = `✓ Merged ${response.mergedGroups} groups (${response.tabsMoved} tabs moved)`;
       if (response.skippedProtected > 0) {
         message += ` (${response.skippedProtected} protected sets skipped)`;
       }
-      showStatus(message, 'success');
+      if (response.errors > 0) {
+        message += ` ⚠️ ${response.errors} merge error(s) occurred`;
+      }
+      showStatus(message, response.errors > 0 ? 'error' : 'success');
     }
   } catch (error) {
     showStatus(`Error: ${error.message}`, 'error');
