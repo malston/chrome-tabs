@@ -61,7 +61,7 @@ const createElement = (tag) => {
 };
 
 // Setup DOM environment
-let organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn, combineGroupsBtn;
+let organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, saveBookmarksBtn, restoreBookmarksBtn, removeGroupsBtn, combineGroupsBtn;
 let statusDiv, bookmarkSelector, folderSelect, restoreSelectedBtn, cancelSelectBtn;
 let combineGroupsSelector, sourceGroupSelect, targetGroupSelect, combineSelectedBtn, cancelCombineBtn;
 let protectGroupBtn, protectGroupSelector, protectGroupSelect, protectSelectedBtn, cancelProtectBtn;
@@ -91,7 +91,6 @@ global.document = {
       case 'organizeCategoryBtn': return organizeCategoryBtn;
       case 'organizeAllWindowsBtn': return organizeAllWindowsBtn;
       case 'organizeAllWindowsCategoryBtn': return organizeAllWindowsCategoryBtn;
-      case 'dedupeBtn': return dedupeBtn;
       case 'saveBookmarksBtn': return saveBookmarksBtn;
       case 'restoreBookmarksBtn': return restoreBookmarksBtn;
       case 'removeGroupsBtn': return removeGroupsBtn;
@@ -129,7 +128,6 @@ function setupDOM() {
   organizeCategoryBtn = createMockElement('organizeCategoryBtn');
   organizeAllWindowsBtn = createMockElement('organizeAllWindowsBtn');
   organizeAllWindowsCategoryBtn = createMockElement('organizeAllWindowsCategoryBtn');
-  dedupeBtn = createMockElement('dedupeBtn');
   saveBookmarksBtn = createMockElement('saveBookmarksBtn');
   restoreBookmarksBtn = createMockElement('restoreBookmarksBtn');
   removeGroupsBtn = createMockElement('removeGroupsBtn');
@@ -168,7 +166,7 @@ function setupDOM() {
   mergeDuplicatesBtn = createMockElement('mergeDuplicatesBtn');
 
   allButtons.length = 0;
-  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, combineGroupsBtn, protectGroupBtn, removeGroupsBtn, mergeDuplicatesBtn);
+  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, saveBookmarksBtn, restoreBookmarksBtn, combineGroupsBtn, protectGroupBtn, removeGroupsBtn, mergeDuplicatesBtn);
   allButtons.forEach = function(callback) {
     for (let i = 0; i < this.length; i++) {
       callback(this[i]);
@@ -367,57 +365,6 @@ describe('popup.js', () => {
       await Promise.resolve();
 
       expect(statusDiv.textContent).toBe('✓ Organized 12 tabs into 3 categories!');
-    });
-  });
-
-  describe('Remove Duplicates button', () => {
-    test('should send removeDuplicates message', async () => {
-      chrome.runtime.sendMessage.mockResolvedValue({
-        duplicatesClosed: 5
-      });
-
-      dedupeBtn.click();
-
-      await Promise.resolve();
-
-      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
-        action: 'removeDuplicates'
-      });
-    });
-
-    test('should disable button while finding duplicates', () => {
-      chrome.runtime.sendMessage.mockImplementation(() =>
-        new Promise(resolve => setTimeout(() => resolve({ duplicatesClosed: 5 }), 100))
-      );
-
-      dedupeBtn.click();
-
-      expect(dedupeBtn.disabled).toBe(true);
-      expect(dedupeBtn.textContent).toBe('Finding duplicates...');
-    });
-
-    test('should display success when duplicates found', async () => {
-      chrome.runtime.sendMessage.mockResolvedValue({
-        duplicatesClosed: 7
-      });
-
-      dedupeBtn.click();
-
-      await Promise.resolve();
-
-      expect(statusDiv.textContent).toBe('✓ Removed 7 duplicate tabs!');
-    });
-
-    test('should display message when no duplicates found', async () => {
-      chrome.runtime.sendMessage.mockResolvedValue({
-        duplicatesClosed: 0
-      });
-
-      dedupeBtn.click();
-
-      await Promise.resolve();
-
-      expect(statusDiv.textContent).toBe('✓ No duplicates found!');
     });
   });
 
@@ -1191,12 +1138,12 @@ describe('popup.js', () => {
     test('should handle clicks on different buttons', async () => {
       chrome.runtime.sendMessage
         .mockResolvedValueOnce({ groupedTabs: 10, groups: 3 })
-        .mockResolvedValueOnce({ duplicatesClosed: 5 });
+        .mockResolvedValueOnce({ savedBookmarks: 20, folders: 3 });
 
       organizeBtn.click();
       await Promise.resolve();
 
-      dedupeBtn.click();
+      saveBookmarksBtn.click();
       await Promise.resolve();
 
       expect(chrome.runtime.sendMessage).toHaveBeenCalledTimes(2);
@@ -1232,13 +1179,13 @@ describe('popup.js', () => {
     test('should handle missing response properties', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({});
 
-      dedupeBtn.click();
+      organizeBtn.click();
 
       await Promise.resolve();
 
-      // duplicatesClosed is undefined, will show "Removed undefined duplicate tabs!"
-      // This is expected behavior - the response should always include duplicatesClosed
-      expect(statusDiv.textContent).toBe('✓ Removed undefined duplicate tabs!');
+      // groupedTabs and groups are undefined, will show "Organized undefined tabs into undefined groups!"
+      // This is expected behavior - the response should always include these properties
+      expect(statusDiv.textContent).toBe('✓ Organized undefined tabs into undefined groups!');
     });
   });
 
@@ -1258,7 +1205,7 @@ describe('popup.js', () => {
     test('should handle timeout errors', async () => {
       chrome.runtime.sendMessage.mockRejectedValue(new Error('Request timeout'));
 
-      dedupeBtn.click();
+      organizeBtn.click();
 
       await Promise.resolve();
       await Promise.resolve();
@@ -1328,20 +1275,6 @@ describe('popup.js', () => {
       expect(statusDiv.textContent).toContain('Moved 5 ungrouped tab(s) to end.');
     });
 
-    test('should display ungroupedDuplicates warning in organize by domain', async () => {
-      chrome.runtime.sendMessage.mockResolvedValue({
-        groupedTabs: 10,
-        groups: 3,
-        ungroupedDuplicates: 2
-      });
-
-      organizeBtn.click();
-
-      await Promise.resolve();
-
-      expect(statusDiv.textContent).toContain('Warning: 2 ungrouped duplicate(s) found.');
-    });
-
     test('should display ungroupedTabsMoved in organize by category', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
         groupedTabs: 12,
@@ -1396,19 +1329,6 @@ describe('popup.js', () => {
   });
 
   describe('Additional Error Handling', () => {
-    test('should handle error in remove duplicates', async () => {
-      chrome.runtime.sendMessage.mockResolvedValue({
-        error: 'Failed to remove duplicates'
-      });
-
-      dedupeBtn.click();
-
-      await Promise.resolve();
-
-      expect(statusDiv.textContent).toBe('Error: Failed to remove duplicates');
-      expect(statusDiv.className).toContain('error');
-    });
-
     test('should handle error in save to bookmarks', async () => {
       chrome.runtime.sendMessage.mockResolvedValue({
         error: 'Failed to save bookmarks'
