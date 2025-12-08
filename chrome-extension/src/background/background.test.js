@@ -6,10 +6,6 @@ jest.mock('./organizeTabs.js', () => ({
   organizeTabs: jest.fn()
 }));
 
-jest.mock('./removeDuplicateTabs.js', () => ({
-  removeDuplicateTabs: jest.fn()
-}));
-
 jest.mock('./removeAllGroups.js', () => ({
   removeAllGroups: jest.fn()
 }));
@@ -51,7 +47,6 @@ global.chrome = {
 
 // Import mocked modules
 import { organizeTabs } from './organizeTabs.js';
-import { removeDuplicateTabs } from './removeDuplicateTabs.js';
 import { removeAllGroups } from './removeAllGroups.js';
 import { saveTabsToBookmarks } from './saveTabsToBookmarks.js';
 import { restoreFromBookmarks } from './restoreFromBookmarks.js';
@@ -134,34 +129,6 @@ describe('background.js message router', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
 
       expect(sendResponse).toHaveBeenCalledWith({ error: 'Test error' });
-    });
-  });
-
-  describe('removeDuplicates action', () => {
-    test('should call removeDuplicateTabs', async () => {
-      removeDuplicateTabs.mockResolvedValue({ removed: 3 });
-
-      const result = messageListener(
-        { action: 'removeDuplicates' },
-        {},
-        sendResponse
-      );
-
-      expect(result).toBe(true);
-      await new Promise(resolve => setTimeout(resolve, 0));
-
-      expect(removeDuplicateTabs).toHaveBeenCalled();
-      expect(sendResponse).toHaveBeenCalledWith({ removed: 3 });
-    });
-
-    test('should handle errors', async () => {
-      removeDuplicateTabs.mockRejectedValue(new Error('Remove failed'));
-
-      messageListener({ action: 'removeDuplicates' }, {}, sendResponse);
-
-      await new Promise(resolve => setTimeout(resolve, 0));
-
-      expect(sendResponse).toHaveBeenCalledWith({ error: 'Remove failed' });
     });
   });
 

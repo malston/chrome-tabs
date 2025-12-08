@@ -694,8 +694,7 @@ describe('popup.js', () => {
         groups: 8,
         duplicatesClosed: 5,
         tabsMoved: 10,
-        ungroupedTabsMoved: 3,
-        ungroupedDuplicates: 2
+        ungroupedTabsMoved: 3
       });
 
       organizeAllWindowsBtn.click();
@@ -706,7 +705,6 @@ describe('popup.js', () => {
       expect(statusDiv.textContent).toContain('Removed 5 duplicates.');
       expect(statusDiv.textContent).toContain('Moved 10 tabs.');
       expect(statusDiv.textContent).toContain('Moved 3 ungrouped tab(s) to end.');
-      expect(statusDiv.textContent).toContain('Warning: 2 ungrouped duplicate(s) found.');
     });
 
     test('should display error status on failure', async () => {
@@ -785,8 +783,7 @@ describe('popup.js', () => {
         groups: 10,
         duplicatesClosed: 8,
         tabsMoved: 15,
-        ungroupedTabsMoved: 4,
-        ungroupedDuplicates: 1
+        ungroupedTabsMoved: 4
       });
 
       organizeAllWindowsCategoryBtn.click();
@@ -797,7 +794,6 @@ describe('popup.js', () => {
       expect(statusDiv.textContent).toContain('Removed 8 duplicates.');
       expect(statusDiv.textContent).toContain('Moved 15 tabs.');
       expect(statusDiv.textContent).toContain('Moved 4 ungrouped tab(s) to end.');
-      expect(statusDiv.textContent).toContain('Warning: 1 ungrouped duplicate(s) found.');
     });
 
     test('should display error status on failure', async () => {
@@ -1287,20 +1283,6 @@ describe('popup.js', () => {
       await Promise.resolve();
 
       expect(statusDiv.textContent).toContain('Moved 3 ungrouped tab(s) to end.');
-    });
-
-    test('should display ungroupedDuplicates warning in organize by category', async () => {
-      chrome.runtime.sendMessage.mockResolvedValue({
-        groupedTabs: 12,
-        groups: 4,
-        ungroupedDuplicates: 1
-      });
-
-      organizeCategoryBtn.click();
-
-      await Promise.resolve();
-
-      expect(statusDiv.textContent).toContain('Warning: 1 ungrouped duplicate(s) found.');
     });
 
     test('should handle error in organize by category', async () => {
