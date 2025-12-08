@@ -250,6 +250,22 @@
       overflow-y: auto;
       margin-bottom: var(--spacing-xl);
     }
+
+    .advanced-section {
+      margin-top: 16px;
+      padding-top: 12px;
+    }
+
+    .section-divider {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
   </style>
 </head>
 <body>
@@ -259,37 +275,37 @@
 
   <div class="subsection-header" role="heading" aria-level="3">Manage Tabs</div>
 
-  <button id="organizeCategoryBtn" class="primary">
+  <button id="organizeCategoryBtn" class="primary main-action-btn">
     Organize by Category
   </button>
 
-  <button id="organizeBtn" class="primary">
+  <button id="organizeBtn" class="primary main-action-btn">
     Organize by Domain
   </button>
 
-  <button id="dedupeBtn" class="primary">
+  <button id="dedupeBtn" class="primary main-action-btn">
     Remove Duplicates
   </button>
 
-  <button id="saveBookmarksBtn" class="primary">
+  <button id="saveBookmarksBtn" class="primary main-action-btn">
     Save to Bookmarks
   </button>
 
-  <button id="restoreBookmarksBtn" class="primary">
+  <button id="restoreBookmarksBtn" class="primary main-action-btn">
     Restore from Bookmarks
   </button>
 
   <div class="subsection-header" role="heading" aria-level="3">Manage Groups</div>
 
-  <button id="combineGroupsBtn" class="secondary">
+  <button id="combineGroupsBtn" class="secondary main-action-btn">
     Combine Groups
   </button>
 
-  <button id="protectGroupBtn" class="secondary">
+  <button id="protectGroupBtn" class="secondary main-action-btn">
     Protect Groups
   </button>
 
-  <button id="removeGroupsBtn" class="secondary">
+  <button id="removeGroupsBtn" class="secondary main-action-btn">
     Remove All Groups
   </button>
 
@@ -297,13 +313,20 @@
 
   <div class="subsection-header" role="heading" aria-level="3">Manage Tabs</div>
 
-  <button id="organizeAllWindowsCategoryBtn" class="primary">
+  <button id="organizeAllWindowsCategoryBtn" class="primary main-action-btn">
     Organize by Category
   </button>
 
-  <button id="organizeAllWindowsBtn" class="primary">
+  <button id="organizeAllWindowsBtn" class="primary main-action-btn">
     Organize by Domain
   </button>
+
+  <div id="advancedSection" class="advanced-section" style="display: none;">
+    <div class="section-divider">Advanced</div>
+    <button id="mergeDuplicatesBtn" class="secondary main-action-btn">
+      Merge Duplicate Groups
+    </button>
+  </div>
 
   <div id="status" class="status"></div>
 

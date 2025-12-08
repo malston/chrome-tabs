@@ -16,8 +16,6 @@ import { extractGroupBaseName } from '../utils/extractGroupBaseName.js';
  *   - remainingTabs: Total tabs remaining after removal
  */
 async function removeDuplicateTabs() {
-  console.log('Removing duplicate tabs...');
-
   const tabs = await chrome.tabs.query({ currentWindow: true });
 
   // Track seen URLs
@@ -35,7 +33,6 @@ async function removeDuplicateTabs() {
     if (seenUrls.has(url)) {
       // This is a duplicate - mark for closure
       tabsToClose.push(tab.id);
-      console.log(`Found duplicate: ${tab.title} (${url})`);
     } else {
       // First occurrence - keep it
       seenUrls.set(url, tab);
@@ -69,7 +66,6 @@ async function removeDuplicateTabs() {
       // Only update if the title has changed
       if (group.title !== newTitle) {
         await chrome.tabGroups.update(group.id, { title: newTitle });
-        console.log(`Updated group "${group.title}" to "${newTitle}"`);
       }
     }
   }

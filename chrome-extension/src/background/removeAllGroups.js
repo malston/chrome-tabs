@@ -2,8 +2,6 @@
 // ABOUTME: Tabs remain open but are removed from their groups.
 
 async function removeAllGroups() {
-  console.log('Removing all tab groups...');
-
   const tabs = await chrome.tabs.query({ currentWindow: true });
 
   // Batch ungroup operation for better performance

@@ -397,3 +397,33 @@ categoryList.addEventListener('change', (e) => {
 
 // Initialize
 loadCategories();
+
+// Advanced Features Settings
+const advancedFeaturesCheckbox = document.getElementById('advancedFeaturesEnabled');
+const autoMergeCheckbox = document.getElementById('autoMergeDuplicates');
+const autoMergeContainer = document.getElementById('autoMergeSettingContainer');
+
+async function loadAdvancedSettings() {
+  const result = await chrome.storage.local.get(['advancedFeaturesEnabled', 'autoMergeDuplicates']);
+  advancedFeaturesCheckbox.checked = result.advancedFeaturesEnabled || false;
+  autoMergeCheckbox.checked = result.autoMergeDuplicates || false;
+  autoMergeContainer.style.display = advancedFeaturesCheckbox.checked ? 'block' : 'none';
+}
+
+advancedFeaturesCheckbox.addEventListener('change', async () => {
+  await chrome.storage.local.set({ advancedFeaturesEnabled: advancedFeaturesCheckbox.checked });
+  autoMergeContainer.style.display = advancedFeaturesCheckbox.checked ? 'block' : 'none';
+  if (!advancedFeaturesCheckbox.checked) {
+    autoMergeCheckbox.checked = false;
+    await chrome.storage.local.set({ autoMergeDuplicates: false });
+  }
+  showStatus('Settings saved!', 'success');
+});
+
+autoMergeCheckbox.addEventListener('change', async () => {
+  await chrome.storage.local.set({ autoMergeDuplicates: autoMergeCheckbox.checked });
+  showStatus('Settings saved!', 'success');
+});
+
+// Load advanced settings on page load
+loadAdvancedSettings();

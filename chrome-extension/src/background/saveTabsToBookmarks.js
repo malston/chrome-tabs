@@ -5,8 +5,6 @@ import { shouldSkipUrl } from '../utils/shouldSkipUrl.js';
 import { getOtherBookmarksId } from '../utils/getOtherBookmarksId.js';
 
 async function saveTabsToBookmarks() {
-  console.log('Saving tabs to bookmarks...');
-
   const tabs = await chrome.tabs.query({ currentWindow: true });
   const groups = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
 
@@ -107,8 +105,6 @@ async function saveTabsToBookmarks() {
     const results = await Promise.all(bookmarkPromises);
     savedCount += results.filter(r => r !== null).length;
   }
-
-  console.log(`Saved ${savedCount} bookmarks in ${folderCount} folders`);
 
   return {
     totalTabs: tabs.length,

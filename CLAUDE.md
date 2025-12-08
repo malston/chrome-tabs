@@ -34,6 +34,7 @@ chrome-extension/
 │   │   ├── getExistingGroups.js
 │   │   ├── protectGroup.js
 │   │   ├── getProtectedGroups.js
+│   │   ├── mergeDuplicateGroups.js
 │   │   └── *.test.js         # Colocated unit tests
 │   ├── popup/                # Popup UI
 │   │   ├── popup.html
@@ -79,6 +80,7 @@ chrome-extension/
   - `getExistingGroups()` - Retrieves current tab groups in window
   - `protectGroup()` - Marks a group as protected from reorganization
   - `getProtectedGroups()` - Gets list of protected group IDs
+  - `mergeDuplicateGroups()` - Consolidates groups with the same base name
 
 - **Utility Functions** (`src/utils/`)
   - `extractDomain()` - Extracts domain from URLs with special handling for:
@@ -93,10 +95,13 @@ chrome-extension/
   - `categoryManager()` - Manages category definitions for "Organize by Category"
 
 - **Options Page** (`src/options/`)
-  - `options.html/js` - Extension settings UI for customizing categories
+  - `options.html/js` - Extension settings UI for customizing categories and advanced features
+  - Advanced Features toggle: enables additional tools for power users
+  - Auto-merge setting: automatically consolidates duplicate groups during organize
 
 - **popup.html/js** (`src/popup/`) - Extension UI
-  - Buttons: Organize by Domain, Organize by Category, Remove Duplicates, Save to Bookmarks, Restore from Bookmarks, Remove All Groups
+  - Buttons: Organize by Domain, Organize by Category, Remove Duplicates, Save to Bookmarks, Restore from Bookmarks, Combine Groups, Protect Groups, Remove All Groups
+  - Advanced section (when enabled): Merge Duplicate Groups
   - Status feedback with success/error states
   - Communication with background service worker via `chrome.runtime.sendMessage()`
 
@@ -108,6 +113,8 @@ chrome-extension/
 - Each group shows name and tab count: `github.com (25)`
 - Colors rotate through: blue, red, yellow, green, pink, purple, cyan, orange
 - Bookmark save/restore automatically manages Tab Organizer bookmark folders with timestamps
+- Merge duplicate groups respects protected groups (protected groups absorb but never dissolve)
+- Auto-merge can run before organize operations when enabled in settings
 
 ## Development Commands
 
@@ -190,6 +197,10 @@ Edit `removeDuplicateTabs()` function in `chrome-extension/src/background/remove
 
 - Edit `saveTabsToBookmarks()` in `chrome-extension/src/background/saveTabsToBookmarks.js`
 - Edit `restoreFromBookmarks()` in `chrome-extension/src/background/restoreFromBookmarks.js`
+
+### Modify Merge Duplicate Groups Logic
+
+Edit `mergeDuplicateGroups()` function in `chrome-extension/src/background/mergeDuplicateGroups.js`
 
 ## Key Technical Constraints
 

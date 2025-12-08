@@ -39,6 +39,11 @@ global.chrome = {
     onMessage: {
       addListener: jest.fn()
     }
+  },
+  storage: {
+    local: {
+      get: jest.fn().mockResolvedValue({})
+    }
   }
 };
 

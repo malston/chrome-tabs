@@ -6,9 +6,20 @@ import { shouldSkipUrl } from '../utils/shouldSkipUrl.js';
 import { extractGroupBaseName } from '../utils/extractGroupBaseName.js';
 import { getNextColor, resetColorIndex } from '../utils/colorManager.js';
 import { categorizeUrl } from '../utils/categoryManager.js';
+import { mergeDuplicateGroups } from './mergeDuplicateGroups.js';
 
 async function organizeTabs(mode = 'domain', allWindows = false) {
-  console.log(`Organizing tabs by ${mode}${allWindows ? ' across all windows' : ''}...`);
+  // Check if auto-merge is enabled
+  let mergeResult = null;
+  const settings = await chrome.storage.local.get('autoMergeDuplicates');
+  if (settings && settings.autoMergeDuplicates) {
+    try {
+      mergeResult = await mergeDuplicateGroups();
+    } catch (error) {
+      console.error('Auto-merge failed, continuing with organize:', error);
+      // Continue with organize even if merge fails
+    }
+  }
 
   // Get current window for reference
   const currentWindow = await chrome.windows.getCurrent();
@@ -34,7 +45,6 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
       if (seenUrls.has(tab.url)) {
         // This is a duplicate - mark for closure
         tabsToClose.push(tab.id);
-        console.log(`Found duplicate: ${tab.title} (${tab.url})`);
       } else {
         // First occurrence - keep it
         seenUrls.set(tab.url, tab);
@@ -48,14 +58,12 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
 
     // Close duplicate tabs
     if (tabsToClose.length > 0) {
-      console.log(`Closing ${tabsToClose.length} duplicate tabs...`);
       await chrome.tabs.remove(tabsToClose);
       duplicatesClosed = tabsToClose.length;
     }
 
     // Move tabs from other windows to current window
     if (tabsToMove.length > 0) {
-      console.log(`Moving ${tabsToMove.length} tabs to current window...`);
       for (const tab of tabsToMove) {
         try {
           await chrome.tabs.move(tab.id, { windowId: currentWindow.id, index: -1 });
@@ -98,7 +106,6 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
       if (groupedTabUrls.has(tab.url)) {
         ungroupedDuplicates++;
         ungroupedDuplicateUrls.add(tab.url);
-        console.log(`Ungrouped duplicate found: ${tab.title} (${tab.url}) - grouped version exists`);
       }
     }
   }
@@ -120,7 +127,6 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
 
     // Skip ungrouped duplicates - don't organize them
     if (tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE && skippedUngroupedDuplicateUrls.has(tab.url)) {
-      console.log(`Skipping ungrouped duplicate: ${tab.title} (${tab.url})`);
       continue;
     }
 
@@ -202,7 +208,6 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
         });
 
         groupsUpdated++;
-        console.log(`Updated group: ${groupName} (+${toAdd.length} -${toRemove.length} tabs, total: ${newTabIds.length})`);
       } else {
         // Group doesn't exist - create it (same as before)
         const groupId = await chrome.tabs.group({ tabIds: newTabIds });
@@ -217,7 +222,6 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
         existingGroupsByName.set(groupName, await chrome.tabGroups.get(groupId));
 
         groupsCreated++;
-        console.log(`Created new group: ${groupName} (${newTabIds.length} tabs)`);
       }
 
       groupedCount += newTabIds.length;
@@ -250,8 +254,6 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
   );
 
   if (ungroupedTabsToMove.length > 0) {
-    console.log(`Moving ${ungroupedTabsToMove.length} ungrouped tabs to end of tab bar...`);
-
     // Move tabs to the end, preserving their relative order
     // Batch move for better performance - Chrome API accepts array of tab IDs
     const tabIdsToMove = ungroupedTabsToMove.map(tab => tab.id);
@@ -261,8 +263,6 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
     } catch (e) {
       console.error('Error moving ungrouped tabs:', e);
     }
-
-    console.log(`Moved ${ungroupedTabsMoved} ungrouped tabs to end`);
   }
 
   return {
@@ -275,7 +275,10 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
     duplicatesClosed: duplicatesClosed,
     tabsMoved: tabsMoved,
     ungroupedDuplicates: ungroupedDuplicates,
-    ungroupedTabsMoved: ungroupedTabsMoved
+    ungroupedTabsMoved: ungroupedTabsMoved,
+    duplicateGroupsMerged: mergeResult?.mergedGroups || 0,
+    tabsMovedFromMerge: mergeResult?.tabsMoved || 0,
+    mergeErrors: mergeResult?.errors || 0
   };
 }
 

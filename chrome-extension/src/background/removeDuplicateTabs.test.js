@@ -522,22 +522,6 @@ describe('removeDuplicateTabs', () => {
   });
 
   describe('Console Logging', () => {
-    test('should log duplicate detection', async () => {
-      const mockTabs = [
-        { id: 1, url: 'https://github.com', title: 'First' },
-        { id: 2, url: 'https://github.com', title: 'Second' }
-      ];
-
-      chrome.tabs.query.mockResolvedValue(mockTabs);
-      chrome.tabs.remove.mockResolvedValue(undefined);
-
-      await removeDuplicateTabs();
-
-      expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Found duplicate: Second (https://github.com)')
-      );
-    });
-
     test('should log errors when tab removal fails', async () => {
       const mockTabs = [
         { id: 1, url: 'https://github.com', title: 'First' },

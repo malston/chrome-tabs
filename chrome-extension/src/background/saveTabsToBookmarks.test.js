@@ -477,23 +477,6 @@ describe('saveTabsToBookmarks', () => {
   });
 
   describe('Console Logging', () => {
-    test('should log success message', async () => {
-      const mockTabs = [
-        { id: 1, url: 'https://github.com', title: 'GitHub', groupId: -1 }
-      ];
-
-      chrome.tabs.query.mockResolvedValue(mockTabs);
-      chrome.tabGroups.query.mockResolvedValue([]);
-      chrome.bookmarks.create
-        .mockResolvedValueOnce({ id: 'root1' })
-        .mockResolvedValueOnce({ id: 'ungrouped1' })
-        .mockResolvedValueOnce({ id: 'bm1' });
-
-      await saveTabsToBookmarks();
-
-      expect(console.log).toHaveBeenCalledWith('Saved 1 bookmarks in 1 folders');
-    });
-
     test('should log bookmark creation errors', async () => {
       const mockTabs = [
         { id: 1, url: 'https://github.com', title: 'GitHub', groupId: -1 }

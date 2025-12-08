@@ -67,6 +67,7 @@ let combineGroupsSelector, sourceGroupSelect, targetGroupSelect, combineSelected
 let protectGroupBtn, protectGroupSelector, protectGroupSelect, protectSelectedBtn, cancelProtectBtn;
 let protectedGroupsList, protectedGroupsContainer, closeProtectedListBtn;
 let settingsLink;
+let advancedSection, mergeDuplicatesBtn;
 const allButtons = [];
 
 // Mock Chrome API
@@ -74,6 +75,11 @@ global.chrome = {
   runtime: {
     sendMessage: jest.fn(),
     openOptionsPage: jest.fn(),
+  },
+  storage: {
+    local: {
+      get: jest.fn().mockResolvedValue({}),
+    },
   },
 };
 
@@ -109,6 +115,8 @@ global.document = {
       case 'protectedGroupsContainer': return protectedGroupsContainer;
       case 'closeProtectedListBtn': return closeProtectedListBtn;
       case 'settingsLink': return settingsLink;
+      case 'advancedSection': return advancedSection;
+      case 'mergeDuplicatesBtn': return mergeDuplicatesBtn;
       default: return null;
     }
   },
@@ -156,9 +164,11 @@ function setupDOM() {
   protectedGroupsContainer = createMockElement('protectedGroupsContainer');
   closeProtectedListBtn = createMockElement('closeProtectedListBtn');
   settingsLink = createMockElement('settingsLink');
+  advancedSection = createMockElement('advancedSection');
+  mergeDuplicatesBtn = createMockElement('mergeDuplicatesBtn');
 
   allButtons.length = 0;
-  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, combineGroupsBtn, protectGroupBtn, removeGroupsBtn);
+  allButtons.push(organizeBtn, organizeCategoryBtn, organizeAllWindowsBtn, organizeAllWindowsCategoryBtn, dedupeBtn, saveBookmarksBtn, restoreBookmarksBtn, combineGroupsBtn, protectGroupBtn, removeGroupsBtn, mergeDuplicatesBtn);
   allButtons.forEach = function(callback) {
     for (let i = 0; i < this.length; i++) {
       callback(this[i]);
@@ -1776,6 +1786,138 @@ describe('popup.js', () => {
 
       expect(protectedGroupsList.style.display).toBe('none');
       expect(organizeBtn.style.display).toBe('block');
+    });
+  });
+
+  describe('Advanced Section', () => {
+    test('should show advanced section when advancedFeaturesEnabled is true', async () => {
+      chrome.storage.local.get.mockResolvedValue({ advancedFeaturesEnabled: true });
+
+      // Re-require to trigger initAdvancedSection
+      jest.resetModules();
+      setupDOM();
+      require('./popup.js');
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(advancedSection.style.display).toBe('block');
+    });
+
+    test('should hide advanced section when advancedFeaturesEnabled is false', async () => {
+      chrome.storage.local.get.mockResolvedValue({ advancedFeaturesEnabled: false });
+
+      // Re-require to trigger initAdvancedSection
+      jest.resetModules();
+      setupDOM();
+      require('./popup.js');
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      // Display should remain empty (not 'none') since the function only sets 'block' when enabled
+      expect(advancedSection.style.display).not.toBe('block');
+    });
+
+    test('should send mergeDuplicateGroups action when button clicked', async () => {
+      chrome.storage.local.get.mockResolvedValue({ advancedFeaturesEnabled: true });
+      chrome.runtime.sendMessage.mockResolvedValue({
+        mergedGroups: 2,
+        tabsMoved: 8,
+        skippedProtected: 0,
+        message: 'Merged 2 groups'
+      });
+
+      // Re-require to set up event listeners
+      jest.resetModules();
+      setupDOM();
+      require('./popup.js');
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      mergeDuplicatesBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        action: 'mergeDuplicateGroups'
+      });
+    });
+
+    test('should display success message when groups merged', async () => {
+      chrome.storage.local.get.mockResolvedValue({ advancedFeaturesEnabled: true });
+      chrome.runtime.sendMessage.mockResolvedValue({
+        mergedGroups: 2,
+        tabsMoved: 8,
+        skippedProtected: 0,
+        message: 'Merged 2 groups'
+      });
+
+      jest.resetModules();
+      setupDOM();
+      require('./popup.js');
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      mergeDuplicatesBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toContain('Merged 2 groups');
+      expect(statusDiv.textContent).toContain('8 tabs moved');
+    });
+
+    test('should display no duplicates message when none found', async () => {
+      chrome.storage.local.get.mockResolvedValue({ advancedFeaturesEnabled: true });
+      chrome.runtime.sendMessage.mockResolvedValue({
+        mergedGroups: 0,
+        tabsMoved: 0,
+        skippedProtected: 0,
+        errors: 0,
+        message: 'No duplicate groups to merge'
+      });
+
+      jest.resetModules();
+      setupDOM();
+      require('./popup.js');
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      mergeDuplicatesBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toContain('No duplicate groups to merge');
+    });
+
+    test('should show protected skipped count when applicable', async () => {
+      chrome.storage.local.get.mockResolvedValue({ advancedFeaturesEnabled: true });
+      chrome.runtime.sendMessage.mockResolvedValue({
+        mergedGroups: 1,
+        tabsMoved: 5,
+        skippedProtected: 2,
+        message: 'Merged 1 group'
+      });
+
+      jest.resetModules();
+      setupDOM();
+      require('./popup.js');
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      mergeDuplicatesBtn.click();
+
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(statusDiv.textContent).toContain('2 protected sets skipped');
     });
   });
 });

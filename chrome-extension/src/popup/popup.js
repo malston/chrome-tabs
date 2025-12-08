@@ -52,6 +52,12 @@ organizeBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} groups!`;
+      if (response.duplicateGroupsMerged > 0) {
+        message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
+      if (response.mergeErrors > 0) {
+        message += ` ⚠️ ${response.mergeErrors} merge error(s) occurred.`;
+      }
       if (response.ungroupedTabsMoved > 0) {
         message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
       }
@@ -82,6 +88,12 @@ organizeCategoryBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`;
+      if (response.duplicateGroupsMerged > 0) {
+        message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
+      if (response.mergeErrors > 0) {
+        message += ` ⚠️ ${response.mergeErrors} merge error(s) occurred.`;
+      }
       if (response.ungroupedTabsMoved > 0) {
         message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
       }
@@ -113,6 +125,12 @@ organizeAllWindowsBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} groups!`;
+      if (response.duplicateGroupsMerged > 0) {
+        message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
+      if (response.mergeErrors > 0) {
+        message += ` ⚠️ ${response.mergeErrors} merge error(s) occurred.`;
+      }
       if (response.duplicatesClosed > 0) {
         message += ` Removed ${response.duplicatesClosed} duplicates.`;
       }
@@ -150,6 +168,12 @@ organizeAllWindowsCategoryBtn.addEventListener('click', async () => {
       showStatus(`Error: ${response.error}`, 'error');
     } else {
       let message = `✓ Organized ${response.groupedTabs} tabs into ${response.groups} categories!`;
+      if (response.duplicateGroupsMerged > 0) {
+        message += ` Merged ${response.duplicateGroupsMerged} duplicate groups.`;
+      }
+      if (response.mergeErrors > 0) {
+        message += ` ⚠️ ${response.mergeErrors} merge error(s) occurred.`;
+      }
       if (response.duplicatesClosed > 0) {
         message += ` Removed ${response.duplicatesClosed} duplicates.`;
       }
@@ -330,14 +354,12 @@ removeGroupsBtn.addEventListener('click', async () => {
 });
 
 // Combine Groups functionality
-const mainButtonsSelector = '#organizeBtn, #organizeCategoryBtn, #organizeAllWindowsBtn, #organizeAllWindowsCategoryBtn, #dedupeBtn, #saveBookmarksBtn, #restoreBookmarksBtn, #combineGroupsBtn, #protectGroupBtn, #removeGroupsBtn';
-
 function hideMainButtons() {
-  document.querySelectorAll(mainButtonsSelector).forEach(btn => btn.style.display = 'none');
+  document.querySelectorAll('.main-action-btn').forEach(btn => btn.style.display = 'none');
 }
 
 function showMainButtons() {
-  document.querySelectorAll(mainButtonsSelector).forEach(btn => btn.style.display = 'block');
+  document.querySelectorAll('.main-action-btn').forEach(btn => btn.style.display = 'block');
 }
 
 function getSelectedSourceIds() {
@@ -545,3 +567,49 @@ if (settingsLink) {
     chrome.runtime.openOptionsPage();
   });
 }
+
+// Advanced Features Section
+const advancedSection = document.getElementById('advancedSection');
+const mergeDuplicatesBtn = document.getElementById('mergeDuplicatesBtn');
+
+// Check if advanced features are enabled and show/hide section
+async function initAdvancedSection() {
+  const result = await chrome.storage.local.get('advancedFeaturesEnabled');
+  if (result.advancedFeaturesEnabled) {
+    advancedSection.style.display = 'block';
+  }
+}
+
+mergeDuplicatesBtn.addEventListener('click', async () => {
+  mergeDuplicatesBtn.disabled = true;
+  mergeDuplicatesBtn.textContent = 'Merging...';
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'mergeDuplicateGroups'
+    });
+
+    if (response.error) {
+      showStatus(`Error: ${response.error}`, 'error');
+    } else if (response.mergedGroups === 0 && response.errors === 0) {
+      showStatus('No duplicate groups to merge', 'success');
+    } else {
+      let message = `✓ Merged ${response.mergedGroups} groups (${response.tabsMoved} tabs moved)`;
+      if (response.skippedProtected > 0) {
+        message += ` (${response.skippedProtected} protected sets skipped)`;
+      }
+      if (response.errors > 0) {
+        message += ` ⚠️ ${response.errors} merge error(s) occurred`;
+      }
+      showStatus(message, response.errors > 0 ? 'error' : 'success');
+    }
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+  } finally {
+    mergeDuplicatesBtn.disabled = false;
+    mergeDuplicatesBtn.textContent = 'Merge Duplicate Groups';
+  }
+});
+
+// Initialize advanced section
+initAdvancedSection();

@@ -12,8 +12,6 @@ import { getNextColor } from '../utils/colorManager.js';
  * @returns {Promise<Object>} Statistics object with: totalRestored, duplicatesSkipped, groupsCreated, groupsMerged
  */
 async function restoreFromBookmarks(bookmarkFolderId) {
-  console.log('Restoring tabs from bookmarks...');
-
   // Get the bookmark folder
   const [folder] = await chrome.bookmarks.get(bookmarkFolderId);
   if (!folder) {
@@ -187,8 +185,6 @@ async function restoreFromBookmarks(bookmarkFolderId) {
       }
     }
   }
-
-  console.log(`Restored ${totalRestored} tabs, skipped ${duplicatesSkipped} duplicates`);
 
   return {
     totalRestored: totalRestored,
