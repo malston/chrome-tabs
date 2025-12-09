@@ -2,7 +2,6 @@
 // ABOUTME: Routes messages from popup to appropriate handler functions.
 
 import { organizeTabs } from './organizeTabs.js';
-import { removeDuplicateTabs } from './removeDuplicateTabs.js';
 import { removeAllGroups } from './removeAllGroups.js';
 import { saveTabsToBookmarks } from './saveTabsToBookmarks.js';
 import { restoreFromBookmarks } from './restoreFromBookmarks.js';
@@ -31,13 +30,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .then(result => sendResponse(result))
       .catch(error => sendResponse({ error: error.message }));
     return true; // Keep channel open for async response
-  }
-
-  if (request.action === 'removeDuplicates') {
-    removeDuplicateTabs()
-      .then(result => sendResponse(result))
-      .catch(error => sendResponse({ error: error.message }));
-    return true;
   }
 
   if (request.action === 'removeGroups') {

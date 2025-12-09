@@ -1,19 +1,18 @@
 /**
- * E2E Test: Ungrouped Duplicates Detection
+ * E2E Test: Automatic Duplicate Removal During Organize
  *
- * Tests the ungrouped duplicate detection feature:
- * - Opens tabs and organizes them into groups
- * - Opens new ungrouped tabs that duplicate existing grouped tabs
- * - Clicks "Organize by Domain" again
- * - Verifies the status message shows ungrouped duplicate warning
- * - Verifies ungrouped duplicates are NOT automatically removed
- * - Tests with both domain and category modes
+ * Tests that duplicate tabs are automatically closed when organizing:
+ * - Opens tabs with duplicates
+ * - Clicks "Organize by Domain" or "Organize by Category"
+ * - Verifies duplicates are automatically closed
+ * - Verifies status message reports duplicates removed
+ * - Tests both domain and category modes
  */
 
 const puppeteer = require('puppeteer');
 const { getPuppeteerConfig } = require('./test-config');
 
-describe('Ungrouped Duplicates Detection', () => {
+describe('Automatic Duplicate Removal During Organize', () => {
   let browser;
   let page;
   let extensionId;
@@ -52,8 +51,8 @@ describe('Ungrouped Duplicates Detection', () => {
     }
   });
 
-  test('should detect ungrouped duplicates of grouped tabs', async () => {
-    console.log('=== Test: Detect Ungrouped Duplicates ===');
+  test('should close ungrouped duplicates of grouped tabs during organize', async () => {
+    console.log('=== Test: Close Ungrouped Duplicates of Grouped Tabs ===');
 
     // Step 1: Open initial tabs across multiple domains
     console.log('Opening initial tabs...');
@@ -123,18 +122,21 @@ describe('Ungrouped Duplicates Detection', () => {
     console.log(`Opened ${duplicateUrls.length} new tabs (2 duplicates, 1 unique)`);
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Verify the new tabs are ungrouped
+    // Count tabs before second organization
     const tabsBeforeSecondOrg = await serviceWorker.evaluate(async () => {
       const tabs = await chrome.tabs.query({});
-      return tabs.map(t => ({ url: t.url, groupId: t.groupId }));
+      return tabs.filter(t =>
+        !t.url.startsWith('chrome://') &&
+        !t.url.startsWith('chrome-extension://') &&
+        t.url !== 'about:blank'
+      ).length;
     });
 
-    const ungroupedCount = tabsBeforeSecondOrg.filter(t => t.groupId === -1).length;
-    console.log(`Ungrouped tabs before second organization: ${ungroupedCount}`);
-    expect(ungroupedCount).toBeGreaterThanOrEqual(3); // At least the 3 new tabs
+    console.log(`Tabs before second organization: ${tabsBeforeSecondOrg}`);
+    expect(tabsBeforeSecondOrg).toBe(8); // 5 initial + 3 new
 
-    // Step 4: Organize again and check for ungrouped duplicate warning
-    console.log('Second organization - should detect ungrouped duplicates...');
+    // Step 4: Organize again - duplicates should be automatically closed
+    console.log('Second organization - should close duplicates...');
     popupPage = await browser.newPage();
     await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
     await popupPage.waitForSelector('#organizeBtn');
@@ -151,85 +153,55 @@ describe('Ungrouped Duplicates Detection', () => {
 
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Step 5: Verify status message contains ungrouped duplicate warning
+    // Step 5: Verify status message reports duplicates removed
     const statusMessage = await popupPage.evaluate(() => {
       const status = document.getElementById('status');
       return status ? status.textContent : '';
     });
 
     console.log('Status message:', statusMessage);
-    expect(statusMessage).toContain('Warning');
-    expect(statusMessage).toContain('ungrouped duplicate');
-    // The warning should mention at least 1 duplicate (exact count may vary due to timing)
-    expect(statusMessage).toMatch(/\d+.*ungrouped duplicate/i);
+    expect(statusMessage).toContain('Removed');
+    expect(statusMessage).toContain('duplicate');
+    // Should report at least 1 duplicate removed (timing may affect exact count)
+    expect(statusMessage).toMatch(/Removed \d+ duplicate/i);
 
-    // Step 6: Verify ungrouped duplicates stayed ungrouped (were NOT organized into groups)
+    // Step 6: Verify duplicates were actually closed
     const tabsAfterSecondOrg = await serviceWorker.evaluate(async () => {
       const tabs = await chrome.tabs.query({});
-      return tabs.map(t => ({ url: t.url, groupId: t.groupId }));
+      return tabs.filter(t =>
+        !t.url.startsWith('chrome://') &&
+        !t.url.startsWith('chrome-extension://') &&
+        t.url !== 'about:blank'
+      ).map(t => ({ url: t.url, groupId: t.groupId }));
     });
 
     console.log(`Total tabs after organization: ${tabsAfterSecondOrg.length}`);
+    console.log('Tabs:', tabsAfterSecondOrg.map(t => t.url));
 
-    // We opened 5 initial + 3 new = 8 tabs total
-    // All should still exist (duplicates are NOT removed, just left ungrouped)
-    expect(tabsAfterSecondOrg.length).toBeGreaterThanOrEqual(7); // Allow for some variance
+    // Should have fewer tabs than before (duplicates were closed)
+    expect(tabsAfterSecondOrg.length).toBeLessThan(tabsBeforeSecondOrg);
+    // Should have at least 6 tabs (5 initial + 1 unique, or more if timing affected duplicate detection)
+    expect(tabsAfterSecondOrg.length).toBeGreaterThanOrEqual(6);
 
-    // Count how many tabs are ungrouped
-    const ungroupedTabs = tabsAfterSecondOrg.filter(t => t.groupId === -1);
-    console.log(`Ungrouped tabs after organization: ${ungroupedTabs.length}`);
+    // Verify no duplicate URLs exist
+    const urls = tabsAfterSecondOrg.map(t => t.url);
+    const uniqueUrls = new Set(urls);
+    expect(uniqueUrls.size).toBe(urls.length); // All URLs should be unique
 
-    // The duplicate tabs should still be ungrouped (at least 2)
-    expect(ungroupedTabs.length).toBeGreaterThanOrEqual(2);
-
-    // Step 7: Verify groups were NOT updated with the duplicates
-    const finalGroups = await serviceWorker.evaluate(async () => {
-      const groups = await chrome.tabGroups.query({});
-      return groups.map(g => ({ id: g.id, title: g.title }));
-    });
-
-    console.log('Final groups:', finalGroups);
-    // Should still have 2 groups (github.com and google.com)
-    expect(finalGroups.length).toBeGreaterThanOrEqual(2);
-
-    // Verify group counts did NOT increase (duplicates were not added)
-    const githubGroup = finalGroups.find(g => g.title.startsWith('github.com'));
-    const googleGroup = finalGroups.find(g => g.title.startsWith('google.com'));
-
-    if (githubGroup) {
-      console.log(`GitHub group: ${githubGroup.title}`);
-      // Should still be (3) or (4), not increased by the duplicate
-      expect(githubGroup.title).toMatch(/github\.com \([3-4]\)/);
-    }
-
-    if (googleGroup) {
-      console.log(`Google group: ${googleGroup.title}`);
-      // Should still be (2) or (3), not increased by the duplicate
-      expect(googleGroup.title).toMatch(/google\.com \([2-3]\)/);
-    }
-
-    console.log('✅ Ungrouped duplicates detection test passed!');
+    console.log('✅ Ungrouped duplicates of grouped tabs closed successfully!');
     await popupPage.close();
   }, 90000); // 90 second timeout
 
-  test('should work with category mode', async () => {
-    console.log('=== Test: Ungrouped Duplicates with Category Mode ===');
+  test('should close multiple ungrouped tabs with same URL during organize', async () => {
+    console.log('=== Test: Close Multiple Ungrouped Duplicates ===');
 
-    // Re-establish service worker connection (may have terminated between tests)
-    let swTarget = await browser.waitForTarget(
-      target => target.type() === 'service_worker' && target.url().includes(extensionId),
-      { timeout: 10000 }
-    );
-    serviceWorker = await swTarget.worker();
-
-    // Close all tabs and start fresh
+    // Clean up from previous test
     await serviceWorker.evaluate(async () => {
       const tabs = await chrome.tabs.query({});
-      const tabsToClose = tabs.slice(1); // Keep at least one tab
+      const tabsToClose = tabs.slice(1);
       if (tabsToClose.length > 0) {
         await chrome.tabs.remove(tabsToClose.map(t => t.id));
       }
-      // Remove all groups
       const groups = await chrome.tabGroups.query({});
       for (const group of groups) {
         const groupTabs = await chrome.tabs.query({ groupId: group.id });
@@ -241,8 +213,112 @@ describe('Ungrouped Duplicates Detection', () => {
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Step 1: Open tabs that will be categorized as "Development"
-    // Open all tabs as NEW pages to ensure consistent state
+    // Step 1: Open multiple ungrouped tabs with same URL
+    console.log('Opening ungrouped duplicate tabs...');
+    const duplicateUrl = 'https://github.com/facebook/react';
+    const uniqueUrls = [
+      'https://github.com/vuejs/vue',
+      'https://github.com/angular/angular'
+    ];
+
+    // Open first unique URL
+    const pages = await browser.pages();
+    await pages[0].goto(uniqueUrls[0], { waitUntil: 'load', timeout: 60000 });
+
+    // Open 3 copies of the duplicate URL
+    for (let i = 0; i < 3; i++) {
+      const newPage = await browser.newPage();
+      await newPage.goto(duplicateUrl, { waitUntil: 'load', timeout: 60000 });
+    }
+
+    // Open second unique URL
+    const newPage = await browser.newPage();
+    await newPage.goto(uniqueUrls[1], { waitUntil: 'load', timeout: 60000 });
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Count tabs before organization
+    const tabsBefore = await serviceWorker.evaluate(async () => {
+      const tabs = await chrome.tabs.query({});
+      return tabs.filter(t =>
+        !t.url.startsWith('chrome://') &&
+        !t.url.startsWith('chrome-extension://') &&
+        t.url !== 'about:blank'
+      ).length;
+    });
+
+    console.log(`Tabs before organization: ${tabsBefore}`);
+    expect(tabsBefore).toBe(5); // 3 duplicates + 2 unique
+
+    // Step 2: Organize - should keep first occurrence, close rest
+    console.log('Organizing - should close duplicate occurrences...');
+    const popupPage = await browser.newPage();
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
+    await popupPage.waitForSelector('#organizeBtn');
+    await popupPage.click('#organizeBtn');
+
+    await popupPage.waitForFunction(
+      () => {
+        const status = document.getElementById('status');
+        return status && status.classList.contains('show');
+      },
+      { timeout: 10000 }
+    );
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Step 3: Verify status message reports 2 duplicates removed
+    const statusMessage = await popupPage.evaluate(() => {
+      const status = document.getElementById('status');
+      return status ? status.textContent : '';
+    });
+
+    console.log('Status message:', statusMessage);
+    expect(statusMessage).toContain('Removed 2 duplicate');
+
+    // Step 4: Verify only first occurrence kept
+    const tabsAfter = await serviceWorker.evaluate(async () => {
+      const tabs = await chrome.tabs.query({});
+      return tabs.filter(t =>
+        !t.url.startsWith('chrome://') &&
+        !t.url.startsWith('chrome-extension://') &&
+        t.url !== 'about:blank'
+      ).map(t => t.url);
+    });
+
+    console.log(`Tabs after organization: ${tabsAfter.length}`);
+    expect(tabsAfter.length).toBe(3); // 3 unique URLs (2 duplicates closed)
+
+    // Verify all URLs are unique
+    const uniqueUrlsSet = new Set(tabsAfter);
+    expect(uniqueUrlsSet.size).toBe(3);
+
+    console.log('✅ Multiple ungrouped duplicates closed successfully!');
+    await popupPage.close();
+  }, 90000);
+
+  test('should work with category mode', async () => {
+    console.log('=== Test: Duplicate Removal with Category Mode ===');
+
+    // Clean up from previous test
+    await serviceWorker.evaluate(async () => {
+      const tabs = await chrome.tabs.query({});
+      const tabsToClose = tabs.slice(1);
+      if (tabsToClose.length > 0) {
+        await chrome.tabs.remove(tabsToClose.map(t => t.id));
+      }
+      const groups = await chrome.tabGroups.query({});
+      for (const group of groups) {
+        const groupTabs = await chrome.tabs.query({ groupId: group.id });
+        if (groupTabs.length > 0) {
+          await chrome.tabs.ungroup(groupTabs.map(t => t.id));
+        }
+      }
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Step 1: Open Development category tabs
     console.log('Opening Development category tabs...');
     const devUrls = [
       'https://github.com/facebook/react',
@@ -250,17 +326,14 @@ describe('Ungrouped Duplicates Detection', () => {
       'https://github.com/vuejs/vue'
     ];
 
-    // Keep the existing tab on about:blank (won't be organized since it's skipped)
     const pages = await browser.pages();
-    await pages[0].goto('about:blank', { waitUntil: 'load' });
+    await pages[0].goto(devUrls[0], { waitUntil: 'load', timeout: 60000 });
 
-    // Open ALL dev URLs as new pages for consistent state
-    for (const url of devUrls) {
+    for (let i = 1; i < devUrls.length; i++) {
       const newPage = await browser.newPage();
-      await newPage.goto(url, { waitUntil: 'load', timeout: 60000 });
+      await newPage.goto(devUrls[i], { waitUntil: 'load', timeout: 60000 });
     }
 
-    console.log(`Opened ${devUrls.length} Development tabs`);
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Step 2: Organize by category
@@ -279,31 +352,7 @@ describe('Ungrouped Duplicates Detection', () => {
     );
 
     await popupPage.close();
-
     await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Re-establish service worker connection after organization
-    let swTarget3 = await browser.waitForTarget(
-      target => target.type() === 'service_worker' && target.url().includes(extensionId),
-      { timeout: 10000 }
-    );
-    serviceWorker = await swTarget3.worker();
-
-    // Debug: Check all tabs and their group status
-    const allTabs = await serviceWorker.evaluate(async () => {
-      const tabs = await chrome.tabs.query({});
-      return tabs.map(t => ({ url: t.url, groupId: t.groupId, title: t.title }));
-    });
-    console.log('All tabs after organization:', allTabs);
-
-    // Verify Development group was created
-    const groups = await serviceWorker.evaluate(async () => {
-      const groups = await chrome.tabGroups.query({});
-      return groups.map(g => ({ id: g.id, title: g.title }));
-    });
-
-    console.log('Groups after category organization:', groups);
-    expect(groups.some(g => g.title.startsWith('Development'))).toBe(true);
 
     // Step 3: Open ungrouped duplicate
     console.log('Opening ungrouped duplicate (Development category)...');
@@ -315,7 +364,20 @@ describe('Ungrouped Duplicates Detection', () => {
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Step 4: Organize again and verify warning
+    // Count tabs before re-organizing
+    const tabsBefore = await serviceWorker.evaluate(async () => {
+      const tabs = await chrome.tabs.query({});
+      return tabs.filter(t =>
+        !t.url.startsWith('chrome://') &&
+        !t.url.startsWith('chrome-extension://') &&
+        t.url !== 'about:blank'
+      ).length;
+    });
+
+    console.log(`Tabs before re-organization: ${tabsBefore}`);
+    expect(tabsBefore).toBe(4); // 3 initial + 1 duplicate
+
+    // Step 4: Organize again - duplicate should be closed
     console.log('Re-organizing by category...');
     popupPage = await browser.newPage();
     await popupPage.goto(`chrome-extension://${extensionId}/src/popup/popup.html`);
@@ -332,24 +394,36 @@ describe('Ungrouped Duplicates Detection', () => {
 
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Verify warning message
+    // Verify status message reports duplicate removed
     const statusMessage = await popupPage.evaluate(() => {
       const status = document.getElementById('status');
       return status ? status.textContent : '';
     });
 
     console.log('Status message (category mode):', statusMessage);
-    expect(statusMessage).toContain('Warning');
-    expect(statusMessage).toContain('ungrouped duplicate');
+    expect(statusMessage).toContain('Removed 1 duplicate');
 
-    console.log('✅ Category mode ungrouped duplicates detection test passed!');
+    // Verify duplicate was closed
+    const tabsAfter = await serviceWorker.evaluate(async () => {
+      const tabs = await chrome.tabs.query({});
+      return tabs.filter(t =>
+        !t.url.startsWith('chrome://') &&
+        !t.url.startsWith('chrome-extension://') &&
+        t.url !== 'about:blank'
+      ).length;
+    });
+
+    console.log(`Tabs after re-organization: ${tabsAfter}`);
+    expect(tabsAfter).toBe(3); // Duplicate closed
+
+    console.log('✅ Category mode duplicate removal test passed!');
     await popupPage.close();
-  }, 90000); // 90 second timeout
+  }, 90000);
 
-  test('should show no warning when there are no ungrouped duplicates', async () => {
-    console.log('=== Test: No Warning When No Ungrouped Duplicates ===');
+  test('should show no duplicate message when there are no duplicates', async () => {
+    console.log('=== Test: No Message When No Duplicates ===');
 
-    // Close all tabs and start fresh
+    // Clean up
     await serviceWorker.evaluate(async () => {
       const tabs = await chrome.tabs.query({});
       const tabsToClose = tabs.slice(1);
@@ -403,18 +477,18 @@ describe('Ungrouped Duplicates Detection', () => {
 
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Step 3: Verify no warning in status message
+    // Step 3: Verify no duplicate message in status
     const statusMessage = await popupPage.evaluate(() => {
       const status = document.getElementById('status');
       return status ? status.textContent : '';
     });
 
     console.log('Status message (no duplicates):', statusMessage);
-    expect(statusMessage).not.toContain('Warning');
-    expect(statusMessage).not.toContain('ungrouped duplicate');
+    expect(statusMessage).not.toContain('Removed');
+    expect(statusMessage).not.toContain('duplicate');
     expect(statusMessage).toContain('Organized'); // Should still show success
 
-    console.log('✅ No warning test passed!');
+    console.log('✅ No duplicate message test passed!');
     await popupPage.close();
-  }, 90000); // 90 second timeout
+  }, 90000);
 });

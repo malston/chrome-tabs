@@ -26,7 +26,6 @@ chrome-extension/
 │   ├── background/           # Service worker and feature modules
 │   │   ├── background.js     # Service worker entry point (message router)
 │   │   ├── organizeTabs.js   # Tab grouping by domain or category
-│   │   ├── removeDuplicateTabs.js
 │   │   ├── removeAllGroups.js
 │   │   ├── saveTabsToBookmarks.js
 │   │   ├── restoreFromBookmarks.js
@@ -71,8 +70,7 @@ chrome-extension/
   - Imports feature modules from same directory
 
 - **Feature Modules** (`src/background/`)
-  - `organizeTabs()` - Groups tabs by domain or category using Chrome Tab Groups API
-  - `removeDuplicateTabs()` - Closes duplicate tabs (keeps first occurrence)
+  - `organizeTabs()` - Groups tabs by domain or category using Chrome Tab Groups API (includes automatic duplicate removal)
   - `removeAllGroups()` - Ungroups all tabs
   - `saveTabsToBookmarks()` - Saves tab groups to bookmarks
   - `restoreFromBookmarks()` - Restores tabs from saved bookmarks
@@ -100,7 +98,7 @@ chrome-extension/
   - Auto-merge setting: automatically consolidates duplicate groups during organize
 
 - **popup.html/js** (`src/popup/`) - Extension UI
-  - Buttons: Organize by Domain, Organize by Category, Remove Duplicates, Save to Bookmarks, Restore from Bookmarks, Combine Groups, Protect Groups, Remove All Groups
+  - Buttons: Organize by Domain, Organize by Category, Save to Bookmarks, Restore from Bookmarks, Combine Groups, Protect Groups, Remove All Groups
   - Advanced section (when enabled): Merge Duplicate Groups
   - Status feedback with success/error states
   - Communication with background service worker via `chrome.runtime.sendMessage()`
@@ -161,15 +159,13 @@ npm run test:coverage  # Generate coverage report
 
 1. Open Chrome with many tabs across multiple domains
 2. Click extension icon → "Organize by Domain"
-3. Verify tabs are grouped by domain, sorted alphabetically
-4. Click "Remove Duplicates"
-5. Verify duplicate URLs are closed (first occurrence kept)
-6. Click "Save to Bookmarks"
-7. Verify bookmarks created in "Other Bookmarks"
-8. Click "Restore from Bookmarks" and select a folder
-9. Verify tabs restored and grouped correctly
-10. Click "Remove All Groups"
-11. Verify groups are removed but tabs remain open
+3. Verify tabs are grouped by domain, sorted alphabetically, and duplicates are automatically removed
+4. Click "Save to Bookmarks"
+5. Verify bookmarks created in "Other Bookmarks"
+6. Click "Restore from Bookmarks" and select a folder
+7. Verify tabs restored and grouped correctly
+8. Click "Remove All Groups"
+9. Verify groups are removed but tabs remain open
 
 ## Common Development Tasks
 
@@ -191,7 +187,7 @@ Edit `organizeTabs()` function in `chrome-extension/src/background/organizeTabs.
 
 ### Modify Duplicate Removal Logic
 
-Edit `removeDuplicateTabs()` function in `chrome-extension/src/background/removeDuplicateTabs.js`
+Duplicate removal is integrated into the organize operation. Edit the duplicate removal logic in `organizeTabs()` function in `chrome-extension/src/background/organizeTabs.js`
 
 ### Modify Bookmark Save/Restore Behavior
 

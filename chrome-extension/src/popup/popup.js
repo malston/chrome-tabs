@@ -5,7 +5,6 @@ const organizeBtn = document.getElementById('organizeBtn');
 const organizeCategoryBtn = document.getElementById('organizeCategoryBtn');
 const organizeAllWindowsBtn = document.getElementById('organizeAllWindowsBtn');
 const organizeAllWindowsCategoryBtn = document.getElementById('organizeAllWindowsCategoryBtn');
-const dedupeBtn = document.getElementById('dedupeBtn');
 const saveBookmarksBtn = document.getElementById('saveBookmarksBtn');
 const restoreBookmarksBtn = document.getElementById('restoreBookmarksBtn');
 const removeGroupsBtn = document.getElementById('removeGroupsBtn');
@@ -58,11 +57,11 @@ organizeBtn.addEventListener('click', async () => {
       if (response.mergeErrors > 0) {
         message += ` ⚠️ ${response.mergeErrors} merge error(s) occurred.`;
       }
+      if (response.duplicatesClosed > 0) {
+        message += ` Removed ${response.duplicatesClosed} duplicate(s).`;
+      }
       if (response.ungroupedTabsMoved > 0) {
         message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
-      }
-      if (response.ungroupedDuplicates > 0) {
-        message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
       }
       showStatus(message, 'success');
     }
@@ -94,11 +93,11 @@ organizeCategoryBtn.addEventListener('click', async () => {
       if (response.mergeErrors > 0) {
         message += ` ⚠️ ${response.mergeErrors} merge error(s) occurred.`;
       }
+      if (response.duplicatesClosed > 0) {
+        message += ` Removed ${response.duplicatesClosed} duplicate(s).`;
+      }
       if (response.ungroupedTabsMoved > 0) {
         message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
-      }
-      if (response.ungroupedDuplicates > 0) {
-        message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
       }
       showStatus(message, 'success');
     }
@@ -140,9 +139,6 @@ organizeAllWindowsBtn.addEventListener('click', async () => {
       if (response.ungroupedTabsMoved > 0) {
         message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
       }
-      if (response.ungroupedDuplicates > 0) {
-        message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
-      }
       showStatus(message, 'success');
     }
   } catch (error) {
@@ -183,9 +179,6 @@ organizeAllWindowsCategoryBtn.addEventListener('click', async () => {
       if (response.ungroupedTabsMoved > 0) {
         message += ` Moved ${response.ungroupedTabsMoved} ungrouped tab(s) to end.`;
       }
-      if (response.ungroupedDuplicates > 0) {
-        message += ` Warning: ${response.ungroupedDuplicates} ungrouped duplicate(s) found.`;
-      }
       showStatus(message, 'success');
     }
   } catch (error) {
@@ -193,33 +186,6 @@ organizeAllWindowsCategoryBtn.addEventListener('click', async () => {
   } finally {
     organizeAllWindowsCategoryBtn.disabled = false;
     organizeAllWindowsCategoryBtn.textContent = 'Organize by Category';
-  }
-});
-
-dedupeBtn.addEventListener('click', async () => {
-  dedupeBtn.disabled = true;
-  dedupeBtn.textContent = 'Finding duplicates...';
-
-  try {
-    const response = await chrome.runtime.sendMessage({
-      action: 'removeDuplicates'
-    });
-
-    if (response.error) {
-      showStatus(`Error: ${response.error}`, 'error');
-    } else if (response.duplicatesClosed === 0) {
-      showStatus('✓ No duplicates found!', 'success');
-    } else {
-      showStatus(
-        `✓ Removed ${response.duplicatesClosed} duplicate tabs!`,
-        'success'
-      );
-    }
-  } catch (error) {
-    showStatus(`Error: ${error.message}`, 'error');
-  } finally {
-    dedupeBtn.disabled = false;
-    dedupeBtn.textContent = 'Remove Duplicates';
   }
 });
 

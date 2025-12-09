@@ -907,14 +907,18 @@ describe('organizeTabs', () => {
         { id: 5, title: 'github.com (2)' }
       ];
 
-      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.query
+        .mockResolvedValueOnce(mockTabs) // Initial query
+        .mockResolvedValueOnce([mockTabs[0], mockTabs[1], mockTabs[3]]); // After removing duplicate
       chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.remove.mockResolvedValue(undefined);
       chrome.tabs.group.mockResolvedValue(5);
 
       const result = await organizeTabs('domain', false);
 
-      // Should detect 1 ungrouped duplicate
-      expect(result.ungroupedDuplicates).toBe(1);
+      // Should close 1 ungrouped duplicate
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([3]);
+      expect(result.duplicatesClosed).toBe(1);
     });
 
     test('should count multiple ungrouped duplicates correctly', async () => {
@@ -932,14 +936,18 @@ describe('organizeTabs', () => {
         { id: 5, title: 'github.com (2)' }
       ];
 
-      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.query
+        .mockResolvedValueOnce(mockTabs) // Initial query
+        .mockResolvedValueOnce([mockTabs[0], mockTabs[1]]); // After removing duplicates
       chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.remove.mockResolvedValue(undefined);
       chrome.tabs.group.mockResolvedValue(5);
 
       const result = await organizeTabs('domain', false);
 
-      // Should detect 3 ungrouped duplicates (2 of repo1, 1 of repo2)
-      expect(result.ungroupedDuplicates).toBe(3);
+      // Should close 3 ungrouped duplicates (2 of repo1, 1 of repo2)
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([3, 4, 5]);
+      expect(result.duplicatesClosed).toBe(3);
     });
 
     test('should return 0 ungrouped duplicates when none exist', async () => {
@@ -959,8 +967,9 @@ describe('organizeTabs', () => {
 
       const result = await organizeTabs('domain', false);
 
-      // Should detect no ungrouped duplicates
-      expect(result.ungroupedDuplicates).toBe(0);
+      // Should close no ungrouped duplicates
+      expect(chrome.tabs.remove).not.toHaveBeenCalled();
+      expect(result.duplicatesClosed).toBe(0);
     });
 
     test('should skip chrome internal pages when detecting duplicates', async () => {
@@ -979,14 +988,18 @@ describe('organizeTabs', () => {
         { id: 5, title: 'github.com (1)' }
       ];
 
-      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.query
+        .mockResolvedValueOnce(mockTabs) // Initial query
+        .mockResolvedValueOnce([mockTabs[0], mockTabs[2], mockTabs[3], mockTabs[4]]); // After removing duplicate
       chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.remove.mockResolvedValue(undefined);
       chrome.tabs.group.mockResolvedValue(5);
 
       const result = await organizeTabs('domain', false);
 
-      // Should only detect the github duplicate, not chrome pages
-      expect(result.ungroupedDuplicates).toBe(1);
+      // Should only close the github duplicate, not chrome pages
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([2]);
+      expect(result.duplicatesClosed).toBe(1);
     });
 
     test('should work correctly with category mode', async () => {
@@ -1002,22 +1015,26 @@ describe('organizeTabs', () => {
         { id: 7, title: 'Development (2)' }
       ];
 
-      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.query
+        .mockResolvedValueOnce(mockTabs) // Initial query
+        .mockResolvedValueOnce([mockTabs[0], mockTabs[1]]); // After removing duplicate
       chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.remove.mockResolvedValue(undefined);
       chrome.tabs.group.mockResolvedValue(7);
 
       const result = await organizeTabs('category', false);
 
-      // Should detect ungrouped duplicate in category mode too
-      expect(result.ungroupedDuplicates).toBe(1);
+      // Should close ungrouped duplicate in category mode too
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([3]);
+      expect(result.duplicatesClosed).toBe(1);
     });
 
-    test('should skip ungrouped duplicates and not organize them', async () => {
+    test('should close ungrouped duplicates before organizing', async () => {
       const mockTabs = [
         // Grouped tabs
         { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5, windowId: 1 },
         { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5, windowId: 1 },
-        // Ungrouped duplicate - should NOT be organized
+        // Ungrouped duplicate - should be CLOSED
         { id: 3, url: 'https://github.com/repo1', title: 'Repo 1 Duplicate', groupId: -1, windowId: 1 },
         // Regular ungrouped tabs (not duplicates) - should still be organized if eligible
         { id: 4, url: 'https://example.com/page1', title: 'Example 1', groupId: -1, windowId: 1 },
@@ -1028,23 +1045,27 @@ describe('organizeTabs', () => {
         { id: 5, title: 'github.com (2)' }
       ];
 
-      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.query
+        .mockResolvedValueOnce(mockTabs) // Initial query
+        .mockResolvedValueOnce([mockTabs[0], mockTabs[1], mockTabs[3], mockTabs[4]]); // After removing duplicate
       chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.remove.mockResolvedValue(undefined);
       chrome.tabs.group.mockResolvedValue(10);
 
       const result = await organizeTabs('domain', false);
 
-      // Should detect 1 ungrouped duplicate
-      expect(result.ungroupedDuplicates).toBe(1);
+      // Should close 1 ungrouped duplicate
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([3]);
+      expect(result.duplicatesClosed).toBe(1);
 
       // Should have been called to create a new example.com group (2 tabs)
-      // But NOT called to add the duplicate github tab (tab id 3)
+      // The duplicate github tab (tab id 3) was already removed
       expect(chrome.tabs.group).toHaveBeenCalledWith({ tabIds: [4, 5] }); // example.com group
 
-      // The ungrouped duplicate (tab 3) should NOT be in any group call
+      // The ungrouped duplicate (tab 3) should NOT be in any group call (it was removed)
       const allGroupCalls = chrome.tabs.group.mock.calls;
       const allTabIdsGrouped = allGroupCalls.flatMap(call => call[0].tabIds);
-      expect(allTabIdsGrouped).not.toContain(3); // Tab 3 should not be grouped
+      expect(allTabIdsGrouped).not.toContain(3); // Tab 3 was removed before grouping
     });
 
     test('should move ungrouped tabs to end of tab bar', async () => {
@@ -1102,6 +1123,80 @@ describe('organizeTabs', () => {
       expect(result.ungroupedTabsMoved).toBe(1);
       expect(chrome.tabs.move).toHaveBeenCalledWith([3], { index: -1 });
       expect(chrome.tabs.move).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Automatic Duplicate Removal', () => {
+    test('should close ungrouped tab that duplicates a grouped tab', async () => {
+      const mockTabs = [
+        // Grouped tabs
+        { id: 1, url: 'https://github.com/repo1', title: 'Repo 1', groupId: 5, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'Repo 2', groupId: 5, windowId: 1 },
+        // Ungrouped duplicate of grouped tab - should be CLOSED
+        { id: 3, url: 'https://github.com/repo1', title: 'Repo 1 Duplicate', groupId: -1, windowId: 1 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'github.com (2)' }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+      chrome.tabs.remove.mockResolvedValue(undefined);
+
+      const result = await organizeTabs('domain', false);
+
+      // Should have closed the ungrouped duplicate (tab 3)
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([3]);
+      expect(result.duplicatesClosed).toBe(1);
+    });
+
+    test('should close multiple ungrouped tabs with same URL, keeping first', async () => {
+      const mockTabs = [
+        // Three ungrouped tabs with same URL
+        { id: 1, url: 'https://github.com/repo1', title: 'First', groupId: -1, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo1', title: 'Second', groupId: -1, windowId: 1 },
+        { id: 3, url: 'https://github.com/repo1', title: 'Third', groupId: -1, windowId: 1 },
+        // Another domain to form a group
+        { id: 4, url: 'https://github.com/repo2', title: 'Repo 2', groupId: -1, windowId: 1 }
+      ];
+
+      chrome.tabs.query
+        .mockResolvedValueOnce(mockTabs) // Initial query
+        .mockResolvedValueOnce([mockTabs[0], mockTabs[3]]); // After removing duplicates
+      chrome.tabGroups.query.mockResolvedValue([]);
+      chrome.tabs.remove.mockResolvedValue(undefined);
+      chrome.tabs.group.mockResolvedValue(1);
+
+      const result = await organizeTabs('domain', false);
+
+      // Should have closed tabs 2 and 3 (duplicates of tab 1)
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([2, 3]);
+      expect(result.duplicatesClosed).toBe(2);
+    });
+
+    test('should preserve cross-group duplicates (same URL in different groups)', async () => {
+      const mockTabs = [
+        // Same URL in two different groups
+        { id: 1, url: 'https://github.com/repo1', title: 'In Dev Group', groupId: 5, windowId: 1 },
+        { id: 2, url: 'https://github.com/repo2', title: 'In Dev Group', groupId: 5, windowId: 1 },
+        { id: 3, url: 'https://github.com/repo1', title: 'In Domain Group', groupId: 7, windowId: 1 },
+        { id: 4, url: 'https://example.com/page', title: 'In Domain Group', groupId: 7, windowId: 1 }
+      ];
+
+      const mockGroups = [
+        { id: 5, title: 'Development (2)' },
+        { id: 7, title: 'github.com (2)' }
+      ];
+
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabGroups.query.mockResolvedValue(mockGroups);
+
+      const result = await organizeTabs('domain', false);
+
+      // Should NOT close any tabs - cross-group duplicates are allowed
+      expect(chrome.tabs.remove).not.toHaveBeenCalled();
+      expect(result.duplicatesClosed).toBe(0);
     });
   });
 });

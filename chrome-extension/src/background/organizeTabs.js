@@ -31,24 +31,33 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
 
   // If organizing across all windows, first remove duplicates and move all tabs to current window
   if (allWindows) {
-    // Track unique URLs and their first occurrence
-    const seenUrls = new Map(); // url -> tab
+    // First pass: identify grouped tabs (prioritized)
+    const groupedUrls = new Map(); // url -> tab
+    for (const tab of tabs) {
+      if (shouldSkipUrl(tab.url)) continue;
+      if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
+        if (!groupedUrls.has(tab.url)) {
+          groupedUrls.set(tab.url, tab);
+        }
+      }
+    }
+
+    // Second pass: find duplicates and tabs to move
+    const seenUrls = new Map(); // url -> tab (first seen)
     const tabsToClose = [];
     const tabsToMove = [];
 
     for (const tab of tabs) {
-      // Skip chrome internal pages
-      if (shouldSkipUrl(tab.url)) {
-        continue;
-      }
+      if (shouldSkipUrl(tab.url)) continue;
 
-      if (seenUrls.has(tab.url)) {
-        // This is a duplicate - mark for closure
+      // Check if this is a duplicate of a grouped tab
+      if (groupedUrls.has(tab.url) && groupedUrls.get(tab.url).id !== tab.id) {
+        tabsToClose.push(tab.id);
+      } else if (seenUrls.has(tab.url)) {
+        // Duplicate of another seen tab
         tabsToClose.push(tab.id);
       } else {
-        // First occurrence - keep it
         seenUrls.set(tab.url, tab);
-
         // If tab is in a different window, mark for moving
         if (tab.windowId !== currentWindow.id) {
           tabsToMove.push(tab);
@@ -76,57 +85,56 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
 
     // Re-query tabs in current window after moving
     tabs = await chrome.tabs.query({ currentWindow: true });
-  }
-
-  // Detect ungrouped tabs that duplicate grouped tabs
-  let ungroupedDuplicates = 0;
-  const ungroupedDuplicateUrls = new Set();
-
-  // Build a map of grouped tab URLs
-  const groupedTabUrls = new Map(); // url -> tab
-  for (const tab of tabs) {
-    if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
-      // Skip chrome internal pages
-      if (shouldSkipUrl(tab.url)) {
-        continue;
+  } else {
+    // Single-window mode: remove ungrouped duplicates
+    // Step 1: Identify grouped tab URLs (these take priority)
+    const groupedUrls = new Map(); // url -> tab
+    for (const tab of tabs) {
+      if (shouldSkipUrl(tab.url)) continue;
+      if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
+        if (!groupedUrls.has(tab.url)) {
+          groupedUrls.set(tab.url, tab);
+        }
       }
-      groupedTabUrls.set(tab.url, tab);
     }
-  }
 
-  // Check ungrouped tabs for duplicates
-  for (const tab of tabs) {
-    if (tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE) {
-      // Skip chrome internal pages
-      if (shouldSkipUrl(tab.url)) {
-        continue;
-      }
+    // Step 2: Find ungrouped duplicates to close
+    const seenUngroupedUrls = new Map(); // url -> tab
+    const tabsToClose = [];
 
-      // Check if this ungrouped tab's URL already exists in a grouped tab
-      if (groupedTabUrls.has(tab.url)) {
-        ungroupedDuplicates++;
-        ungroupedDuplicateUrls.add(tab.url);
+    for (const tab of tabs) {
+      if (shouldSkipUrl(tab.url)) continue;
+      if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) continue; // Skip grouped tabs
+
+      if (groupedUrls.has(tab.url)) {
+        // Ungrouped duplicate of grouped tab - close it
+        tabsToClose.push(tab.id);
+      } else if (seenUngroupedUrls.has(tab.url)) {
+        // Ungrouped duplicate of another ungrouped tab - close it
+        tabsToClose.push(tab.id);
+      } else {
+        seenUngroupedUrls.set(tab.url, tab);
       }
+    }
+
+    // Step 3: Close duplicates
+    if (tabsToClose.length > 0) {
+      await chrome.tabs.remove(tabsToClose);
+      duplicatesClosed = tabsToClose.length;
+    }
+
+    // Step 4: Re-query tabs after removing duplicates
+    if (duplicatesClosed > 0) {
+      tabs = await chrome.tabs.query({ currentWindow: true });
     }
   }
 
   // Group tabs by domain or category
   const groups = {};
 
-  // Build a set of URLs that should be skipped (ungrouped duplicates)
-  const skippedUngroupedDuplicateUrls = new Set();
-  for (const url of ungroupedDuplicateUrls) {
-    skippedUngroupedDuplicateUrls.add(url);
-  }
-
   for (const tab of tabs) {
     // Skip chrome internal pages
     if (shouldSkipUrl(tab.url)) {
-      continue;
-    }
-
-    // Skip ungrouped duplicates - don't organize them
-    if (tab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE && skippedUngroupedDuplicateUrls.has(tab.url)) {
       continue;
     }
 
@@ -274,7 +282,6 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
     ungroupedTabs: tabs.length - groupedCount,
     duplicatesClosed: duplicatesClosed,
     tabsMoved: tabsMoved,
-    ungroupedDuplicates: ungroupedDuplicates,
     ungroupedTabsMoved: ungroupedTabsMoved,
     duplicateGroupsMerged: mergeResult?.mergedGroups || 0,
     tabsMovedFromMerge: mergeResult?.tabsMoved || 0,
