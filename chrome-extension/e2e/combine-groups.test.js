@@ -214,8 +214,7 @@ describe('Combine Groups Feature', () => {
 
     console.log('Final groups:', finalGroups);
     expect(finalGroups.length).toBe(1);
-    expect(finalGroups[0].title).toContain('github.com');
-    expect(finalGroups[0].title).toContain('5'); // 3 github + 2 google tabs
+    expect(finalGroups[0].title).toBe('github.com');
 
     console.log('✅ Combine two groups test passed!');
 
@@ -354,8 +353,7 @@ describe('Combine Groups Feature', () => {
 
     console.log('Final groups:', finalGroups);
     expect(finalGroups.length).toBe(1);
-    expect(finalGroups[0].title).toContain('github.com');
-    expect(finalGroups[0].title).toContain('7'); // 3 github + 2 google + 2 stackoverflow
+    expect(finalGroups[0].title).toBe('github.com');
 
     console.log('✅ Combine multiple source groups test passed!');
 
