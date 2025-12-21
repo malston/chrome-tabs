@@ -200,11 +200,9 @@ describe('Re-Organization (Update Existing Groups)', () => {
     const updatedGroupIds = updatedGroups.map(g => g.id).sort();
     expect(updatedGroupIds).toEqual(initialGroupIds.sort());
 
-    // Verify group titles reflect the new tab counts
+    // Verify group titles (no longer include tab counts)
     const groupTitles = updatedGroups.map(g => g.title).sort();
-    expect(groupTitles).toContain('example.com (3)'); // was 2, now 3
-    expect(groupTitles).toContain('github.com (5)');  // was 3, now 5
-    expect(groupTitles).toContain('google.com (4)');  // was 2, now 4
+    expect(groupTitles).toEqual(['example.com', 'github.com', 'google.com']);
 
     // Step 8: Verify tabs are sorted alphabetically within each group
     const allTabs = await serviceWorker.evaluate(async () => {
