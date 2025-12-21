@@ -3,14 +3,16 @@
 
 /**
  * Extracts the base name from a group title by removing the tab count suffix.
- * This allows matching existing groups with new grouping operations.
+ * Primarily used for backward compatibility with older group formats that
+ * included tab counts in the title. Also enables matching existing groups
+ * with new grouping operations regardless of their title format.
  *
  * Examples:
- * - "github.com (15)" → "github.com"
- * - "acme.com (5)" → "acme.com"
+ * - "github.com (15)" → "github.com"  // Legacy format with count
+ * - "github.com" → "github.com"        // Current format (unchanged)
  * - "Development (10)" → "Development"
  *
- * @param {string} groupTitle - The full group title with count
+ * @param {string} groupTitle - The group title (with or without count suffix)
  * @returns {string} The base name without the count suffix
  */
 function extractGroupBaseName(groupTitle) {

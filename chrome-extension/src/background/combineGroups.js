@@ -32,7 +32,7 @@ export async function combineGroups(sourceGroupIds, targetGroupId) {
     };
   }
 
-  // Get current target tab count for final count calculation
+  // Get current target tab count for status message display
   const targetTabs = await chrome.tabs.query({ groupId: targetGroupId });
   const tabsMoved = allSourceTabs.length;
   const newTargetTabCount = targetTabs.length + tabsMoved;
