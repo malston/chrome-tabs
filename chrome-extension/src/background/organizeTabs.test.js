@@ -189,9 +189,9 @@ describe('organizeTabs', () => {
       expect(chrome.tabs.ungroup).not.toHaveBeenCalledWith(1);
       expect(chrome.tabs.ungroup).not.toHaveBeenCalledWith(2);
 
-      // Should update the existing group title (even though count didn't change)
+      // Should update the existing group title
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(5, {
-        title: 'github.com (2)'
+        title: 'github.com'
       });
 
       // Should NOT create a new group
@@ -210,7 +210,7 @@ describe('organizeTabs', () => {
       await organizeTabs('domain');
 
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(1, {
-        title: 'github.com (2)',
+        title: 'github.com',
         color: 'blue',
         collapsed: false
       });
@@ -231,12 +231,12 @@ describe('organizeTabs', () => {
 
       expect(chrome.tabs.group).toHaveBeenCalledTimes(2);
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(1, {
-        title: 'localhost (2)',
+        title: 'localhost',
         color: 'blue',
         collapsed: false
       });
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(2, {
-        title: 'local-network (2)',
+        title: 'local-network',
         color: 'red',
         collapsed: false
       });
@@ -268,9 +268,9 @@ describe('organizeTabs', () => {
         groupId: 5
       });
 
-      // Should update group title with new count
+      // Should update group title
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(5, {
-        title: 'github.com (4)'
+        title: 'github.com'
       });
 
       // Should NOT ungroup any tabs
@@ -298,9 +298,9 @@ describe('organizeTabs', () => {
       // Note: chrome.tabs.ungroup is called with array from within group diff logic
       expect(chrome.tabs.ungroup).toHaveBeenCalledWith([3]);
 
-      // Should update group title with new count
+      // Should update group title
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(5, {
-        title: 'github.com (2)'
+        title: 'github.com'
       });
     });
 
@@ -328,7 +328,7 @@ describe('organizeTabs', () => {
 
       // Should update existing github group (no changes needed)
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(5, {
-        title: 'github.com (2)'
+        title: 'github.com'
       });
 
       // Should create new stackoverflow group
@@ -336,7 +336,7 @@ describe('organizeTabs', () => {
         tabIds: [3, 4]
       });
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(7, {
-        title: 'stackoverflow.com (2)',
+        title: 'stackoverflow.com',
         color: 'blue',
         collapsed: false
       });
@@ -398,8 +398,8 @@ describe('organizeTabs', () => {
       // Check that both groups were created with correct titles
       const updateCalls = chrome.tabGroups.update.mock.calls;
       const titles = updateCalls.map(call => call[1].title);
-      expect(titles).toContain('Development (3)');
-      expect(titles).toContain('Documentation (2)');
+      expect(titles).toContain('Development');
+      expect(titles).toContain('Documentation');
     });
 
     test('should categorize social media sites correctly', async () => {
@@ -420,7 +420,7 @@ describe('organizeTabs', () => {
       // Check the title of the created group
       const updateCalls = chrome.tabGroups.update.mock.calls;
       const lastCall = updateCalls[updateCalls.length - 1];
-      expect(lastCall[1].title).toBe('Social Media (3)');
+      expect(lastCall[1].title).toBe('Social Media');
     });
 
     test('should categorize shopping sites correctly', async () => {
@@ -440,7 +440,7 @@ describe('organizeTabs', () => {
       // Check the title of the created group
       const updateCalls = chrome.tabGroups.update.mock.calls;
       const lastCall = updateCalls[updateCalls.length - 1];
-      expect(lastCall[1].title).toBe('Shopping (2)');
+      expect(lastCall[1].title).toBe('Shopping');
     });
 
     test('should categorize cloud services correctly', async () => {
@@ -461,7 +461,7 @@ describe('organizeTabs', () => {
       // Check the title of the created group
       const updateCalls = chrome.tabGroups.update.mock.calls;
       const lastCall = updateCalls[updateCalls.length - 1];
-      expect(lastCall[1].title).toBe('Cloud Services (2)');
+      expect(lastCall[1].title).toBe('Cloud Services');
     });
 
     test('should group uncategorized tabs as "Other"', async () => {
@@ -504,9 +504,9 @@ describe('organizeTabs', () => {
         groupId: 5
       });
 
-      // Should update group title with new count
+      // Should update group title
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(5, {
-        title: 'Development (3)'
+        title: 'Development'
       });
     });
   });
@@ -680,7 +680,7 @@ describe('organizeTabs', () => {
       expect(updateCalls[9][1].color).toBe('red');
     });
 
-    test('should include tab count in group title', async () => {
+    test('should use domain name only as group title', async () => {
       const mockTabs = [
         { id: 1, url: 'https://github.com/r1', title: 'R1', groupId: -1 },
         { id: 2, url: 'https://github.com/r2', title: 'R2', groupId: -1 },
@@ -693,7 +693,7 @@ describe('organizeTabs', () => {
       await organizeTabs('domain');
 
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(1, {
-        title: 'github.com (3)',
+        title: 'github.com',
         color: 'blue',
         collapsed: false
       });

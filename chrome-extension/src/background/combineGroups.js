@@ -41,9 +41,9 @@ export async function combineGroups(sourceGroupIds, targetGroupId) {
   const sourceTabIds = allSourceTabs.map(tab => tab.id);
   await chrome.tabs.group({ tabIds: sourceTabIds, groupId: targetGroupId });
 
-  // Update target group title with new count
+  // Update target group title
   await chrome.tabGroups.update(targetGroupId, {
-    title: `${targetGroupName} (${newTargetTabCount})`
+    title: targetGroupName
   });
 
   return {

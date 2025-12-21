@@ -55,7 +55,7 @@ describe('mergeDuplicateGroups', () => {
         groupId: 1,
       });
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(1, {
-        title: 'github.com (15)',
+        title: 'github.com',
       });
       expect(result.mergedGroups).toBe(1);
       expect(result.tabsMoved).toBe(5);
@@ -134,7 +134,7 @@ describe('mergeDuplicateGroups', () => {
         groupId: 2,
       });
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(2, {
-        title: 'github.com (15)',
+        title: 'github.com',
       });
     });
 

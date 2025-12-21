@@ -110,10 +110,9 @@ async function mergeDuplicateGroups() {
         try {
           await chrome.tabs.group({ tabIds: allSourceTabIds, groupId: targetGroupData.group.id });
 
-          // Update target group title with new count
-          const newTabCount = targetGroupData.tabCount + allSourceTabIds.length;
+          // Update target group title
           await chrome.tabGroups.update(targetGroupData.group.id, {
-            title: `${baseName} (${newTabCount})`
+            title: baseName
           });
 
           mergedGroups += sourceGroupsData.length;
