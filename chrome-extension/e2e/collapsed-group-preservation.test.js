@@ -190,8 +190,8 @@ describe('Group State Preservation (Collapsed Groups)', () => {
     // Verify color is preserved
     expect(updatedGroup.color).toBe(initialColor);
 
-    // Verify tab count updated
-    expect(updatedGroup.title).toBe('github.com (5)'); // 3 initial + 2 additional
+    // Verify title is preserved
+    expect(updatedGroup.title).toBe('github.com');
 
     console.log('✅ Collapsed state was preserved.');
   }, 90000);

@@ -92,7 +92,7 @@ describe('Base Domain Grouping and Edge Cases', () => {
     // Should have one group for github.com (all subdomains grouped together)
     const githubGroup = groups.find(g => g.title.includes('github.com'));
     expect(githubGroup).toBeDefined();
-    expect(githubGroup.title).toBe('github.com (3)');
+    expect(githubGroup.title).toBe('github.com');
 
     console.log('✅ Subdomains grouped by base domain.');
   }, 90000);
@@ -213,7 +213,7 @@ describe('Base Domain Grouping and Edge Cases', () => {
 
     const githubGroup = groups.find(g => g.title.includes('github.com'));
     expect(githubGroup).toBeDefined();
-    expect(githubGroup.title).toBe('github.com (2)');
+    expect(githubGroup.title).toBe('github.com');
 
     console.log('✅ Chrome internal pages skipped.');
   }, 90000);

@@ -102,7 +102,7 @@ describe('Cross-Window Tab Organization', () => {
     // Should have created github group with all tabs from both windows
     const githubGroup = groups.find(g => g.title.includes('github.com'));
     expect(githubGroup).toBeDefined();
-    expect(githubGroup.title).toBe('github.com (3)');
+    expect(githubGroup.title).toBe('github.com');
 
     console.log('✅ Cross-window consolidation passed!');
   }, 120000);
@@ -164,7 +164,7 @@ describe('Cross-Window Tab Organization', () => {
 
     const githubGroup = groups.find(g => g.title.includes('github.com'));
     expect(githubGroup).toBeDefined();
-    expect(githubGroup.title).toBe('github.com (2)'); // react + vue (angular duplicate removed)
+    expect(githubGroup.title).toBe('github.com'); // react + vue (angular duplicate removed)
 
     console.log('✅ Cross-window duplicate removal passed!');
   }, 120000);
@@ -216,7 +216,7 @@ describe('Cross-Window Tab Organization', () => {
 
     const developmentGroup = groups.find(g => g.title.includes('Development'));
     expect(developmentGroup).toBeDefined();
-    expect(developmentGroup.title).toBe('Development (4)');
+    expect(developmentGroup.title).toBe('Development');
 
     console.log('✅ Cross-window category organization passed!');
   }, 120000);
@@ -282,7 +282,7 @@ describe('Cross-Window Tab Organization', () => {
 
     const githubGroup = groups.find(g => g.title.includes('github.com'));
     expect(githubGroup).toBeDefined();
-    expect(githubGroup.title).toBe('github.com (3)'); // Only the 3 github tabs
+    expect(githubGroup.title).toBe('github.com');
 
     console.log('✅ Chrome internal pages skipped correctly!');
   }, 120000);

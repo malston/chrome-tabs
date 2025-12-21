@@ -117,8 +117,8 @@ describe('Tab Movement, Ungrouping, Mixed Operations', () => {
     const githubGroup = initialGroups.find(g => g.title.includes('github.com'));
     const googleGroup = initialGroups.find(g => g.title.includes('google.com'));
 
-    expect(githubGroup.title).toBe('github.com (3)');
-    expect(googleGroup.title).toBe('google.com (2)');
+    expect(githubGroup.title).toBe('github.com');
+    expect(googleGroup.title).toBe('google.com');
 
     // Navigate a GitHub tab to google.com
     console.log('Changing one GitHub tab to google.com...');
@@ -152,8 +152,8 @@ describe('Tab Movement, Ungrouping, Mixed Operations', () => {
     const updatedGoogle = updatedGroups.find(g => g.title.includes('google.com'));
 
     // GitHub should have 1 less, Google should have 1 more
-    expect(updatedGithub.title).toBe('github.com (2)');
-    expect(updatedGoogle.title).toBe('google.com (3)');
+    expect(updatedGithub.title).toBe('github.com');
+    expect(updatedGoogle.title).toBe('google.com');
 
     console.log('✅ Tab moved between groups correctly.');
   }, 120000);
@@ -183,7 +183,7 @@ describe('Tab Movement, Ungrouping, Mixed Operations', () => {
     console.log('Groups before closing tab:', groupsBefore);
     const exampleGroup = groupsBefore.find(g => g.title.includes('example.com'));
     expect(exampleGroup).toBeDefined();
-    expect(exampleGroup.title).toBe('example.com (2)');
+    expect(exampleGroup.title).toBe('example.com');
 
     // Close one example.com tab
     console.log('Closing one example.com tab...');
@@ -283,11 +283,11 @@ describe('Tab Movement, Ungrouping, Mixed Operations', () => {
     // Should have created stackoverflow group
     const stackoverflowGroup = groupsAfter.find(g => g.title.includes('stackoverflow.com'));
     expect(stackoverflowGroup).toBeDefined();
-    expect(stackoverflowGroup.title).toBe('stackoverflow.com (3)');
+    expect(stackoverflowGroup.title).toBe('stackoverflow.com');
 
     // Should have updated github group (2 initial + 2 new = 4)
     const githubGroup = groupsAfter.find(g => g.title.includes('github.com'));
-    expect(githubGroup.title).toBe('github.com (4)');
+    expect(githubGroup.title).toBe('github.com');
 
     console.log('✅ Mixed create and update worked correctly.');
   }, 120000);
