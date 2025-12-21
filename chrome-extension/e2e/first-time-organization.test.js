@@ -143,11 +143,9 @@ describe('First-Time Organization (Create New Groups)', () => {
     // Verify we have 3 groups (github, google, example)
     expect(groups.length).toBe(3);
 
-    // Verify group titles match expected domains
+    // Verify group titles match expected domains (no longer include tab counts)
     const groupTitles = groups.map(g => g.title).sort();
-    expect(groupTitles).toContain('example.com (3)');
-    expect(groupTitles).toContain('github.com (5)');
-    expect(groupTitles).toContain('google.com (4)');
+    expect(groupTitles).toEqual(['example.com', 'github.com', 'google.com']);
 
     // Step 5: Verify tabs are sorted alphabetically within each group
     const tabs = await serviceWorker.evaluate(async () => {
