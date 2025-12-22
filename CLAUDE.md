@@ -108,7 +108,7 @@ chrome-extension/
 - Tabs are sorted alphabetically by title within each group
 - Only groups with 2+ tabs are created (singles remain ungrouped)
 - Chrome internal pages (`chrome://`, `chrome-extension://`, `about:`) are skipped
-- Each group shows name and tab count: `github.com (25)`
+- Each group shows name only: `github.com`
 - Colors rotate through: blue, red, yellow, green, pink, purple, cyan, orange
 - Bookmark save/restore automatically manages Tab Organizer bookmark folders with timestamps
 - Merge duplicate groups respects protected groups (protected groups absorb but never dissolve)

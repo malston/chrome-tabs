@@ -210,9 +210,9 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
           await chrome.tabs.ungroup(toRemove);
         }
 
-        // Update group title with new count (preserve color and collapsed state)
+        // Update group title (preserve color and collapsed state)
         await chrome.tabGroups.update(existingGroup.id, {
-          title: `${groupName} (${newTabIds.length})`
+          title: groupName
         });
 
         groupsUpdated++;
@@ -221,7 +221,7 @@ async function organizeTabs(mode = 'domain', allWindows = false) {
         const groupId = await chrome.tabs.group({ tabIds: newTabIds });
 
         await chrome.tabGroups.update(groupId, {
-          title: `${groupName} (${newTabIds.length})`,
+          title: groupName,
           color: getNextColor(),
           collapsed: false
         });

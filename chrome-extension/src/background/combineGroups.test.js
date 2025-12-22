@@ -59,7 +59,7 @@ describe('combineGroups', () => {
         groupId: 2,
       });
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(2, {
-        title: 'Development (7)',
+        title: 'Development',
       });
       expect(result).toEqual({
         sourceGroupNames: ['Documentation'],
@@ -132,7 +132,7 @@ describe('combineGroups', () => {
         groupId: 2,
       });
       expect(chrome.tabGroups.update).toHaveBeenCalledWith(2, {
-        title: 'Development (9)',
+        title: 'Development',
       });
       expect(result).toEqual({
         sourceGroupNames: ['Documentation', 'Research'],
