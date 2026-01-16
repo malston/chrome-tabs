@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-01-16
+
+### Changed
+
+- **Automatic duplicate removal during organize** (#58) - Duplicate tabs are now automatically removed when organizing by domain or category, eliminating the need for a separate "Remove Duplicates" button
+- **Cleaner group names** (#59) - Tab groups now display only the domain/category name without tab counts for a cleaner appearance
+
+### Removed
+
+- Standalone "Remove Duplicates" button - Duplicate removal is now integrated into organize operations
+
+### Fixed
+
+- E2E test stability improvements for duplicate removal and group organization
+
 ## [1.5.0] - 2025-12-06
 
 ### Added
